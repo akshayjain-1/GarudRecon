@@ -2,9 +2,15 @@
   <img src="img/GarudRecon_banner2.png" alt="GarudRecon"></a>
 </h1>
 
-[![License](https://img.shields.io/badge/license-MIT-_red.svg)](https://opensource.org/licenses/MIT)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/rix4uni/axiom/issues)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/rix4uni.svg?logo=twitter)](https://twitter.com/rix4uni)
+<p align="center">
+<a href="#"><img src="https://madewithlove.org.in/badge.svg"></a>
+<a href="https://ko-fi.com/rix4uni"><img src="https://img.shields.io/badge/buy%20me%20a%20ko--fi%20-donate-red"></a>
+<a href="https://x.com/rix4uni"><img src="https://img.shields.io/badge/twitter-%40rix4uni-blue.svg"></a>
+<a href="https://github.com/rix4uni/GarudRecon/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://github.com/rix4uni/GarudRecon/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+<a href="#"><img src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg"></a>
+<a href="https://github.com/rix4uni?tab=followers"><img src="https://img.shields.io/badge/github-%40rix4uni-orange"></a>
+</p>
 
 ## GarudRecon
 
