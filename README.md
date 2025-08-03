@@ -103,6 +103,9 @@ Use "garudrecon [command] --help" for more information about a command.
 
 ```
 ```
+
+#### Output
+<img src="img/output/mediumscope.png"/>
 </details>
 
 
@@ -140,6 +143,9 @@ Example:
 # Combined
   garudrecon mediumscope -d dell.com -rx -ef "AMASS"
 ```
+
+#### Output
+<img src="img/output/mediumscope.png"/>
 </details>
 
 
@@ -148,6 +154,9 @@ Example:
 
 ```
 ```
+
+#### Output
+<img src="img/output/mediumscope.png"/>
 </details>
 
 
