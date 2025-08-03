@@ -99,6 +99,14 @@ Use "garudrecon [command] --help" for more information about a command.
 
 
 <details open>
+  <summary><b>garudrecon install -h</b></summary>
+
+```
+```
+</details>
+
+
+<details open>
   <summary><b>garudrecon smallscope -h</b></summary>
 
 ```
