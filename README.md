@@ -121,35 +121,39 @@ Use "garudrecon [command] --help" for more information about a command.
   <summary><b>garudrecon mediumscope -h</b></summary>
 
 ```
-This command utilizes a web scraping approach to collect subdomains of the specified domain.
+Usually the scope is wildcard scope where all the subdomains are part of scope. like: Scope: *.domain.com
 
 Usage:
   garudrecon mediumscope [flags]
 
 Flags:
-  -rx, --recon-xss                      Run full recon with XSS checks"
-  -rs, --recon-sqli                     Run full recon with SQLi checks"
-  -rl, --recon-lfi                      Run full recon with LFI checks"
-  -rst, --recon-subtakeover             Run full recon with Subdomain Takeover checks"
-  -rr, --recon-rce                      Run full recon with RCE checks"
-  -ri, --recon-iis                      Run full recon with IIS checks"
+  -d, --domain                          Scan a domain (e.g. domain.com)
+  -ef, --exclude-functions              Exclude a function from running (e.g. AMASS)
+  -rx, --recon-xss                      Run full recon with XSS checks
+  -rs, --recon-sqli                     Run full recon with SQLi checks
+  -rl, --recon-lfi                      Run full recon with LFI checks
+  -rst, --recon-subtakeover             Run full recon with Subdomain Takeover checks
+  -rr, --recon-rce                      Run full recon with RCE checks
+  -ri, --recon-iis                      Run full recon with IIS checks
+  -oos, --outofscope                    Exclude outofscope subdomains from a list (e.g. domain.com.oos)
+  -config, --config                     Custom configuration file path
   -h, --help                            help for mediumscope
 
 Example:
 # Full recon
-  garudrecon mediumscope -d dell.com
+  garudrecon mediumscope -d domain.com
 
 # Recon with XSS only
-  garudrecon mediumscope -d dell.com -rx
+  garudrecon mediumscope -d domain.com -rx
 
 # Recon with SQLi only
-  garudrecon mediumscope -d dell.com -rs
+  garudrecon mediumscope -d domain.com -rs
 
 # Exclude functions manually
-  garudrecon mediumscope -d dell.com -ef "SUBFINDER,AMASS"
+  garudrecon mediumscope -d domain.com -ef "SUBFINDER,AMASS"
 
 # Combined
-  garudrecon mediumscope -d dell.com -rx -ef "AMASS"
+  garudrecon mediumscope -d domain.com -rx -ef "AMASS"
 ```
 
 #### Output
