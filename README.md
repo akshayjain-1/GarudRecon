@@ -86,6 +86,21 @@ After that i tried in python, golang but i did'nt liked "String Concatenation", 
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
 ```
 
+### Download prebuilt binaries
+```
+wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.0.4.zip
+unzip v0.0.4.zip
+cd GarudRecon
+garudrecon install -f ALL
+```
+
+### Using Git Clone
+```
+git clone --depth 1 https://github.com/rix4uni/GarudRecon.git
+cd GarudRecon
+garudrecon install -f ALL
+```
+
 ## Usage
 
 <details>

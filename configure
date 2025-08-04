@@ -13,7 +13,7 @@ mv GarudRecon/garudrecon /usr/bin/
 chmod +x ~/.garudrecon/cmd/* /usr/bin/garudrecon
 
 # install tools
-garudrecon install
+garudrecon install -f ALL
 
 # send config files
 cp -r GarudRecon/.config/* ~/.config
