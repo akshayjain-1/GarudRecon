@@ -219,7 +219,7 @@ Example:
 ```
 
 #### Output
-<img src="img/output/mediumscope.png"/>
+<img src="img/output/smallscope.png"/>
 </details>
 
 

@@ -1784,7 +1784,7 @@ else
 	# run "TIMEBASEDSQLI"
 	# run "LFI"
 	run "RCE"
-	run "DOTGIT"
+	# run "DOTGIT"
 	run "PDFTOTEXT"
 	# run "JSLEAKS"
 	# run "JSONLEAKS"
