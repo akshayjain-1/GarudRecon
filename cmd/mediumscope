@@ -216,9 +216,6 @@ mkdir -p "$ROOT_INPUTFILES"
 mkdir -p "$ROOT_WORDLISTDIR"
 
 # Creating files
-touch "$ROOT_INPUTFILES/targets.txt"
-touch "$ROOT_INPUTFILES/inscope.txt"
-touch "$ROOT_INPUTFILES/outofscope.txt"
 touch "$ROOT_INPUTFILES/crunchbase.txt"
 touch "$ROOT_INPUTFILES/manual_google_dorking.txt"
 
