@@ -14,7 +14,28 @@
 
 ## GarudRecon
 
-An automated recon tool for asset discovery and vulnerability scanning using open-source tools. Supports XSS, SQLi, LFI, RCE, IIS, Open Redirect, Swagger UI, .git exposures and more.
+GarudRecon - Recon Automation Framework
+
+GarudRecon is an automated reconnaissance framework designed for asset discovery,
+vulnerability detection, and continuous monitoring. It leverages a wide range of
+open-source tools to scan domains, collect subdomains, and check for various
+vulnerabilities such as:
+
+- XSS (Cross-Site Scripting)
+- SQLi (SQL Injection)
+- LFI (Local File Inclusion)
+- RCE (Remote Code Execution)
+- IIS misconfigurations
+- Subdomain Takeover
+- Open Redirects
+- Swagger UI exposures
+- .git directory leaks
+- JavaScript secrets and more.
+
+The tool supports scoped recon with flexible modes like `smallscope`, `mediumscope`,
+and `largescope`, depending on your coverage needs. You can customize scans,
+exclude specific functions, provide configuration files, and automate cron jobs
+for continuous monitoring.
 
 ## History
 I created GarudRecon in 2022 but I deleted because some of api keys leaked here someone forked [GarudRecon](https://github.com/polling-repo-continua/GarudRecon)
