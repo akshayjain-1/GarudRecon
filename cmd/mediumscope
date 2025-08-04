@@ -1139,7 +1139,7 @@ MASSCAN(){
 	START_SPINNER "${BGREEN}MASSCAN${RESET}"
 
 	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
-	masscan -p1-65535 -iL final-ips.txt --max-rate 10000 -oG $TARGET_OUTPUT
+	masscan -p1-65535 -iL ${ROOT_SUBDOMAINDIR}/allsubs.txt --max-rate 10000
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] MASSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/naabu.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
