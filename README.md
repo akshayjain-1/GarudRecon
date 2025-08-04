@@ -200,6 +200,7 @@ Flags:
   -d, --domain                  Domain to monitor
   -f, --function                Function to run (e.g. MONITOR_SUBDOMAIN)
   -c, --config                  Custom configuration file path
+  -i, --interval                Customize the sleep duration (e.g. 1800)
   -v, --verbose                 enable verbose mode
   -h, --help                    help for cronjobs
 

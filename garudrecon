@@ -37,7 +37,7 @@ Available Commands:
   smallscope              Run minimal recon for subdomain (e.g. support.domain.com)
   mediumscope             Perform moderate recon with optional vulnerability checks for wildcard domain (e.g. *.domain.com)
   largescope              Full-scale recon for deep visibility for organisation
-  cronjobs                Automate recurring recon tasks
+  cronjobs                Automate recurring recon tasks continuously
 
 Flags:
   -h, --help     help for garudrecon

@@ -6,6 +6,7 @@ CONFIG_PATH="configuration/garudrecon.cfg"
 TARGET=""
 
 VERBOSE=false
+CRONJOBS_SLEEP_INTERVAL=3600  # default: 1 hour
 
 # Help function
 function show_help() {
@@ -19,6 +20,7 @@ Flags:
   -d, --domain			Domain to monitor
   -f, --function		Function to run (e.g. MONITOR_SUBDOMAIN)
   -c, --config   		Custom configuration file path
+  -i, --interval		Customize the sleep duration (e.g. 1800)
   -v, --verbose 		enable verbose mode
   -h, --help   			help for cronjobs
 
@@ -53,6 +55,10 @@ while [[ "$#" -gt 0 ]]; do
       FUNC="$2"
       shift 2
       ;;
+    -i|--interval)
+		  CRONJOBS_SLEEP_INTERVAL="$2"
+		  shift 2
+		  ;;
     -c|--config)
       CONFIG_PATH="$2"
       shift 2
@@ -278,5 +284,12 @@ MONITOR_JSLEAKS(){
 }
 
 
-# Dynamically call the selected function
-$FUNC
+# Run the selected function in an infinite loop
+while true; do
+  # Dynamically run the selected monitoring function
+  $FUNC
+  
+  echo -e "${BYELLOW}[i] Sleeping for $CRONJOBS_SLEEP_INTERVAL seconds before next run...${RESET}\n"
+
+  sleep "$CRONJOBS_SLEEP_INTERVAL"
+done
