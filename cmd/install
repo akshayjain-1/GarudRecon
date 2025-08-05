@@ -114,6 +114,9 @@ STOP_SPINNER() {
     return $TIME
 }
 
+STARTED_AT=$(date +"%d-%m-%Y_%H:%M:%S")
+START_EPOCH=$(date +%s)
+
 echo -e "Using $CONFIG_PATH"
 
 
@@ -3123,6 +3126,16 @@ ALL(){
 
 # Dynamically call the selected function
 $FUNC
+
+
+ENDED_AT=$(date +"%d-%m-%Y_%H:%M:%S")
+END_EPOCH=$(date +%s)
+
+DURATION=$(( END_EPOCH - START_EPOCH ))
+TIMETOOK=$(printf "%02d:%02d:%02d" $((DURATION/3600)) $(( (DURATION%3600)/60 )) $((DURATION%60)) )
+
+echo -e "${BGREEN}[+] STARTED${RESET}: ${STARTED_AT}, ${BGREEN}FINISHED${RESET}: ${ENDED_AT}, ${BGREEN}TIMETOOK${RESET}: ${TIMETOOK}"
+
 
 # https://github.com/Screetsec/Sudomy
 
