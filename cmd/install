@@ -2897,7 +2897,7 @@ WORDLISTS() {
     rm -rf $WORDLIST_BASEDIR/top-subdomain-list
 
     rm -rf $WORDLIST_BASEDIR/n0kovo_subdomains && git clone https://github.com/n0kovo/n0kovo_subdomains.git --depth 1 $WORDLIST_BASEDIR/n0kovo_subdomains &>/dev/null
-    mv $WORDLIST_BASEDIR/n0kovo_subdomains/*.txt wordlists
+    mv $WORDLIST_BASEDIR/n0kovo_subdomains/*.txt $WORDLIST_BASEDIR
     rm -rf $WORDLIST_BASEDIR/n0kovo_subdomains
 
     STOP_SPINNER
