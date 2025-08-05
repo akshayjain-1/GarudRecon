@@ -1,25 +1,45 @@
 git clone https://github.com/rix4uni/GarudRecon.git --depth 1
 
+cd GarudRecon
+
 # create garudrecon directory if not exit
-mkdir -p ~/.garudrecon
+mkdir -p $HOME/.garudrecon
+
+# delete all files/directory in $HOME/.garudrecon except scans directory
+find $HOME/.garudrecon -mindepth 1 -maxdepth 1 ! -name scans ! -name cronjobscan -exec rm -rf {} +
 
 # send important files
-mv GarudRecon/cmd/* GarudRecon/configuration/* ~/.garudrecon/
+mv cmd/ configuration/ $HOME/.garudrecon
 
 # make it garudrecon globally
-mv GarudRecon/garudrecon /usr/bin/
+mv garudrecon /usr/bin/
 
 # make it excutble
-chmod +x ~/.garudrecon/cmd/* /usr/bin/garudrecon
+chmod +x $HOME/.garudrecon/cmd/* /usr/bin/garudrecon
+
+# set path to access globally
+sed -i -e 's|source "configuration/garudrecon.cfg"|source "$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|bash "$(dirname "\$0")/cmd/\(.*\)"|bash "$HOME/.garudrecon/cmd/\1"|' /usr/bin/garudrecon
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/install
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/smallscope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/mediumscope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/largescope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="cronjobscan"|BASEDIR="$HOME/.garudrecon/cronjobscan"|' $HOME/.garudrecon/cmd/cronjobs
+
+sed -i -e 's|mkdir -p wordlists|mkdir -p $HOME/.garudrecon/wordlists|' -e 's|mkdir -p takeovers|mkdir -p $HOME/.garudrecon/takeovers|' -e 's|mkdir -p templates|mkdir -p $HOME/.garudrecon/templates|' $HOME/.garudrecon/cmd/install
+sed -i -e 's|cp -r ~/nuclei-templates/http/takeovers templates/takeovers|cp -r ~/nuclei-templates/http/takeovers $HOME/.garudrecon/templates/takeovers|' $HOME/.garudrecon/cmd/install
+sed -i -e 's|templates/takeovers/\*\.yaml|$HOME/.garudrecon/templates/takeovers/*.yaml|' $HOME/.garudrecon/cmd/install
+
 
 # install tools
 garudrecon install -f ALL
 
 # send config files
-cp -r GarudRecon/.config/* ~/.config
+cp -r .config/* $HOME/.config
 
 echo -e "Add api keys to these files:"
 find .config -type f | sed 's|^|~/|'
+
+cd ..
 
 # remove
 rm -rf GarudRecon

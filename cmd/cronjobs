@@ -99,12 +99,15 @@ PRINTBANNER
 # Check root user
 AREUROOTUSER
 
+# Base directory
+BASEDIR="cronjobscan"
+
 # Subdirectories within cronjobscan
-CRONJOBS_SUBDOMAINDIR="cronjobscan/subdomain"
-CRONJOBS_PORTSIR="cronjobscan/ports"
-CRONJOBS_ALIVE_SUBDOMAINDIR="cronjobscan/alivesubdomain"
-CRONJOBS_JSDIR="cronjobscan/javascript"
-CRONJOBS_JSLEAKSDIR="cronjobscan/javascriptleaks"
+CRONJOBS_SUBDOMAINDIR="$BASEDIR/subdomain"
+CRONJOBS_PORTSIR="$BASEDIR/ports"
+CRONJOBS_ALIVE_SUBDOMAINDIR="$BASEDIR/alivesubdomain"
+CRONJOBS_JSDIR="$BASEDIR/javascript"
+CRONJOBS_JSLEAKSDIR="$BASEDIR/javascriptleaks"
 
 # Creating directories
 mkdir -p "$CRONJOBS_SUBDOMAINDIR"
