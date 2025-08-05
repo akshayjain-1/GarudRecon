@@ -28,6 +28,7 @@ sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garu
 sed -i -e 's|mkdir -p wordlists|mkdir -p $HOME/.garudrecon/wordlists|' -e 's|mkdir -p takeovers|mkdir -p $HOME/.garudrecon/takeovers|' -e 's|mkdir -p templates|mkdir -p $HOME/.garudrecon/templates|' $HOME/.garudrecon/cmd/install
 sed -i -e 's|cp -r ~/nuclei-templates/http/takeovers templates/takeovers|cp -r ~/nuclei-templates/http/takeovers $HOME/.garudrecon/templates/takeovers|' $HOME/.garudrecon/cmd/install
 sed -i -e 's|templates/takeovers/\*\.yaml|$HOME/.garudrecon/templates/takeovers/*.yaml|' $HOME/.garudrecon/cmd/install
+sed -i -e 's|WORDLIST_BASEDIR="wordlists"|WORDLIST_BASEDIR="$HOME/.garudrecon/wordlists"|' $HOME/.garudrecon/configuration/garudrecon.cfg
 
 
 # install tools
@@ -36,7 +37,7 @@ garudrecon install -f ALL
 # send config files
 cp -r .config/* $HOME/.config
 
-echo -e "Add api keys to these files:"
+echo -e "\nAdd api keys to these files:"
 find .config -type f | sed 's|^|~/|'
 
 cd ..
