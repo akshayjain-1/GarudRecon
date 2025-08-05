@@ -2756,10 +2756,6 @@ RECON(){
 	# run "X8"
 	run "ALLURLS"
 	run "MANUAL_ALLURLS_FILTER"
-
-
-	# Delete TMPDIR files
-	run "DELETE_TMPDIR"
 }
 
 # Run functions based on selected recon mode
@@ -2767,23 +2763,41 @@ if [[ "$RECON_XSS" == true ]]; then
     RECON
     run "XSS"
     run "SWAGGERUI"
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
 elif [[ "$RECON_SQLI" == true ]]; then
     RECON
     run "ERRORBASEDSQLI"
 	# run "TIMEBASEDSQLI"
+
+	# Delete TMPDIR files
+	run "DELETE_TMPDIR"
 elif [[ "$RECON_LFI" == true ]]; then
     RECON
     run "LFI"
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
 elif [[ "$RECON_SUBTAKEOVER" == true ]]; then
     RECON
     run "SUBZY"
 	run "NUCLEI"
+
+	# Delete TMPDIR files
+	run "DELETE_TMPDIR"
 elif [[ "$RECON_RCE" == true ]]; then
     RECON
     run "RCE"
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
 elif [[ "$RECON_IIS" == true ]]; then
     RECON
     run "IIS"
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
 else
     # Default behavior: run all
     # Subdomain Enumeration
