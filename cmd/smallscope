@@ -884,7 +884,7 @@ PARAMFINDER(){
 	fi
 
 	# Common steps for both TRUE and FALSE conditions
-	cat ${URLSDIR}/paramfinderlinks.txt | paramfinder --silent --insecure -c ${PARAMFINDER_THREADS} --timeout ${PARAMFINDER_TIMEOUT} | grep 'TRANSFORM_URL:' | sed 's/^TRANSFORM_URL: //' | unew -el -i -t -q ${URLSDIR}/paramfinder.urls
+	timelimitx -t ${PARAMFINDER_TIMELIMITX} "cat ${URLSDIR}/paramfinderlinks.txt | paramfinder --silent --insecure -c ${PARAMFINDER_THREADS} --timeout ${PARAMFINDER_TIMEOUT} | grep 'TRANSFORM_URL:' | sed 's/^TRANSFORM_URL: //' | unew -el -i -t -q ${URLSDIR}/paramfinder.urls" &>/dev/null
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/urls/paramfinder.urls 2>/dev/null | unew -el -i -t -q ${URLSDIR}/paramfinder.urls
@@ -1444,9 +1444,9 @@ JSLEAKS(){
 
 	cat urls.txt | egrep -av "\.json" | grep -a "\.js" | linkinspector -silent -nc -mt "application/javascript" | awk '{print $1}' | unew -el -t -q js-links.txt
 	cat js-links.txt | nuclei -duc -silent -nc -t ~/nuclei-templates/exposures/ | unew js-leaks.txt
-	trufflehog
-	secretfinder
-	mantra
+	# trufflehog
+	# secretfinder
+	# mantra
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] JSLEAKS${RESET}: $(wc -l 2>/dev/null < ${ROOT_VULNDIR}/jsleaks.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1626,7 +1626,7 @@ RECON(){
 
 	# Google Dorking
 	# run "AUTOMATED_GOOGLE_DORKING"
-	# run "MANUAL_GOOGLE_DORKING"
+	run "MANUAL_GOOGLE_DORKING"
 
 
 	# JS Crawling
@@ -1645,8 +1645,8 @@ RECON(){
 
 	# Hidden Parameter
 	run "PARAMFINDER"
-	# run "MSARJUN"
-	# run "X8"
+	run "MSARJUN"
+	run "X8"
 	run "ALLURLS"
 	run "MANUAL_ALLURLS_FILTER"
 
@@ -1724,7 +1724,7 @@ else
 
 	# Google Dorking
 	# run "AUTOMATED_GOOGLE_DORKING"
-	# run "MANUAL_GOOGLE_DORKING"
+	run "MANUAL_GOOGLE_DORKING"
 
 
 	# JS Crawling
@@ -1743,8 +1743,8 @@ else
 
 	# Hidden Parameter
 	run "PARAMFINDER"
-	# run "MSARJUN"
-	# run "X8"
+	run "MSARJUN"
+	run "X8"
 	run "ALLURLS"
 	run "MANUAL_ALLURLS_FILTER"
 
@@ -1779,14 +1779,14 @@ else
 	run "FTP"
 	# run "SSH"
 	run "VULNTECHX"
-	# run "XSS"
+	run "XSS"
 	run "ERRORBASEDSQLI"
-	# run "TIMEBASEDSQLI"
-	# run "LFI"
+	run "TIMEBASEDSQLI"
+	run "LFI"
 	run "RCE"
 	# run "DOTGIT"
 	run "PDFTOTEXT"
-	# run "JSLEAKS"
+	run "JSLEAKS"
 	# run "JSONLEAKS"
 	# run "GITHUBLEAKS"
 	run "IIS"
