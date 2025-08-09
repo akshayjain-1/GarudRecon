@@ -122,6 +122,42 @@ START_EPOCH=$(date +%s)
 echo -e "Using $CONFIG_PATH"
 
 
+UNEW() {
+    START_SPINNER "${BGREEN}UNEW${RESET}"
+    gocl -i github.com/rix4uni/unew &>/dev/null
+
+    if ! command -v unew &>/dev/null; then
+        echo -e "${BRED}[x] UNEW - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] UNEW - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
+UNEWFLUSH() {
+    START_SPINNER "${BGREEN}UNEWFLUSH${RESET}"
+    # This is unew flush version only for gungnir saves output immediately in a file.
+    git clone https://github.com/rix4uni/unew.git --depth 1 unewflush &>/dev/null
+    cd unewflush
+    mv unew.go unewflush.go
+    sed -i 's/unew/unewflush/' go.mod
+    sed -i '/w\.WriteString(line + "\\n")/a \\t\t\t\t\tw.Flush() // Flush immediately after writing' unewflush.go
+    go install &>/dev/null
+    cd ..
+    rm -rf unewflush
+
+    if ! command -v unewflush &>/dev/null; then
+        echo -e "${BRED}[x] UNEWFLUSH - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] UNEWFLUSH - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
 # VARIABLES
 VARIABLES() {
     START_SPINNER "${BGREEN}VARIABLES${RESET}"
@@ -1437,42 +1473,6 @@ TECHX() {
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] TECHX - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
-}
-
-UNEW() {
-    START_SPINNER "${BGREEN}UNEW${RESET}"
-    gocl -i github.com/rix4uni/unew &>/dev/null
-
-    if ! command -v unew &>/dev/null; then
-        echo -e "${BRED}[x] UNEW - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
-        STOP_SPINNER
-        return
-    fi
-
-    STOP_SPINNER
-    echo -e "${BGREEN}[+] UNEW - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
-}
-
-UNEWFLUSH() {
-    START_SPINNER "${BGREEN}UNEWFLUSH${RESET}"
-    # This is unew flush version only for gungnir saves output immediately in a file.
-    git clone https://github.com/rix4uni/unew.git --depth 1 unewflush &>/dev/null
-    cd unewflush
-    mv unew.go unewflush.go
-    sed -i 's/unew/unewflush/' go.mod
-    sed -i '/w\.WriteString(line + "\\n")/a \\t\t\t\t\tw.Flush() // Flush immediately after writing' unewflush.go
-    go install &>/dev/null
-    cd ..
-    rm -rf unewflush
-
-    if ! command -v unewflush &>/dev/null; then
-        echo -e "${BRED}[x] UNEWFLUSH - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
-        STOP_SPINNER
-        return
-    fi
-
-    STOP_SPINNER
-    echo -e "${BGREEN}[+] UNEWFLUSH - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 IP2ORG() {
