@@ -76,6 +76,14 @@ After that i tried in python, golang but i did'nt liked "String Concatenation", 
 
 ## Installation
 
+> **Note:** Switch to the **root** user first (instead of using `sudo su`) before running the installation command.  
+> This helps avoid permission and environment-related issues.  
+>  
+> If any tool fails to install during the script execution, install it manually.  
+>  
+> Make sure your shell is set to **bash**.
+
+
 ### Docker
 ```
 
