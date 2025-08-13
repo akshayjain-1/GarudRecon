@@ -13,6 +13,10 @@ RECON_SUBTAKEOVER=false
 RECON_RCE=false
 RECON_IIS=false
 
+# New variable
+RESUME_MODE=false
+RESUME_TARGET=""
+
 # Help function
 function show_help() {
   cat <<EOF
@@ -32,6 +36,7 @@ Flags:
   -ri, --recon-iis 	   		Run full recon with IIS checks
   -oos, --outofscope			Exclude outofscope subdomains from a list (e.g. domain.com.oos)
   -c, --config				Custom configuration file path
+  -r, --resume <scan_folder>   		Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume domain.com or --resume domain.com_1). Skips functions already completed in resume.cfg.
   -h, --help				help for mediumscope
 
 Example:
@@ -49,6 +54,9 @@ Example:
 
 # Combined
   garudrecon mediumscope -d domain.com -rx -ef "AMASS"
+
+# Skips functions already completed in resume.cfg.
+  garudrecon mediumscope -d domain.com -rx --resume domain.com_1
 EOF
 }
 
@@ -116,6 +124,11 @@ while [[ "$#" -gt 0 ]]; do
             CONFIG_PATH="$2"
             shift 2
             ;;
+	-r|--resume)
+            RESUME_MODE=true
+            RESUME_TARGET="$2"
+            shift 2
+            ;;
         -h|--help)
 	        show_help
 	        exit 0
@@ -130,7 +143,7 @@ done
 # Escape dots in domain for regex
 ESCAPED_TARGET=$(echo "$TARGET" | sed 's/\./\\./g')
 
-if [[ -z "$TARGET" ]]; then
+if [[ -z "$TARGET" && "$RESUME_MODE" == false ]]; then
     echo "Error: Target domain is required. Use -d <domain>"
     exit 1
 fi
@@ -151,93 +164,146 @@ AREUROOTUSER
 # Base directory
 BASEDIR="scans"
 
-# Function to generate a unique directory name
-generate_unique_dir(){
-    local dir_path="$BASEDIR/$TARGET"
-    local counter=1
-    
-    while [ -d "$dir_path" ]; do
-        dir_path="$BASEDIR/${TARGET}_$counter"
-        ((counter++))
-    done
+# Track completed functions from resume.cfg
+COMPLETED_FUNCS=()
 
-    echo "$dir_path"
-}
+if [[ "$RESUME_MODE" == true ]]; then
+    UNIQUEDOMAINDIR="$BASEDIR/$RESUME_TARGET"
+    RESUMELOGFILE="$UNIQUEDOMAINDIR/resume.cfg"
+    if [[ -f "$RESUMELOGFILE" ]]; then
+        # Remove colors, remove everything after colon, then extract function name
+        mapfile -t COMPLETED_FUNCS < <(sed 's/\x1b\[[0-9;]*m//g' "$RESUMELOGFILE" | cut -d':' -f1 | awk '{print $2}')
+    else
+        echo "Error: Resume file '$RESUMELOGFILE' not found."
+        exit 1
+    fi
 
-# Generate unique domain directory
-UNIQUEDOMAINDIR=$(generate_unique_dir)
-TMPDIR="$UNIQUEDOMAINDIR/.tmp"
+    # Use these variables in RESUME_MODE also
+	TMPDIR="$UNIQUEDOMAINDIR/.tmp"
 
-# Subdirectories within .tmp
-SUBDOMAINDIR="$TMPDIR/subdomain"
-FFUFBRUTE="$TMPDIR/ffufbrute"
-FAVICON_HASH="$TMPDIR/favicon_hash"
-SCREENSHOTS="$TMPDIR/screenshots"
-URLSDIR="$TMPDIR/urls"
-VULNDIR="$TMPDIR/vuln"
-GITHUB_ENDPOINTSDIR="$URLSDIR/github_endpoints"
-CRAWLEYDIR="$URLSDIR/crawley"
-CARIDDIDIR="$URLSDIR/cariddi"
-XCRAWL3RDIR="$URLSDIR/xcrawl3r"
-GOLINKFINDERDIR="$URLSDIR/GoLinkFinder"
-AUTOMATED_GOOGLE_DORKINGDIR="$URLSDIR/dorks_hunter"
-SOURCEMAPPERDIR="$URLSDIR/sourcemapper"
-FTPDIR="$VULNDIR/ftp"
-IISIDR="$VULNDIR/iis"
-DOTGITDIR="$VULNDIR/dotgit"
-PDFTOTEXTDIR="$VULNDIR/pdftotext"
+	# Subdirectories within .tmp
+	SUBDOMAINDIR="$TMPDIR/subdomain"
+	FFUFBRUTE="$TMPDIR/ffufbrute"
+	FAVICON_HASH="$TMPDIR/favicon_hash"
+	SCREENSHOTS="$TMPDIR/screenshots"
+	URLSDIR="$TMPDIR/urls"
+	VULNDIR="$TMPDIR/vuln"
+	GITHUB_ENDPOINTSDIR="$URLSDIR/github_endpoints"
+	CRAWLEYDIR="$URLSDIR/crawley"
+	CARIDDIDIR="$URLSDIR/cariddi"
+	XCRAWL3RDIR="$URLSDIR/xcrawl3r"
+	GOLINKFINDERDIR="$URLSDIR/GoLinkFinder"
+	AUTOMATED_GOOGLE_DORKINGDIR="$URLSDIR/dorks_hunter"
+	SOURCEMAPPERDIR="$URLSDIR/sourcemapper"
+	FTPDIR="$VULNDIR/ftp"
+	IISIDR="$VULNDIR/iis"
+	DOTGITDIR="$VULNDIR/dotgit"
+	PDFTOTEXTDIR="$VULNDIR/pdftotext"
 
-# Root-level directories in UNIQUEDOMAINDIR
-ROOT_SUBDOMAINDIR="$UNIQUEDOMAINDIR/subdomain"
-ROOT_URLSDIR="$UNIQUEDOMAINDIR/urls"
-ROOT_EMAILSDIR="$UNIQUEDOMAINDIR/emails"
-ROOT_VULNDIR="$UNIQUEDOMAINDIR/vuln"
-ROOT_INPUTFILES="$UNIQUEDOMAINDIR/inputfiles"
-ROOT_WORDLISTDIR="$UNIQUEDOMAINDIR/wordlist"
+	# Root-level directories in UNIQUEDOMAINDIR
+	ROOT_SUBDOMAINDIR="$UNIQUEDOMAINDIR/subdomain"
+	ROOT_URLSDIR="$UNIQUEDOMAINDIR/urls"
+	ROOT_EMAILSDIR="$UNIQUEDOMAINDIR/emails"
+	ROOT_VULNDIR="$UNIQUEDOMAINDIR/vuln"
+	ROOT_INPUTFILES="$UNIQUEDOMAINDIR/inputfiles"
+	ROOT_WORDLISTDIR="$UNIQUEDOMAINDIR/wordlist"
 
-ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
-RESUMELOGFILE="$UNIQUEDOMAINDIR/resume.cfg"
+	ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
+	RESUMELOGFILE="$UNIQUEDOMAINDIR/resume.cfg"
+else
+	# Function to generate a unique directory name
+	generate_unique_dir(){
+	    local dir_path="$BASEDIR/$TARGET"
+	    local counter=1
+	    
+	    while [ -d "$dir_path" ]; do
+	        dir_path="$BASEDIR/${TARGET}_$counter"
+	        ((counter++))
+	    done
+
+	    echo "$dir_path"
+	}
+
+	# Generate unique domain directory
+	UNIQUEDOMAINDIR=$(generate_unique_dir)
+	TMPDIR="$UNIQUEDOMAINDIR/.tmp"
+
+	# Subdirectories within .tmp
+	SUBDOMAINDIR="$TMPDIR/subdomain"
+	FFUFBRUTE="$TMPDIR/ffufbrute"
+	FAVICON_HASH="$TMPDIR/favicon_hash"
+	SCREENSHOTS="$TMPDIR/screenshots"
+	URLSDIR="$TMPDIR/urls"
+	VULNDIR="$TMPDIR/vuln"
+	GITHUB_ENDPOINTSDIR="$URLSDIR/github_endpoints"
+	CRAWLEYDIR="$URLSDIR/crawley"
+	CARIDDIDIR="$URLSDIR/cariddi"
+	XCRAWL3RDIR="$URLSDIR/xcrawl3r"
+	GOLINKFINDERDIR="$URLSDIR/GoLinkFinder"
+	AUTOMATED_GOOGLE_DORKINGDIR="$URLSDIR/dorks_hunter"
+	SOURCEMAPPERDIR="$URLSDIR/sourcemapper"
+	FTPDIR="$VULNDIR/ftp"
+	IISIDR="$VULNDIR/iis"
+	DOTGITDIR="$VULNDIR/dotgit"
+	PDFTOTEXTDIR="$VULNDIR/pdftotext"
+
+	# Root-level directories in UNIQUEDOMAINDIR
+	ROOT_SUBDOMAINDIR="$UNIQUEDOMAINDIR/subdomain"
+	ROOT_URLSDIR="$UNIQUEDOMAINDIR/urls"
+	ROOT_EMAILSDIR="$UNIQUEDOMAINDIR/emails"
+	ROOT_VULNDIR="$UNIQUEDOMAINDIR/vuln"
+	ROOT_INPUTFILES="$UNIQUEDOMAINDIR/inputfiles"
+	ROOT_WORDLISTDIR="$UNIQUEDOMAINDIR/wordlist"
+
+	ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
+	RESUMELOGFILE="$UNIQUEDOMAINDIR/resume.cfg"
 
 
-# Creating directories
-# Subdirectories within .tmp
-mkdir -p "$UNIQUEDOMAINDIR"
-mkdir -p "$TMPDIR"
-mkdir -p "$SUBDOMAINDIR"
-mkdir -p "$FFUFBRUTE"
-mkdir -p "$FAVICON_HASH"
-mkdir -p "$SCREENSHOTS"
-mkdir -p "$URLSDIR"
-mkdir -p "$VULNDIR"
-mkdir -p "$GITHUB_ENDPOINTSDIR"
-mkdir -p "$CRAWLEYDIR"
-mkdir -p "$CARIDDIDIR"
-mkdir -p "$XCRAWL3RDIR"
-mkdir -p "$GOLINKFINDERDIR"
-mkdir -p "$AUTOMATED_GOOGLE_DORKINGDIR"
-mkdir -p "$SOURCEMAPPERDIR"
-mkdir -p "$FTPDIR"
-mkdir -p "$IISIDR"
-mkdir -p "$DOTGITDIR"
-mkdir -p "$PDFTOTEXTDIR"
+	# Creating directories
+	# Subdirectories within .tmp
+	mkdir -p "$UNIQUEDOMAINDIR"
+	mkdir -p "$TMPDIR"
+	mkdir -p "$SUBDOMAINDIR"
+	mkdir -p "$FFUFBRUTE"
+	mkdir -p "$FAVICON_HASH"
+	mkdir -p "$SCREENSHOTS"
+	mkdir -p "$URLSDIR"
+	mkdir -p "$VULNDIR"
+	mkdir -p "$GITHUB_ENDPOINTSDIR"
+	mkdir -p "$CRAWLEYDIR"
+	mkdir -p "$CARIDDIDIR"
+	mkdir -p "$XCRAWL3RDIR"
+	mkdir -p "$GOLINKFINDERDIR"
+	mkdir -p "$AUTOMATED_GOOGLE_DORKINGDIR"
+	mkdir -p "$SOURCEMAPPERDIR"
+	mkdir -p "$FTPDIR"
+	mkdir -p "$IISIDR"
+	mkdir -p "$DOTGITDIR"
+	mkdir -p "$PDFTOTEXTDIR"
 
-# Root-level directories in UNIQUEDOMAINDIR
-mkdir -p "$ROOT_SUBDOMAINDIR"
-mkdir -p "$ROOT_URLSDIR"
-mkdir -p "$ROOT_EMAILSDIR"
-mkdir -p "$ROOT_VULNDIR"
-mkdir -p "$ROOT_INPUTFILES"
-mkdir -p "$ROOT_WORDLISTDIR"
+	# Root-level directories in UNIQUEDOMAINDIR
+	mkdir -p "$ROOT_SUBDOMAINDIR"
+	mkdir -p "$ROOT_URLSDIR"
+	mkdir -p "$ROOT_EMAILSDIR"
+	mkdir -p "$ROOT_VULNDIR"
+	mkdir -p "$ROOT_INPUTFILES"
+	mkdir -p "$ROOT_WORDLISTDIR"
+fi
 
 # Creating files
 touch "$ROOT_INPUTFILES/crunchbase.txt"
 touch "$ROOT_INPUTFILES/manual_google_dorking.txt"
 
-# Utility function to check if a function is excluded
+# Utility function to check if a function is excluded or already completed
 is_excluded() {
     local func="$1"
     for excluded in "${EXCLUDE_FUNCS[@]}"; do
         if [[ "$excluded" == "$func" ]]; then
+            return 0
+        fi
+    done
+    for done_func in "${COMPLETED_FUNCS[@]}"; do
+        if [[ "$done_func" == "$func" ]]; then
             return 0
         fi
     done

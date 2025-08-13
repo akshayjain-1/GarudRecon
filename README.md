@@ -207,6 +207,7 @@ Flags:
   -rr, --recon-rce                      Run full recon with RCE checks
   -ri, --recon-iis                      Run full recon with IIS checks
   -c, --config                          Custom configuration file path
+  -r, --resume <scan_folder>            Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume support.domain.com or --resume support.domain.com_1). Skips functions already completed in resume.cfg.
   -h, --help                            help for smallscope
 
 Example:
@@ -224,6 +225,9 @@ Example:
 
 # Combined
   garudrecon smallscope -d support.domain.com -rx -ef "WAYMORE"
+
+# Skips functions already completed in resume.cfg.
+  garudrecon smallscope -d support.domain.com -rx --resume support.domain.com_1
 ```
 
 #### Output
@@ -251,6 +255,7 @@ Flags:
   -ri, --recon-iis                      Run full recon with IIS checks
   -oos, --outofscope                    Exclude outofscope subdomains from a list (e.g. domain.com.oos)
   -c, --config                          Custom configuration file path
+  -r, --resume <scan_folder>            Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume domain.com or --resume domain.com_1). Skips functions already completed in resume.cfg.
   -h, --help                            help for mediumscope
 
 Example:
@@ -268,6 +273,9 @@ Example:
 
 # Combined
   garudrecon mediumscope -d domain.com -rx -ef "AMASS"
+
+# Skips functions already completed in resume.cfg.
+  garudrecon mediumscope -d domain.com -rx --resume domain.com_1
 ```
 
 #### Output
