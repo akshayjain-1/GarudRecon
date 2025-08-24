@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "rcert -list ${INPUT} | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow rcert --input domain.com.subs --output domain.com.rcert",
+  "description": "Scan certificate transperency with rcert"
+}]

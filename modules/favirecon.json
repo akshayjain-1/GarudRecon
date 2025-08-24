@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | favirecon -silent | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow favirecon --input domain.com.httpx --output domain.com.favirecon",
+  "description": "Scan favicon with favirecon"
+}]

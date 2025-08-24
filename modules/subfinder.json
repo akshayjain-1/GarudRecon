@@ -1,0 +1,8 @@
+[{
+  "command": [
+    "subfinder -duc -silent -d ${INPUT} -all | unew -el -i -t -q ${OUTPUT}",
+    "echo \"We can also do subdomain takeover on these targets\""
+  ],
+  "example": "garudrecon workflow subfinder --input domain.com --output domain.com.subfinder",
+  "description": "Scan subdomain enumeration with subfinder"
+}]

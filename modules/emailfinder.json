@@ -1,0 +1,13 @@
+[{
+  "command": [
+    "cat ${INPUT} | emailfinder saved | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder skymem | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder google -e | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder bing -e | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder duckduckgo -e | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder yahoo -e | unew -el -i -t ${OUTPUT}",
+    "cat ${INPUT} | emailfinder yandex -e | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow emailfinder --input domain.com.subs --output domain.com.emailfinder",
+  "description": "Email Enumeration with emailfinder"
+}]

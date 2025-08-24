@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | cspfinder -silent | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow cspfinder --input domain.com.subs --output domain.com.cspfinder",
+  "description": "Scan content security policy with cspfinder"
+}]

@@ -1,0 +1,9 @@
+[{
+  "command": [
+    "echo 'ssl:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",
+    "echo 'hostname:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",
+    "echo 'ssl.cert.subject.cn:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow ipfinder --input domain.com --output domain.com.ipfinder",
+  "description": ""
+}]

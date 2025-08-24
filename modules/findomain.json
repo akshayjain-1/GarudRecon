@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "findomain -t ${INPUT} -q | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow findomain --input domain.com --output domain.com.findomain",
+  "description": "Scan subdomain enumeration with findomain"
+}]

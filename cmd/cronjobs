@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default config file path
-CONFIG_PATH="configuration/garudrecon.cfg"
+CONFIG_PATH="configuration/garudrecon_max.cfg"
 
 TARGET=""
 

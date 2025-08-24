@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default config file path
-source "configuration/garudrecon.cfg"
+source "configuration/garudrecon_max.cfg"
 
 # Help function
 function show_help() {
@@ -37,6 +37,8 @@ Available Commands:
   smallscope              Run minimal recon for subdomain (e.g. support.domain.com)
   mediumscope             Perform moderate recon with optional vulnerability checks for wildcard domain (e.g. *.domain.com)
   largescope              Full-scale recon for deep visibility for organisation
+  cidrscope               Run fullscan on cidr
+  workflow                Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan)
   cronjobs                Automate recurring recon tasks continuously
 
 Flags:
@@ -68,6 +70,12 @@ case "$COMMAND" in
     ;;
   largemscope)
     bash "$(dirname "$0")/cmd/largemscope" "$@"
+    ;;
+  cidrscope)
+    bash "$(dirname "$0")/cmd/cidrscope" "$@"
+    ;;
+  workflow)
+    bash "$(dirname "$0")/cmd/workflow" "$@"
     ;;
   cronjobs)
     bash "$(dirname "$0")/cmd/cronjobs" "$@"

@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | nuclei -duc -silent -nc -nh -tags takeover -severity info,low,medium,high,critical -retries 3 -rl 150 -t ${TAKEOVERS_BASEDIR} | unew -el ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow nuclei --input domain.com.httpx --output domain.com.nuclei",
+  "description": "Subdomain Takeover with nuclei"
+}]

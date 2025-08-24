@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | cero | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow cero --input domain.com.subs --output domain.com.cero",
+  "description": "Scan certificate transperency with cero"
+}]

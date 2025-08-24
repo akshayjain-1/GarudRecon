@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | certinfo -silent -c 50 | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow certinfo --input domain.com.subs --output domain.com.certinfo",
+  "description": "Scan certificate transperency with certinfo"
+}]

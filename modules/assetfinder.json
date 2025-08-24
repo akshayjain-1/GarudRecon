@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "assetfinder --subs-only ${INPUT} | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow assetfinder --input domain.com --output domain.com.assetfinder",
+  "description": "Scan subdomain enumeration with assetfinder"
+}]

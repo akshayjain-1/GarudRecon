@@ -1,0 +1,126 @@
+#!/bin/bash
+
+MODULES_DIR="modules"
+TOOL="$1"
+shift
+
+VERBOSE=false
+
+# Help function
+function show_help() {
+  cat <<EOF
+Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan).
+
+Usage:
+  garudrecon workflow [flags]
+
+Flags:
+  -i, --input			Pass the input
+  -o, --output			Location where you want to save output
+  -v, --verbose 		enable verbose mode
+  -h, --help   			help for cronjobs
+
+Example:
+  garudrecon workflow amass --input <domain> --output <file> [--verbose]
+  garudrecon workflow ls
+  garudrecon workflow ls [module]
+EOF
+}
+
+print_table() {
+  modules=("$@")
+
+  # collect rows
+  rows=()
+  rows+=("MODULES|USAGE EXAMPLES|DESCRIPTION")
+
+  for module in "${modules[@]}"; do
+    example=$(jq -r '.[0].example' "$MODULES_DIR/$module")
+    description=$(jq -r '.[0].description' "$MODULES_DIR/$module")
+    # categories=$(jq -r '.[0].categories' "$MODULES_DIR/$module")
+
+    rows+=("$module|$example|$description")
+  done
+
+  # calculate max width for each column
+  col1=$(printf "%s\n" "${rows[@]}" | cut -d'|' -f1 | awk '{print length}' | sort -nr | head -1)
+  col2=$(printf "%s\n" "${rows[@]}" | cut -d'|' -f2 | awk '{print length}' | sort -nr | head -1)
+  col3=$(printf "%s\n" "${rows[@]}" | cut -d'|' -f3 | awk '{print length}' | sort -nr | head -1)
+
+  # print header
+  IFS="|" read -r c1 c2 c3 <<< "${rows[0]}"
+  printf "| %-${col1}s | %-${col2}s | %-${col3}s |\n" "$c1" "$c2" "$c3"
+  printf "|-%-${col1}s-|-%-${col2}s-|-%-${col3}s-|\n" "$(printf '─%.0s' $(seq 1 $col1))" "$(printf '─%.0s' $(seq 1 $col2))" "$(printf '─%.0s' $(seq 1 $col3))"
+
+  # print rows
+  for ((i=1; i<${#rows[@]}; i++)); do
+    IFS="|" read -r c1 c2 c3 <<< "${rows[$i]}"
+    printf "| %-${col1}s | %-${col2}s | %-${col3}s |\n" "$c1" "$c2" "$c3"
+  done
+}
+
+if [[ "$TOOL" == "ls" ]]; then
+  if [[ -n "$1" ]]; then
+    # list single module
+    if [[ -f "$MODULES_DIR/$1.json" ]]; then
+      print_table "$1.json"
+    else
+      echo "Module '$1' not found."
+      exit 1
+    fi
+  else
+    # list all modules
+    modules=($(ls "$MODULES_DIR"/*.json | xargs -n1 basename))
+    print_table "${modules[@]}"
+  fi
+  exit 0
+fi
+
+# --- normal module execution ---
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -i|--input)
+      INPUT="$2"
+      shift 2
+      ;;
+    -o|--output)
+      OUTPUT="$2"
+      shift 2
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# Check required args
+if [[ -z "$INPUT" || -z "$OUTPUT" ]]; then
+  echo "Error: --input and --output are required"
+  show_help
+  exit 1
+fi
+
+# Get commands (can be single string or array)
+COMMANDS=$(jq -r '.[0].command[]?' "$MODULES_DIR/$TOOL.json")
+
+# Run each command after replacing placeholders
+while IFS= read -r CMD; do
+  CMD="${CMD//\$\{INPUT\}/$INPUT}"
+  CMD="${CMD//\$\{OUTPUT\}/$OUTPUT}"
+
+  if $VERBOSE; then
+    echo "[*] Running: $CMD"
+  fi
+
+  eval "$CMD"
+done <<< "$COMMANDS"

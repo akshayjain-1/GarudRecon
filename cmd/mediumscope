@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # Default config file path
-CONFIG_PATH="configuration/garudrecon.cfg"
+CONFIG_PATH="configuration/garudrecon_max.cfg"
 
 TARGET=""
 
 EXCLUDE_FUNCS=()
+RECON_SUBDOMAIN=false
+RECON_SUBDOMAIN_URLS=false
 RECON_XSS=false
 RECON_SQLI=false
 RECON_LFI=false
@@ -28,6 +30,8 @@ Usage:
 Flags:
   -d, --domain				Scan a domain (e.g. domain.com)
   -ef, --exclude-functions		Exclude a function from running (e.g. AMASS)
+  -s, --recon-subdomain			Run Subdomain Enumeration only
+  -su, --recon-subdomainurls		Run Subdomain Enumeration + Url Crawling only
   -rx, --recon-xss			Run full recon with XSS checks
   -rs, --recon-sqli			Run full recon with SQLi checks
   -rl, --recon-lfi			Run full recon with LFI checks
@@ -40,8 +44,14 @@ Flags:
   -h, --help				help for mediumscope
 
 Example:
-# Full recon
+# Full recon with all vulnerability scan
   garudrecon mediumscope -d domain.com
+
+# Recon Subdomain Enumeration only
+  garudrecon mediumscope -d domain.com -s
+
+# Recon Subdomain Enumeration + Url Crawling only
+  garudrecon mediumscope -d domain.com -su
 
 # Recon with XSS only
   garudrecon mediumscope -d domain.com -rx
@@ -82,6 +92,14 @@ while [[ "$#" -gt 0 ]]; do
             done
             shift 2
             ;;
+	    -s|--recon-subdomain)
+	        RECON_SUBDOMAIN=true
+	        shift
+	        ;;
+	    -su|--recon-subdomainurls)
+	        RECON_SUBDOMAIN_URLS=true
+	        shift
+	        ;;
 	    -rx|--recon-xss)
 	        RECON_XSS=true
 	        shift
@@ -205,7 +223,6 @@ if [[ "$RESUME_MODE" == true ]]; then
 	ROOT_URLSDIR="$UNIQUEDOMAINDIR/urls"
 	ROOT_EMAILSDIR="$UNIQUEDOMAINDIR/emails"
 	ROOT_VULNDIR="$UNIQUEDOMAINDIR/vuln"
-	ROOT_INPUTFILES="$UNIQUEDOMAINDIR/inputfiles"
 	ROOT_WORDLISTDIR="$UNIQUEDOMAINDIR/wordlist"
 
 	ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
@@ -252,7 +269,6 @@ else
 	ROOT_URLSDIR="$UNIQUEDOMAINDIR/urls"
 	ROOT_EMAILSDIR="$UNIQUEDOMAINDIR/emails"
 	ROOT_VULNDIR="$UNIQUEDOMAINDIR/vuln"
-	ROOT_INPUTFILES="$UNIQUEDOMAINDIR/inputfiles"
 	ROOT_WORDLISTDIR="$UNIQUEDOMAINDIR/wordlist"
 
 	ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
@@ -286,13 +302,13 @@ else
 	mkdir -p "$ROOT_URLSDIR"
 	mkdir -p "$ROOT_EMAILSDIR"
 	mkdir -p "$ROOT_VULNDIR"
-	mkdir -p "$ROOT_INPUTFILES"
 	mkdir -p "$ROOT_WORDLISTDIR"
 fi
 
 # Creating files
-touch "$ROOT_INPUTFILES/crunchbase.txt"
-touch "$ROOT_INPUTFILES/manual_google_dorking.txt"
+touch "$URLSDIR/crunchbase.txt"
+touch "$URLSDIR/manual_google_dorking.urls"
+touch "$URLSDIR/burpsuite.urls"
 
 # Utility function to check if a function is excluded or already completed
 is_excluded() {
@@ -364,6 +380,8 @@ START_EPOCH=$(date +%s)
 
 echo -e "Using $CONFIG_PATH"
 echo -e "Saving all files in $UNIQUEDOMAINDIR"
+
+# echo -e "Start doing these manually:"
 
 
 DOWNLOAD_UPDATED_RESOLVERS(){
@@ -550,18 +568,18 @@ HAKTRAILS(){
 
 HAKTRAILSFREE(){
     if [ ! -s "$SUBDOMAINDIR/securitytrails.subs" ]; then
-        echo -e "${GRAY}[!] You using securitytrails free api key it only allows you to scrape 2k subdomains, follow this url you can scrape 10k subdomains, then add these subdomains in ${SUBDOMAINDIR}/securitytrails.subs currently file is empty. Please choose an option:${RESET}"
+        echo -e "${GRAY}[!] If you using securitytrails free api key it only allows you to scrape 2k subdomains, follow this url you can scrape 10k subdomains, then add these subdomains in ${SUBDOMAINDIR}/securitytrails.subs currently file is empty. Please choose an option:${RESET}"
         echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still doing google dorking but allow me to continue if i'm done earlier by pressing Enter button"
         echo -e "${GRAY}2. Done, I have done google dorking don't wait now"
         echo -e "${GRAY}3. Skip, I don't have time for manual google dorking"
 
         # Read user input with a timeout of 1 minute
-        read -t ${MANUAL_GOOGLE_DORKING_OPTION_WAIT} -p "Select an option (1/2/3): " option
+        read -t ${HAKTRAILSFREE_OPTION_WAIT} -p "Select an option (1/2/3): " option
 
         # If no input after 60 seconds, automatically select Option 1
         if [ -z "$option" ]; then
-            option=${MANUAL_GOOGLE_DORKING_OPTION_SELECT}
-            echo -e "\n${GRAY}[+] No input received from user, automatically choosing Option ${MANUAL_GOOGLE_DORKING_OPTION_SELECT}${RESET}"
+            option=${HAKTRAILSFREE_OPTION_SELECT}
+            echo -e "\n${GRAY}[+] No input received from user, automatically choosing Option ${HAKTRAILSFREE_OPTION_SELECT}${RESET}"
         fi
         
         case "$option" in
@@ -578,7 +596,7 @@ HAKTRAILSFREE(){
                     fi
                     # Exit after 30 minutes if Enter is not pressed
                     ((counter++))
-                    if [ $counter -eq ${MANUAL_GOOGLE_DORKING_TIME} ]; then
+                    if [ $counter -eq ${HAKTRAILSFREE_TIME} ]; then
                         echo -e "${BGREEN}[+] 30 minutes have passed. Proceeding...${RESET}"
                         break
                     fi
@@ -603,7 +621,7 @@ HAKTRAILSFREE(){
     # Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/haktrailsfree.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/haktrailsfree.subs
 
-    # Display the count of lines in manual_google_dorking.urls
+    # Display the count of lines in securitytrails.subs
     echo -e "${BGREEN}[+] HAKTRAILSFREE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/securitytrails.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
@@ -613,110 +631,85 @@ OCCRP(){
 	# do this manually
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] ORG2ASN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/occrp-orgs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] OCCRP${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/occrp-orgs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ORG2ASN(){
 	START_SPINNER "${BGREEN}ORG2ASN${RESET}"
 
 	if [ "$ORG2ASN_SCAN_MODE" = "NORMAL" ]; then
-		echo "$TARGET" | cut -d"." -f1 | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
+		echo "$TARGET" | tldinfo --silent --extract domain | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
 	fi
 
 	if [ "$ORG2ASN_SCAN_MODE" = "ADVANCED" ]; then
-		echo "$TARGET" | cut -d"." -f1 | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
+		echo "$TARGET" | tldinfo --silent --extract domain | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
 		cat ${SUBDOMAINDIR}/org2asn.txt | cut -d"[" -f5 | sed 's/]$//' | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
 	fi
 
+    if [ ! -s "$SUBDOMAINDIR/org2asn.txt" ]; then
+    	echo -e "${GRAY}[!] I collected orgnames of you company as much as i can, There maybe some orgnames that not belong to your company if have to remove those manually otherwise you will be doing scan that are not remove output in ${SUBDOMAINDIR}/orgs.txt currently file is empty. Please choose an option:${RESET}"
+        echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still removing manually but allow me to continue if i'm done earlier by pressing Enter button"
+        echo -e "${GRAY}2. Done, I have done removing manually org2asn output don't wait now"
+        echo -e "${GRAY}3. Skip, I don't have time for removing manually org2asn output"
 
+        # Read user input with a timeout of 1 minute
+        read -t ${ORG2ASN_OPTION_WAIT} -p "Select an option (1/2/3): " option
+
+        # If no input after 60 seconds, automatically select Option 1
+        if [ -z "$option" ]; then
+            option=${ORG2ASN_OPTION_SELECT}
+            echo -e "\n${GRAY}[+] No input received from user, automatically choosing Option ${ORG2ASN_OPTION_SELECT}${RESET}"
+        fi
+        
+        case "$option" in
+            1)
+                echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
+                
+                # Display prompt once and enter wait loop
+                counter=0
+                while true; do
+                    read -t 60 -n 1 input
+                    if [ $? -eq 0 ]; then
+                        echo -e "${BGREEN}[+] Done early! Proceeding...${RESET}"
+                        break
+                    fi
+                    # Exit after 30 minutes if Enter is not pressed
+                    ((counter++))
+                    if [ $counter -eq ${ORG2ASN_TIME} ]; then
+                        echo -e "${BGREEN}[+] 30 minutes have passed. Proceeding...${RESET}"
+                        break
+                    fi
+                done
+                ;;
+            2)
+                echo -e "${BGREEN}[+] Done with Removing manually org2asn output. Proceeding...${RESET}"
+                ;;
+            3)
+                echo -e "${YELLOW}[!] Skipping Removing manually org2asn output.${RESET}"
+                return
+                ;;
+            *)
+                echo -e "${YELLOW}[!] Invalid option. Skipping Removing manually org2asn output.${RESET}"
+                return
+                ;;
+        esac
+    fi
 
 	# Common steps for both conditions
-	# wait for 30 minutes to remove manually, now remove those not belong to your comapny in ${SUBDOMAINDIR}/org2asn.txt using sublime
-
 	sed -i 's/^[^]]*] //' ${SUBDOMAINDIR}/org2asn.txt
 	cat ${SUBDOMAINDIR}/org2asn.txt | grep -oP '\[.*?\](?= \[ASN\])' | sed 's/^\[//' | sed 's/\]$//' | unew -el -t -q ${SUBDOMAINDIR}/asns.txt
 	cat ${SUBDOMAINDIR}/org2asn.txt | grep -oP '\[.*?\](?= \[Route\])' | sed 's/^\[//' | sed 's/\]$//' | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
 	cat ${SUBDOMAINDIR}/org2asn.txt | grep -oP '(?<=\[ASN\] ).*' | sed 's/^\[//' | sed 's/\]$//' | unew -el -t -q ${SUBDOMAINDIR}/orgs.txt
 	cat ${SUBDOMAINDIR}/org2asn.txt | grep -oP '(?<=\[Route\] ).*' | sed 's/^\[//' | sed 's/\]$//' | unew -el -t -q ${SUBDOMAINDIR}/orgs.txt
 
-
-	cat ${SUBDOMAINDIR}/*.subs | unew | cero -c ${CERO_THREADS} -t ${CERO_TIMEOUT} | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/cero.subs
-
-	# Reuse old scanned data
-	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/cero.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/cero.subs
-
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] ORG2ASN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/cero.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
-}
-
-IPFINDER(){
-	START_SPINNER "${BGREEN}IPFINDER${RESET}"
-
-	if ! command -v ipfinder &>/dev/null; then
-        echo -e "${BRED}[x] IPFINDER${RESET}: 0, ${TIME} seconds"
-        STOP_SPINNER
-        return
-    fi
-
-	cat ${SUBDOMAINDIR}/ips.txt | ipfinder shodan --silent
-	cat ${SUBDOMAINDIR}/ips.txt | mapcidr -silent
-
-	# echo 'ip:"173.0.84.0/24"' | ipfinder shodan --silent
-	echo 'ssl:"$TARGET"' | ipfinder shodan --silent
-	echo 'hostname:"$TARGET"' | ipfinder shodan --silent
-	echo 'ssl.cert.subject.cn:"$TARGET"' | ipfinder shodan --silent
-	echo 'org:"FIDELITY NATIONAL INFORMATION SERVICES"' | ipfinder shodan --silent
-	echo 'asn:"AS3614"' | ipfinder shodan --silent
-	# cat ${SUBDOMAINDIR}/asns.txt | sed 's/.*/asn:"&"/' | ipfinder shodan --silent
-
-	if [ "$IPFINDER_SCAN_MODE" = "NORMAL" ]; then
-		cat ${SUBDOMAINDIR}/*.subs | unew | certinfo -silent -c 50 | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	if [ "$IPFINDER_SCAN_MODE" = "ADVANCED" ]; then
-		rcert -list ${SUBDOMAINDIR}/*.subs | unew | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	# Reuse old scanned data
-	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/certinfo.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-
-	STOP_SPINNER
-	echo -e "${BGREEN}[+] IPFINDER${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/certinfo.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
-}
-
-IPRANGES(){
-	START_SPINNER "${BGREEN}IPRANGES${RESET}"
-
-	if ! command -v ipranges &>/dev/null; then
-        echo -e "${BRED}[x] IPRANGES${RESET}: 0, ${TIME} seconds"
-        STOP_SPINNER
-        return
-    fi
-
-	echo "$TARGET" | ipranges -silent | unew -el -t -q ${SUBDOMAINDIR}/ipranges.txt
-
-	if [ "$IPRANGES_SCAN_MODE" = "NORMAL" ]; then
-		cat ${SUBDOMAINDIR}/*.subs | unew | certinfo -silent -c 50 | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	if [ "$IPRANGES_SCAN_MODE" = "ADVANCED" ]; then
-		rcert -list ${SUBDOMAINDIR}/*.subs | unew | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	# Reuse old scanned data
-	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/certinfo.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-
-	STOP_SPINNER
-	echo -e "${BGREEN}[+] IPRANGES${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/certinfo.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ARINRANGE(){
 	START_SPINNER "${BGREEN}ARINRANGE${RESET}"
 
 	cat ${SUBDOMAINDIR}/orgs.txt | arinrange --silent 2>/dev/null | mapcidr -silent -aggregate | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
-
-	# Reuse old scanned data
-	# cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/certinfo.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] ARINRANGE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ips.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -740,6 +733,38 @@ SPK(){
 	echo -e "${BGREEN}[+] SPK${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ips.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
+IPFINDER(){
+	START_SPINNER "${BGREEN}IPFINDER${RESET}"
+
+	# cat ${SUBDOMAINDIR}/ips.txt | ipfinder shodan --silent
+	# cat ${SUBDOMAINDIR}/ips.txt | mapcidr -silent
+
+	# echo 'ip:"173.0.84.0/24"' | ipfinder shodan --silent
+	echo 'ssl:"$TARGET"' | ipfinder shodan --silent | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
+	echo 'hostname:"$TARGET"' | ipfinder shodan --silent | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
+	echo 'ssl.cert.subject.cn:"$TARGET"' | ipfinder shodan --silent | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
+	cat ${SUBDOMAINDIR}/orgs.txt | sed 's/.*/org:"&"/' | ipfinder shodan --silent | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
+	cat ${SUBDOMAINDIR}/asns.txt | sed 's/.*/asn:"&"/' | ipfinder shodan --silent | unew -el -t -q ${SUBDOMAINDIR}/ips.txt
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] IPFINDER${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ips.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
+IPRANGES(){
+	START_SPINNER "${BGREEN}IPRANGES${RESET}"
+
+	if ! command -v ipranges &>/dev/null; then
+        echo -e "${BRED}[x] IPRANGES${RESET}: 0, ${TIME} seconds"
+        STOP_SPINNER
+        return
+    fi
+
+	echo "$TARGET" | ipranges -silent | unew -el -t -q ${SUBDOMAINDIR}/ipranges.txt
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] IPRANGES${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ipranges.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
 ASNMAP(){
 	START_SPINNER "${BGREEN}ASNMAP${RESET}"
 
@@ -761,11 +786,11 @@ ASNMAP(){
 ANALYTICSRELATIONSHIPS(){
 	START_SPINNER "${BGREEN}ANALYTICSRELATIONSHIPS${RESET}"
 
-	if [ "$ANALYTICSRELATIONSHIPS" = "NORMAL" ]; then
+	if [ "$ANALYTICSRELATIONSHIPS_SCAN_MODE" = "NORMAL" ]; then
 		analyticsrelationships --url https://www.example.com
 	fi
 
-	if [ "$ANALYTICSRELATIONSHIPS" = "ADVANCED" ]; then
+	if [ "$ANALYTICSRELATIONSHIPS_SCAN_MODE" = "ADVANCED" ]; then
 		cat ${SUBDOMAINDIR}/*.subs | analyticsrelationships
 	fi
 
@@ -816,7 +841,7 @@ WHOXYSUBS(){
 }
 
 
-# Certificate Transperency
+# Cloud Recon
 KAEFERJAEGER(){
 	START_SPINNER "${BGREEN}KAEFERJAEGER${RESET}"
 
@@ -840,6 +865,7 @@ TRICKESTCLOUD(){
 }
 
 
+# Certificate Transperency
 CERO(){
 	START_SPINNER "${BGREEN}CERO${RESET}"
 
@@ -938,16 +964,16 @@ DNSXBRUTE(){
 	START_SPINNER "${BGREEN}DNSXBRUTE${RESET}"
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "QUICK" ]; then
-		dnsx -duc -silent -d $TARGET -w wordlists/all_hostnames.txt -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d $TARGET -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
 	fi
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "NORMAL" ]; then
-		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w wordlists/all_hostnames.txt -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
 	fi
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "ADVANCED" ]; then
-		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w wordlists/all_hostnames.txt -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
-		dnsx -duc -silent -d ${SUBDOMAINDIR}/dnsxbrute.subs -w wordlists/all_hostnames.txt -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbruteadv.subs
+		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d ${SUBDOMAINDIR}/dnsxbrute.subs -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbruteadv.subs
 	fi
 
 	# Reuse old scanned data
@@ -960,7 +986,7 @@ DNSXBRUTE(){
 SUBWIZ(){
 	START_SPINNER "${BGREEN}SUBWIZ${RESET}"
 
-	subwiz -i ${ROOT_SUBDOMAINDIR}/allsubs.txt --num_predictions 5000 -o ${SUBDOMAINDIR}/tmp_subwiz.subs &>/dev/null
+	subwiz -i ${ROOT_SUBDOMAINDIR}/allsubs.txt --num_predictions ${SUBWIZ_NUM_PREDICTIONS} -o ${SUBDOMAINDIR}/tmp_subwiz.subs &>/dev/null
 	cat ${SUBDOMAINDIR}/tmp_subwiz.subs | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/subwiz.subs
 
 	# Reuse old scanned data
@@ -1133,11 +1159,11 @@ MANUAL_SUBDOMAIN_RESOLVING(){
 PUREDNS(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
-	if [ "$IS_U_USING_VPS" = "TRUE" ]; then
+	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
 		DOWNLOAD_UPDATED_RESOLVERS
 		puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST --resolvers-trusted wordlists/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs
 	else
-		# if IS_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
+		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
 		MANUAL_SUBDOMAIN_RESOLVING
 	fi
 
@@ -1148,11 +1174,11 @@ PUREDNS(){
 SHUFFLEDNS(){
 	START_SPINNER "${BGREEN}SHUFFLEDNS${RESET}"
 
-	if [ "$IS_U_USING_VPS" = "TRUE" ]; then
+	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
 		DOWNLOAD_UPDATED_RESOLVERS
 		shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs
 	else
-		# if IS_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
+		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
 		MANUAL_SUBDOMAIN_RESOLVING
 	fi
 
@@ -1163,12 +1189,12 @@ SHUFFLEDNS(){
 MASSDNS(){
 	START_SPINNER "${BGREEN}MASSDNS${RESET}"
 
-	if [ "$IS_U_USING_VPS" = "TRUE" ]; then
+	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
 		echo -e "I will add later.."
 		massdns -r $RESOLVERS_WORDLIST -q -t A -o S -w ./$domain/subdomain/all_subdomain.txt ./$domain/ips/massdns.raw
     	cat ./$domain/ips/massdns.raw | grep -a -e ' A ' |  cut -d 'A' -f 2 | tr -d ' ' | anew -q ./$domain/ips/resolved_ips.txt
 	else
-		# if IS_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
+		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
 		MANUAL_SUBDOMAIN_RESOLVING
 	fi
 
@@ -1192,7 +1218,7 @@ DNSX(){
 NAABU(){
 	START_SPINNER "${BGREEN}NAABU${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 2>/dev/null | unew -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports ${NAABU_PORTS_SCAN} 2>/dev/null | unew -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/subdomain/naabu.txt 2>/dev/null | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
@@ -1292,7 +1318,7 @@ FFUFBRUTE(){
 	cat ${FFUFBRUTE}/*.json | jq -r '.results[].host' | unew -el -i -t ${ROOT_SUBDOMAINDIR}/allsubs.txt | unew -el -i -t -q ${FFUFBRUTE}/ffuf.subs
 
 
-	cat ${FFUFBRUTE}/ffuf.subs | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 &>/dev/null | unew -el -i -t ${ROOT_SUBDOMAINDIR}/naabu.txt | unew -el -i -t -q ${FFUFBRUTE}/naabu.txt
+	cat ${FFUFBRUTE}/ffuf.subs | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports ${NAABU_PORTS_SCAN} &>/dev/null | unew -el -i -t ${ROOT_SUBDOMAINDIR}/naabu.txt | unew -el -i -t -q ${FFUFBRUTE}/naabu.txt
 
 
 	cat ${FFUFBRUTE}/naabu.txt | httpx -duc -silent -nc -td -t ${HTTPX_THREADS} | unew -el -i -t ${ROOT_SUBDOMAINDIR}/httpx.txt | unew -el -i -t -q ${FFUFBRUTE}/httpx.txt
@@ -1771,8 +1797,8 @@ AUTOMATED_GOOGLE_DORKING(){
 }
 
 MANUAL_GOOGLE_DORKING(){
-    if [ ! -s "$ROOT_INPUTFILES/manual_google_dorking.txt" ]; then
-        echo -e "${GRAY}[!] I collected google dorks output as much as i can using automated tools, You can add your manual google dorks output in ${URLSDIR}/manual_google_dorking.urls currently file is empty. Please choose an option:${RESET}"
+    if [ ! -s "$URLSDIR/manual_google_dorking.urls" ]; then
+        echo -e "${GRAY}[!] I collected google dorks output as much as i can, You can add your manual google dorks output in ${URLSDIR}/manual_google_dorking.urls currently file is empty. Please choose an option:${RESET}"
         echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still doing google dorking but allow me to continue if i'm done earlier by pressing Enter button"
         echo -e "${GRAY}2. Done, I have done google dorking don't wait now"
         echo -e "${GRAY}3. Skip, I don't have time for manual google dorking"
@@ -1825,6 +1851,63 @@ MANUAL_GOOGLE_DORKING(){
 
     # Display the count of lines in manual_google_dorking.urls
     echo -e "${BGREEN}[+] MANUAL_GOOGLE_DORKING${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/manual_google_dorking.urls || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
+BURPSUITE(){
+    if [ ! -s "$URLSDIR/burpsuite.urls" ]; then
+        echo -e "${GRAY}[!] I collected burpsuite urls output as much as i can, You can add your manual burpsuite urls output in ${URLSDIR}/burpsuite.urls currently file is empty. Please choose an option:${RESET}"
+        echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still doing burpsuite urls crawling but allow me to continue if i'm done earlier by pressing Enter button"
+        echo -e "${GRAY}2. Done, I have done adding burpsuite urls don't wait now"
+        echo -e "${GRAY}3. Skip, I don't have time for adding manual burpsuite urls"
+
+        # Read user input with a timeout of 1 minute
+        read -t ${BURPSUITE_OPTION_WAIT} -p "Select an option (1/2/3): " option
+
+        # If no input after 60 seconds, automatically select Option 1
+        if [ -z "$option" ]; then
+            option=${BURPSUITE_OPTION_SELECT}
+            echo -e "\n${GRAY}[+] No input received from user, automatically choosing Option ${BURPSUITE_OPTION_SELECT}${RESET}"
+        fi
+        
+        case "$option" in
+            1)
+                echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
+
+                echo -e "BURPSUITE: Waiting for manually add burpsuite urls" | notify -silent -duc -id xssnotify &>/dev/null
+                
+                # Display prompt once and enter wait loop
+                counter=0
+                while true; do
+                    read -t 60 -n 1 input
+                    if [ $? -eq 0 ]; then
+                        echo -e "${BGREEN}[+] Done early! Proceeding...${RESET}"
+
+                        break
+                    fi
+                    # Exit after 30 minutes if Enter is not pressed
+                    ((counter++))
+                    if [ $counter -eq ${BURPSUITE_TIME} ]; then
+                        echo -e "${BGREEN}[+] 30 minutes have passed. Proceeding...${RESET}"
+                        break
+                    fi
+                done
+                ;;
+            2)
+                echo -e "${BGREEN}[+] Done with Burpsuite urls. Proceeding...${RESET}"
+                ;;
+            3)
+                echo -e "${YELLOW}[!] Skipping adding manual burpsuite urls.${RESET}"
+                return
+                ;;
+            *)
+                echo -e "${YELLOW}[!] Invalid option. Skipping adding manual burpsuite urls.${RESET}"
+                return
+                ;;
+        esac
+    fi
+
+    # Display the count of lines in burpsuite.urls
+    echo -e "${BGREEN}[+] BURPSUITE${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/burpsuite.urls || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 # JS Crawling
@@ -2070,7 +2153,7 @@ JS_SUBDOMAINS(){
 	  curl -s "$target" | grep -oP '(\*-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|\*\.?[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+(\.\*)?\.[a-zA-Z0-9]+(\.[a-zA-Z]{2,}))' | eval ${URLS_FILTER} | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -ef -el -q ${URLSDIR}/js_subdomains.txt
 	done
 
-	cat allurls.txt | interlace --silent -threads 10 -c "curl -s _target_ | grep -oP '(\*-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|\*\.?[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+(\.\*)?\.[a-zA-Z0-9]+(\.[a-zA-Z]{2,}))' >> _output_/_cleantarget_.txt" -o ${PDFTOTEXTDIR}
+	cat ${ROOT_URLSDIR}/allurls.txt | interlace --silent -threads 10 -c "curl -s _target_ | grep -oP '(\*-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|\*\.?[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}|[a-zA-Z0-9]+(\.\*)?\.[a-zA-Z0-9]+(\.[a-zA-Z]{2,}))' >> _output_/_cleantarget_.txt" -o ${PDFTOTEXTDIR}
 
 	# Reuse old scanned data
 	# cat ${BASEDIR}/${TARGET}*/urls/js_subdomains.txt 2>/dev/null | eval ${URLS_FILTER} | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -el -i -t -q ${ROOT_URLSDIR}/js_subdomains.txt
@@ -2179,6 +2262,7 @@ PYDICTOR(){
 }
 
 
+# Parameter Fuzzing
 FFUF_CUSTOM_PARAM(){
 	START_SPINNER "${BGREEN}FFUF_CUSTOM_PARAM${RESET}"
 
@@ -2471,14 +2555,22 @@ RCE(){
 }
 
 SSTI(){
-	# I will write later
 	START_SPINNER "${BGREEN}RCE${RESET}"
+
+	# I will write later
+
 	STOP_SPINNER
+	echo -e "${BGREEN}[+] SSTI${RESET}: $(wc -l 2>/dev/null < ${ROOT_VULNDIR}/ssti.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 SSRF(){
+	START_SPINNER "${BGREEN}RCE${RESET}"
+
 	cat ${URLSDIR}/filteredurls.txt | pvreplace -silent -payload "http://sfsh.oastify.com" -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -ef -el -t -q ${VULNDIR}/ssrf_pvreplace.txt
 	cat ${VULNDIR}/ssrf_pvreplace.txt | httpx -duc -silent -nc -fr | unew -ef -el -t -q ${VULNDIR}/ssrf.txt
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] SSRF${RESET}: $(wc -l 2>/dev/null < ${ROOT_VULNDIR}/ssrf.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 OPEN_REDIRECT(){
@@ -2544,8 +2636,8 @@ PDFTOTEXT(){
 JSLEAKS(){
 	START_SPINNER "${BGREEN}JSLEAKS${RESET}"
 
-	cat urls.txt | egrep -av "\.json" | grep -a "\.js" | linkinspector -silent -nc -mt "application/javascript" | awk '{print $1}' | unew -el -t -q js-links.txt
-	cat js-links.txt | nuclei -duc -silent -nc -t ~/nuclei-templates/exposures/ | unew js-leaks.txt
+	cat ${ROOT_URLSDIR}/allurls.txt | egrep -av "\.json" | grep -a "\.js" | linkinspector -silent -nc -mt "application/javascript" | awk '{print $1}' | unew -el -t -q ${ROOT_VULNDIR}/js-links.txt
+	cat ${ROOT_VULNDIR}/js-links.txt | nuclei -duc -silent -nc -t ~/nuclei-templates/exposures/ | unew -el -t -q ${ROOT_VULNDIR}/js-leaks.txt
 	# trufflehog
 	# secretfinder
 	# mantra
@@ -2630,18 +2722,18 @@ SWAGGERUI(){
 LINKINSPECTOR(){
 	START_SPINNER "${BGREEN}LINKINSPECTOR${RESET}"
 
-	cat urls.txt | linkinspector -silent -nc -append-output linkinspector.txt
+	cat ${ROOT_URLSDIR}/allurls.txt | linkinspector -silent -nc -append-output linkinspector.txt
 
 	# Domain Backup Fuzz
-	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk -F' ' '{ if ($2 == "[403]" || $2 == "[404]" || $2 == "[302]") print $1 }' | unew -el -t -q notaccessible_subs.txt
-	cat notaccessible_subs.txt | fuzzuli -sl -mt shuffle -jw | unew -el -t -q fuzzuli.txt
-	cat fuzzuli.txt | linkinspector -silent -nc -mc 200,302 -append-output fuzzuli_linkinspector.txt
+	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk -F' ' '{ if ($2 == "[403]" || $2 == "[404]" || $2 == "[302]") print $1 }' | unew -el -t -q ${SUBDOMAINDIR}/notaccessible_subs.txt
+	cat ${SUBDOMAINDIR}/notaccessible_subs.txt | fuzzuli -sl -mt shuffle -jw | unew -el -t -q ${SUBDOMAINDIR}/fuzzuli.txt
+	cat ${SUBDOMAINDIR}/fuzzuli.txt | linkinspector -silent -nc -mc 200,302 -append-output ${SUBDOMAINDIR}/fuzzuli_linkinspector.txt
 
 
-	cat notaccessible_subs.txt | wordgen -silent -path wordlists/words.txt -e ".rar, .zip, .tar.gz, .tar, .gz, .jar, .7z, .bz2, .sql, .backup, .war" | unew -el -t -q wordgen.txt
-	cat wordgen.txt | linkinspector -silent -nc -mc 200,302 -append-output fuzzuli_linkinspector.txt
+	cat ${SUBDOMAINDIR}/notaccessible_subs.txt | wordgen -silent -path wordlists/words.txt -e ".rar, .zip, .tar.gz, .tar, .gz, .jar, .7z, .bz2, .sql, .backup, .war" | unew -el -t -q wordgen.txt
+	cat wordgen.txt | linkinspector -silent -nc -mc 200,302 -append-output ${SUBDOMAINDIR}/fuzzuli_linkinspector.txt
 
-	cat notaccessible_subs.txt | interlace --silent -threads ${INTERLACE_THREADS} -c "ffuf -s -u _target_/FUZZ -w wordlists/onelistforallshort.txt -mc ${FFUFDIRENUM_STATUS_MATCH} -o _output_/_cleantarget_.json" -o ${SUBDOMAINDIR}/ffufdirenum
+	cat ${SUBDOMAINDIR}/notaccessible_subs.txt | interlace --silent -threads ${INTERLACE_THREADS} -c "ffuf -s -u _target_/FUZZ -w wordlists/onelistforallshort.txt -mc ${FFUFDIRENUM_STATUS_MATCH} -o _output_/_cleantarget_.json" -o ${SUBDOMAINDIR}/ffufdirenum
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] LINKINSPECTOR${RESET}: $(wc -l 2>/dev/null < ${ROOT_VULNDIR}/linkinspector.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -2688,6 +2780,7 @@ RECON(){
 	run "SUBFINDER"
 	run "AMASS"
 	run "SUBDOG"
+	run "XSUBFIND3R"
 	run "FINDOMAIN"
 	run "CHAOS"
 	run "GITHUB_SUBDOMAINS"
@@ -2697,14 +2790,36 @@ RECON(){
 	run "ASSETFINDER"
 	run "HAKTRAILS"
 	# run "HAKTRAILSFREE"
+	# run "OCCRP"
+	run "ORG2ASN"
+	run "ARINRANGE"
+	run "SPK"
+	run "IPFINDER"
+	# run "IPRANGES"
+	# run "ASNMAP"
+	# run "ANALYTICSRELATIONSHIPS"
+	# run "UDON"
+	run "BUILTWITH"
+	run "WHOXYSUBS"
+
+
+	# Cloud Recon
+	run "KAEFERJAEGER"
+	# run "TRICKESTCLOUD"
 
 
 	# Certificate Transperency
 	run "CERO"
 	run "CERTINFO"
+
+
+	# Content Security Policy
 	run "CSPRECON"
 	run "CSPFINDER"
+	run "JSUBFINDER"
 	run "ALLSUBDOMAIN"
+	run "DNSXBRUTE"
+	run "SUBWIZ"
 	# run "RECURSIVESUBENUM"
 
 
@@ -2716,8 +2831,10 @@ RECON(){
 	# run "DNSGEN"
 	# run "GOALTDNS"
 	# run "RIPGEN"
+	# run "DMUT"
 	# run "DNSCEWL"
 	# run "ALLSUBDOMAINPERMUTATIONS"
+	# run "MANUAL_SUBDOMAIN_RESOLVING"
 
 
 	# Subdomain Resolving
@@ -2728,10 +2845,6 @@ RECON(){
 
 	# Subdomain DNS Enumeration
 	# run "DNSX"
-
-
-	# Cloud Recon
-	run "KAEFERJAEGER"
 
 
 	# Port Scanning
@@ -2773,7 +2886,7 @@ RECON(){
 
 
 	# Email Enumeration
-	# run "EMAILFINDER"
+	run "EMAILFINDER"
 
 
 	# Url Crawling
@@ -2784,6 +2897,7 @@ RECON(){
 	run "GAU"
 	# run "GOSPIDER"
 	run "UFORALL"
+	run "CARIDDI"
 	run "URLFINDER"
 	run "GITHUB_ENDPOINTS"
 	run "XURLFIND3R"
@@ -2791,6 +2905,7 @@ RECON(){
 	run "CRAWLEY"
 	run "GOLINKFINDER"
 	# run "GALER # Taking too much ram need to be fixed"
+	# run "GOURLEX"
 	# run "PATHFINDER"
 	run "PATHCRAWLER"
 	run "ROBOXTRACTOR"
@@ -2800,6 +2915,7 @@ RECON(){
 	# Google Dorking
 	# run "AUTOMATED_GOOGLE_DORKING"
 	run "MANUAL_GOOGLE_DORKING"
+	run "BURPSUITE"
 
 
 	# JS Crawling
@@ -2821,11 +2937,107 @@ RECON(){
 	run "MSARJUN"
 	run "X8"
 	run "ALLURLS"
+	# run "SUBDOMAIN_SCRAPING"
+	# run "JS_SUBDOMAINS"
 	run "MANUAL_ALLURLS_FILTER"
 }
 
 # Run functions based on selected recon mode
-if [[ "$RECON_XSS" == true ]]; then
+if [[ "$RECON_SUBDOMAIN" == true ]]; then
+    # Subdomain Enumeration
+	run "BUGBOUNTYDATA"
+	run "SUBFINDER"
+	run "AMASS"
+	run "SUBDOG"
+	run "XSUBFIND3R"
+	run "FINDOMAIN"
+	run "CHAOS"
+	run "GITHUB_SUBDOMAINS"
+	# run "BBOT"
+	run "ONEFORALL"
+	run "SHOSUBGO"
+	run "ASSETFINDER"
+	run "HAKTRAILS"
+	# run "HAKTRAILSFREE"
+	# run "OCCRP"
+	run "ORG2ASN"
+	run "ARINRANGE"
+	run "SPK"
+	run "IPFINDER"
+	# run "IPRANGES"
+	# run "ASNMAP"
+	# run "ANALYTICSRELATIONSHIPS"
+	# run "UDON"
+	run "BUILTWITH"
+	run "WHOXYSUBS"
+
+
+	# Cloud Recon
+	run "KAEFERJAEGER"
+	# run "TRICKESTCLOUD"
+
+
+	# Certificate Transperency
+	run "CERO"
+	run "CERTINFO"
+
+
+	# Content Security Policy
+	run "CSPRECON"
+	run "CSPFINDER"
+	run "JSUBFINDER"
+	run "ALLSUBDOMAIN"
+	run "DNSXBRUTE"
+	run "SUBWIZ"
+	# run "RECURSIVESUBENUM"
+
+
+	# Subdomain Permutations
+	# run "ALTDNS"
+	# run "PUREDNS"
+	# run "ALTERX"
+	# run "GOTATOR"
+	# run "DNSGEN"
+	# run "GOALTDNS"
+	# run "RIPGEN"
+	# run "DMUT"
+	# run "DNSCEWL"
+	# run "ALLSUBDOMAINPERMUTATIONS"
+	# run "MANUAL_SUBDOMAIN_RESOLVING"
+
+
+	# Subdomain Resolving
+	# run "PUREDNS"
+	# run "SHUFFLEDNS"
+	# run "MASSDNS"
+
+
+	# Subdomain DNS Enumeration
+	# run "DNSX"
+
+
+	# Port Scanning
+	run "NAABU"
+	# run "MASSCAN"
+	# run "RUSTSCAN"
+	# run "NMAP"
+
+
+	# Subdomain Probing
+	run "HTTPX"
+
+
+	# Subdomain Bruteforcing
+	# run "FFUFBRUTE"
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
+elif [[ "$RECON_SUBDOMAIN_URLS" == true ]]; then
+    RECON
+
+    # Delete TMPDIR files
+	run "DELETE_TMPDIR"
+elif [[ "$RECON_XSS" == true ]]; then
     RECON
     run "XSS"
     run "SWAGGERUI"
@@ -2835,7 +3047,7 @@ if [[ "$RECON_XSS" == true ]]; then
 elif [[ "$RECON_SQLI" == true ]]; then
     RECON
     run "ERRORBASEDSQLI"
-	# run "TIMEBASEDSQLI"
+	run "TIMEBASEDSQLI"
 
 	# Delete TMPDIR files
 	run "DELETE_TMPDIR"
@@ -2871,6 +3083,7 @@ else
 	run "SUBFINDER"
 	run "AMASS"
 	run "SUBDOG"
+	run "XSUBFIND3R"
 	run "FINDOMAIN"
 	run "CHAOS"
 	run "GITHUB_SUBDOMAINS"
@@ -2880,14 +3093,36 @@ else
 	run "ASSETFINDER"
 	run "HAKTRAILS"
 	# run "HAKTRAILSFREE"
+	# run "OCCRP"
+	run "ORG2ASN"
+	run "ARINRANGE"
+	run "SPK"
+	run "IPFINDER"
+	# run "IPRANGES"
+	# run "ASNMAP"
+	# run "ANALYTICSRELATIONSHIPS"
+	# run "UDON"
+	run "BUILTWITH"
+	run "WHOXYSUBS"
+
+
+	# Cloud Recon
+	run "KAEFERJAEGER"
+	# run "TRICKESTCLOUD"
 
 
 	# Certificate Transperency
 	run "CERO"
 	run "CERTINFO"
+
+
+	# Content Security Policy
 	run "CSPRECON"
 	run "CSPFINDER"
+	run "JSUBFINDER"
 	run "ALLSUBDOMAIN"
+	run "DNSXBRUTE"
+	run "SUBWIZ"
 	# run "RECURSIVESUBENUM"
 
 
@@ -2899,8 +3134,10 @@ else
 	# run "DNSGEN"
 	# run "GOALTDNS"
 	# run "RIPGEN"
+	# run "DMUT"
 	# run "DNSCEWL"
 	# run "ALLSUBDOMAINPERMUTATIONS"
+	# run "MANUAL_SUBDOMAIN_RESOLVING"
 
 
 	# Subdomain Resolving
@@ -2911,10 +3148,6 @@ else
 
 	# Subdomain DNS Enumeration
 	# run "DNSX"
-
-
-	# Cloud Recon
-	run "KAEFERJAEGER"
 
 
 	# Port Scanning
@@ -2956,7 +3189,7 @@ else
 
 
 	# Email Enumeration
-	# run "EMAILFINDER"
+	run "EMAILFINDER"
 
 
 	# Url Crawling
@@ -2967,6 +3200,7 @@ else
 	run "GAU"
 	# run "GOSPIDER"
 	run "UFORALL"
+	run "CARIDDI"
 	run "URLFINDER"
 	run "GITHUB_ENDPOINTS"
 	run "XURLFIND3R"
@@ -2974,6 +3208,7 @@ else
 	run "CRAWLEY"
 	run "GOLINKFINDER"
 	# run "GALER # Taking too much ram need to be fixed"
+	# run "GOURLEX"
 	# run "PATHFINDER"
 	run "PATHCRAWLER"
 	run "ROBOXTRACTOR"
@@ -2983,6 +3218,7 @@ else
 	# Google Dorking
 	# run "AUTOMATED_GOOGLE_DORKING"
 	run "MANUAL_GOOGLE_DORKING"
+	run "BURPSUITE"
 
 
 	# JS Crawling
@@ -3004,6 +3240,8 @@ else
 	run "MSARJUN"
 	run "X8"
 	run "ALLURLS"
+	# run "SUBDOMAIN_SCRAPING"
+	# run "JS_SUBDOMAINS"
 	run "MANUAL_ALLURLS_FILTER"
 
 
@@ -3015,6 +3253,7 @@ else
 	# run "PYDICTOR"
 
 
+	# Parameter Fuzzing
 	# run "FFUF_CUSTOM_PARAM"
 
 
@@ -3036,12 +3275,16 @@ else
 	# Vulnerability Scanning
 	run "FTP"
 	# run "SSH"
+	# run "S3SCANNER"
 	run "VULNTECHX"
 	run "XSS"
 	run "ERRORBASEDSQLI"
 	run "TIMEBASEDSQLI"
 	run "LFI"
 	run "RCE"
+	run "SSTI"
+	run "SSRF"
+	run "OPEN_REDIRECT"
 	run "DOTGIT"
 	run "PDFTOTEXT"
 	run "JSLEAKS"
@@ -3073,4 +3316,4 @@ TIMETOOK=$(printf "%02d:%02d:%02d" $((DURATION/3600)) $(( (DURATION%3600)/60 )) 
 
 echo -e "${BGREEN}[+] STARTED${RESET}: ${STARTED_AT}, ${BGREEN}FINISHED${RESET}: ${ENDED_AT}, ${BGREEN}TIMETOOK${RESET}: ${TIMETOOK}" | unew -a $RESUMELOGFILE
 
-echo -e "Scan finished: $TARGET" | notify -silent -duc -id xssnotify &>/dev/null
+echo -e "Scan finished: $TARGET" | notify -silent -duc -id ${NOTIFY_SCAN_FINISHED} &>/dev/null

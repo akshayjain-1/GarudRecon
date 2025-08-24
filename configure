@@ -18,17 +18,17 @@ mv garudrecon /usr/bin/
 chmod +x $HOME/.garudrecon/cmd/* /usr/bin/garudrecon
 
 # set path to access globally
-sed -i -e 's|source "configuration/garudrecon.cfg"|source "$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|bash "$(dirname "\$0")/cmd/\(.*\)"|bash "$HOME/.garudrecon/cmd/\1"|' /usr/bin/garudrecon
-sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|INSTALLEDLOGFILE="installed.log"|INSTALLEDLOGFILE="$HOME/.garudrecon/installed.log"|' $HOME/.garudrecon/cmd/install
-sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/smallscope
-sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/mediumscope
-sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/largescope
-sed -i -e 's|CONFIG_PATH="configuration/garudrecon.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon.cfg"|' -e 's|BASEDIR="cronjobscan"|BASEDIR="$HOME/.garudrecon/cronjobscan"|' $HOME/.garudrecon/cmd/cronjobs
+sed -i -e 's|source "configuration/garudrecon_max.cfg"|source "$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|bash "$(dirname "\$0")/cmd/\(.*\)"|bash "$HOME/.garudrecon/cmd/\1"|' /usr/bin/garudrecon
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon_max.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|INSTALLEDLOGFILE="installed.log"|INSTALLEDLOGFILE="$HOME/.garudrecon/installed.log"|' $HOME/.garudrecon/cmd/install
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon_max.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/smallscope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon_max.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/mediumscope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon_max.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|BASEDIR="scans"|BASEDIR="$HOME/.garudrecon/scans"|' $HOME/.garudrecon/cmd/largescope
+sed -i -e 's|CONFIG_PATH="configuration/garudrecon_max.cfg"|CONFIG_PATH="$HOME/.garudrecon/configuration/garudrecon_max.cfg"|' -e 's|BASEDIR="cronjobscan"|BASEDIR="$HOME/.garudrecon/cronjobscan"|' $HOME/.garudrecon/cmd/cronjobs
 
 sed -i -e 's|mkdir -p wordlists|mkdir -p $HOME/.garudrecon/wordlists|' -e 's|mkdir -p takeovers|mkdir -p $HOME/.garudrecon/takeovers|' -e 's|mkdir -p templates|mkdir -p $HOME/.garudrecon/templates|' $HOME/.garudrecon/cmd/install
 sed -i -e 's|cp -r ~/nuclei-templates/http/takeovers templates/takeovers|cp -r ~/nuclei-templates/http/takeovers $HOME/.garudrecon/templates/takeovers|' $HOME/.garudrecon/cmd/install
 sed -i -e 's|templates/takeovers/\*\.yaml|$HOME/.garudrecon/templates/takeovers/*.yaml|' $HOME/.garudrecon/cmd/install
-sed -i -e 's|WORDLIST_BASEDIR="wordlists"|WORDLIST_BASEDIR="$HOME/.garudrecon/wordlists"|' $HOME/.garudrecon/configuration/garudrecon.cfg
+sed -i -e 's|WORDLIST_BASEDIR="wordlists"|WORDLIST_BASEDIR="$HOME/.garudrecon/wordlists"|' $HOME/.garudrecon/configuration/garudrecon_max.cfg
 
 
 # install tools
@@ -47,6 +47,30 @@ echo -e "cp -r private-config/* $HOME/.config && rm -rf private-config"
 echo -e "\nOr if you have backup $HOME/.config in github but it's a private repo:"
 echo -e "git clone https://<TOKEN>@github.com/yourusername/private-config.git --depth 1"
 echo -e "cp -r private-config/* $HOME/.config && rm -rf private-config"
+
+
+# Get total RAM in GB (rounded down)
+TOTAL_RAM_GB=$(free -g | awk '/^Mem:/{print $2}')
+
+echo "Detected System RAM: ${TOTAL_RAM_GB} GB"
+
+if [ "$TOTAL_RAM_GB" -le 1 ]; then
+    CONFIG="garudrecon_1g.cfg"
+elif [ "$TOTAL_RAM_GB" -le 2 ]; then
+    CONFIG="garudrecon_2g.cfg"
+elif [ "$TOTAL_RAM_GB" -le 4 ]; then
+    CONFIG="garudrecon_4g.cfg"
+elif [ "$TOTAL_RAM_GB" -le 6 ]; then
+    CONFIG="garudrecon_6g.cfg"
+elif [ "$TOTAL_RAM_GB" -le 8 ]; then
+    CONFIG="garudrecon_8g.cfg"
+elif [ "$TOTAL_RAM_GB" -ge 16 ]; then
+    CONFIG="garudrecon_max.cfg"
+else
+    CONFIG="garudrecon_max.cfg"  # fallback
+fi
+
+echo "Recommended config file: $CONFIG"
 
 
 cd ..

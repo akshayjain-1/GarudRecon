@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | gowitness scan file -f - --screenshot-fullpage --delay 0 --timeout 30 --threads 50 --save-content --write-db --screenshot-skip-save --write-screenshots"
+  ],
+  "example": "garudrecon workflow gowitness --input domain.com.httpx --output domain.com.gowitness",
+  "description": "Screenshotting with gowitness"
+}]

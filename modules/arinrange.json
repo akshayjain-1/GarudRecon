@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | arinrange --silent 2>/dev/null | mapcidr -silent -aggregate | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow arinrange --input domain.com.orgs --output domain.com.arinrange",
+  "description": ""
+}]

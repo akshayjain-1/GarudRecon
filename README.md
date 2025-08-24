@@ -295,6 +295,52 @@ Example:
 
 
 <details>
+  <summary><b>garudrecon cidrscope -h</b></summary>
+
+```
+```
+
+#### Output
+</details>
+
+
+<details>
+  <summary><b>garudrecon workflow -h</b></summary>
+
+```
+Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan).
+
+Usage:
+  garudrecon workflow [flags]
+
+Flags:
+  -i, --input                   Pass the input
+  -o, --output                  Location where you want to save output
+  -v, --verbose                 enable verbose mode
+  -h, --help                    help for cronjobs
+
+Example:
+  garudrecon workflow amass --input <domain> --output <file> [--verbose]
+  garudrecon workflow ls
+  garudrecon workflow ls [module]
+```
+
+Check invalid
+```
+for f in modules/*.json; do
+  echo -n "Checking $f ... "
+  jq empty "$f" && echo "✅ OK" || echo "❌ INVALID"
+done
+```
+
+#### Output
+<img src="img/output/workflow.png"/>
+<img src="img/output/workflow2.png"/>
+<img src="img/output/workflow3.png"/>
+</details>
+
+
+<details>
   <summary><b>garudrecon cronjobs -h</b></summary>
 
 ```
@@ -343,7 +389,7 @@ Example:
 
 | NAME                 | 1GB RAM | 2GB RAM | 4GB RAM | 8GB RAM | Description                                                                                |
 | -------------------- | ------- | ------- | ------- | ------- | ------------------------------------------------------------------------------------------ |
-| IS_U_USING_VPS       | Yes     | Yes     | Yes     | Yes     | If you running this tool on vps change `IS_U_USING_VPS="FALSE" into IS_U_USING_VPS="TRUE"` |
+| ARE_U_USING_VPS       | Yes     | Yes     | Yes     | Yes     | If you running this tool on vps change `ARE_U_USING_VPS="FALSE" into ARE_U_USING_VPS="TRUE"` |
 | AMASS                | No      | Yes     | Yes     | Yes     |                                                                                            |
 | BBOT                 | No      | Yes     | Yes     | Yes     |                                                                                            |
 | FFUFBRUTE            | No      | Yes     | Yes     | Yes     | Got from https://x.com/ArmanSameer95/status/1680811916053078019                            |

@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "echo ${INPUT} | waybackurls | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow waybackurls --input domain.com.httpx --output domain.com.waybackurls",
+  "description": "Url Crawling with waybackurls"
+}]

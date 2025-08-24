@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default config file path
-CONFIG_PATH="configuration/garudrecon.cfg"
+CONFIG_PATH="configuration/garudrecon_max.cfg"
 
 # Help function
 function show_help() {
@@ -80,8 +80,8 @@ AREUROOTUSER
 
 # Creating directories
 mkdir -p wordlists
-mkdir -p takeovers
-mkdir -p templates
+# mkdir -p takeovers
+# mkdir -p templates
 
 INSTALLEDLOGFILE="installed.log"
 
@@ -992,8 +992,8 @@ NUCLEI_TEMPLATE() {
     nuclei -silent -update-templates &>/dev/null
     git clone https://github.com/rix4uni/nucleihub-templates.git --depth 1 ~/nucleihub-templates &>/dev/null
 
-    cp -r ~/nuclei-templates/http/takeovers templates/takeovers
-    sed -i '/- type: dsl/{N;N;/Host != ip/{N;/^$/d;d;}}' templates/takeovers/*.yaml &>/dev/null
+    cp -r ~/nuclei-templates/http/takeovers takeovers
+    sed -i '/- type: dsl/{N;N;/Host != ip/{N;/^$/d;d;}}' takeovers/*.yaml &>/dev/null
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] NUCLEI_TEMPLATE - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
@@ -1515,6 +1515,20 @@ XSSCHECKER() {
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] XSSCHECKER - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
+GOSQLI() {
+    START_SPINNER "${BGREEN}GOSQLI${RESET}"
+    gocl -i github.com/rix4uni/gosqli &>/dev/null
+
+    if ! command -v gosqli &>/dev/null; then
+        echo -e "${BRED}[x] GOSQLI - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] GOSQLI - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 PORTMAP() {
@@ -2240,6 +2254,20 @@ PYXSS() {
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] PYXSS - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
+PLER() {
+    START_SPINNER "${BGREEN}PLER${RESET}"
+    pip install python-pler &>/dev/null
+
+    if ! command -v pler &>/dev/null; then
+        echo -e "${BRED}[x] PLER - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] PLER - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 ARINRANGE() {
@@ -3079,6 +3107,7 @@ ALL(){
     IP2ORG
     CERTINFO
     XSSCHECKER
+    GOSQLI
     PORTMAP
     PARAMFINDER
     GXSS
@@ -3130,6 +3159,7 @@ ALL(){
     WORDGEN
     FUZZULI
     PYXSS
+    PLER
     ARINRANGE
     BUILTWITHSUBS
     GOOP

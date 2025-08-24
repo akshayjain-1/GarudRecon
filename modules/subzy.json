@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "subzy run --timeout 15 --concurrency 10 --hide_fails --targets ${INPUT} | sed -E 's/\\x1b\\[[0-9;]*m//g' | egrep -av '\\[NOT VULNERABLE\\]' | unew -el ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow subzy --input domain.com.httpx --output domain.com.subzy",
+  "description": "Subdomain Takeover with subzy"
+}]

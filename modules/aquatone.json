@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "cat ${INPUT} | aquatone -out ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow aquatone --input domain.com.subs --output domain.com.aquatone",
+  "description": ""
+}]

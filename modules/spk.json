@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "for ORG in $(cat ${INPUT});do spk -silent -s \"$ORG\" | unew -el -t ${OUTPUT};done"
+  ],
+  "example": "garudrecon workflow spk --input domain.com.orgs --output domain.com.spk",
+  "description": ""
+}]
