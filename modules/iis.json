@@ -1,0 +1,7 @@
+[{
+  "command": [
+    "shortscan ${INPUT} -F -s -p 1 | unew -el -i -t ${OUTPUT}"
+  ],
+  "example": "garudrecon workflow iis --input domain.com --output domain.com.shortscan",
+  "description": "Scan for IIS with shortscan"
+}]
