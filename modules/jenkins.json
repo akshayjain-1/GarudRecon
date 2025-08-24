@@ -1,8 +1,0 @@
-[{
-  "command": [
-    "cat ${INPUT} | httpx -duc -silent | unew -el -i -t -q httpx.cidr",
-    "cat httpx.cidr | nuclei -duc -silent -nc -t ~/nucleihub-templates/nucleihub-templates/unauthenticated-jenkins-rce.yaml | unew -el -i -t ${OUTPUT}"
-  ],
-  "example": "garudrecon workflow jenkins --input domain.subs --output jenkins.nuclei",
-  "description": "Scan jenkins with nuclei"
-}]
