@@ -53,7 +53,7 @@ echo -e "cp -r private-config/* $HOME/.config && rm -rf private-config"
 # Get total RAM in GB (rounded down)
 TOTAL_RAM_GB=$(free -g | awk '/^Mem:/{print $2}')
 
-echo "Detected System RAM: ${TOTAL_RAM_GB} GB"
+echo -e "\nDetected System RAM: ${TOTAL_RAM_GB} GB"
 
 if [ "$TOTAL_RAM_GB" -le 1 ]; then
     CONFIG="garudrecon_1g.cfg"
@@ -71,7 +71,7 @@ else
     CONFIG="garudrecon_max.cfg"  # fallback
 fi
 
-echo "Recommended config file: $CONFIG"
+echo -e "Recommended config file: $CONFIG"
 
 
 cd ..
