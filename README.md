@@ -171,6 +171,7 @@ Usage:
 Flags:
   -f, --function        Function to run (e.g. MEDIUMSCOPE)
   -c, --config          Custom configuration file path
+  -up, --update         Update all tools to latest version
   -v, --verbose         enable verbose mode
   -h, --help            help for install
 
@@ -180,6 +181,7 @@ Example:
   garudrecon install -f LARGESCOPE
   garudrecon install -f CRONJOBS
   garudrecon install -f ALL
+  garudrecon install -f ALL --update
 ```
 
 

@@ -2,6 +2,7 @@
 
 # Default config file path
 CONFIG_PATH="configuration/garudrecon_max.cfg"
+UPDATE=false
 
 # Help function
 function show_help() {
@@ -16,6 +17,7 @@ Usage:
 Flags:
   -f, --function        Function to run (e.g. MEDIUMSCOPE)
   -c, --config          Custom configuration file path
+  -up, --update         Update all tools to latest version
   -v, --verbose         enable verbose mode
   -h, --help            help for install
 
@@ -25,6 +27,7 @@ Example:
   garudrecon install -f LARGESCOPE
   garudrecon install -f CRONJOBS
   garudrecon install -f ALL
+  garudrecon install -f ALL --update
 EOF
 }
 
@@ -49,6 +52,10 @@ while [[ "$#" -gt 0 ]]; do
     -c|--config)
       CONFIG_PATH="$2"
       shift 2
+      ;;
+    -up|--update)
+      UPDATE=true
+      shift
       ;;
     -v|--verbose)
       VERBOSE=true
@@ -80,8 +87,6 @@ AREUROOTUSER
 
 # Creating directories
 mkdir -p wordlists
-# mkdir -p takeovers
-# mkdir -p templates
 
 INSTALLEDLOGFILE="installed.log"
 
@@ -151,6 +156,13 @@ VARIABLES() {
 
 GO() {
     START_SPINNER "${BGREEN}GO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v go &>/dev/null; then
+        echo -e "${YELLOW}[~] GO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash &>/dev/null
 
     if ! command -v go &>/dev/null; then
@@ -165,6 +177,13 @@ GO() {
 
 UNEW() {
     START_SPINNER "${BGREEN}UNEW${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v unew &>/dev/null; then
+        echo -e "${YELLOW}[~] UNEW - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     go install github.com/rix4uni/unew@latest &>/dev/null
 
     if ! command -v unew &>/dev/null; then
@@ -179,6 +198,13 @@ UNEW() {
 
 UNEWFLUSH() {
     START_SPINNER "${BGREEN}UNEWFLUSH${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v unewflush &>/dev/null; then
+        echo -e "${YELLOW}[~] UNEWFLUSH - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     # This is unew flush version only for gungnir saves output immediately in a file.
     git clone https://github.com/rix4uni/unew.git --depth 1 unewflush &>/dev/null
     cd unewflush
@@ -214,6 +240,13 @@ PACKAGES() {
 
 PYTHON3() {
     START_SPINNER "${BGREEN}PYTHON3${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v python3 &>/dev/null; then
+        echo -e "${YELLOW}[~] PYTHON3 - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install python3 -y &>/dev/null
 
     if ! command -v python3 &>/dev/null; then
@@ -226,18 +259,25 @@ PYTHON3() {
     echo -e "${BGREEN}[+] PYTHON3 - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
-PYTHON3_PIP() {
-    START_SPINNER "${BGREEN}PYTHON3_PIP${RESET}"
-    apt install python3-pip -y &>/dev/null
+PIP3() {
+    START_SPINNER "${BGREEN}PIP3${RESET}"
 
-    if ! command -v pip3 &>/dev/null; then
-        echo -e "${BRED}[x] PYTHON3_PIP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+    if [[ "$UPDATE" == false ]] && command -v pip3 &>/dev/null; then
+        echo -e "${YELLOW}[~] PIP3 - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
         STOP_SPINNER
         return
     fi
 
+    apt install python3-pip -y &>/dev/null
+
+    if ! command -v pip3 &>/dev/null; then
+        echo -e "${BRED}[x] PIP3 - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+ 
     STOP_SPINNER
-    echo -e "${BGREEN}[+] PYTHON3_PIP - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+    echo -e "${BGREEN}[+] PIP3 - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 SETUPTOOLS() {
@@ -250,6 +290,13 @@ SETUPTOOLS() {
 
 GCC() {
     START_SPINNER "${BGREEN}GCC${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gcc &>/dev/null; then
+        echo -e "${YELLOW}[~] GCC - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install gcc -y &>/dev/null
 
     if ! command -v gcc &>/dev/null; then
@@ -264,6 +311,13 @@ GCC() {
 
 GIT() {
     START_SPINNER "${BGREEN}GIT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v git &>/dev/null; then
+        echo -e "${YELLOW}[~] GIT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install git -y &>/dev/null
 
     if ! command -v git &>/dev/null; then
@@ -278,6 +332,13 @@ GIT() {
 
 PIPREQS() {
     START_SPINNER "${BGREEN}PIPREQS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pipreqs &>/dev/null; then
+        echo -e "${YELLOW}[~] PIPREQS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip3 install pipreqs --no-cache-dir &>/dev/null
 
     if ! command -v pipreqs &>/dev/null; then
@@ -292,6 +353,13 @@ PIPREQS() {
 
 SSHPASS() {
     START_SPINNER "${BGREEN}SSHPASS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v sshpass &>/dev/null; then
+        echo -e "${YELLOW}[~] SSHPASS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install sshpass &>/dev/null
 
     if ! command -v sshpass &>/dev/null; then
@@ -306,6 +374,13 @@ SSHPASS() {
 
 CURL() {
     START_SPINNER "${BGREEN}CURL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v curl &>/dev/null; then
+        echo -e "${YELLOW}[~] CURL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install curl -y &>/dev/null
 
     if ! command -v curl &>/dev/null; then
@@ -320,6 +395,13 @@ CURL() {
 
 DOS2UNIX() {
     START_SPINNER "${BGREEN}DOS2UNIX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dos2unix &>/dev/null; then
+        echo -e "${YELLOW}[~] DOS2UNIX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install dos2unix &>/dev/null
 
     if ! command -v dos2unix &>/dev/null; then
@@ -334,6 +416,13 @@ DOS2UNIX() {
 
 WGET() {
     START_SPINNER "${BGREEN}WGET${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v wget &>/dev/null; then
+        echo -e "${YELLOW}[~] WGET - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install wget -y &>/dev/null
 
     if ! command -v wget &>/dev/null; then
@@ -348,6 +437,13 @@ WGET() {
 
 ZIP() {
     START_SPINNER "${BGREEN}ZIP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v zip &>/dev/null; then
+        echo -e "${YELLOW}[~] ZIP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install zip -y &>/dev/null
 
     if ! command -v zip &>/dev/null; then
@@ -362,6 +458,13 @@ ZIP() {
 
 XSEL() {
     START_SPINNER "${BGREEN}XSEL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xsel &>/dev/null; then
+        echo -e "${YELLOW}[~] XSEL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install xsel &>/dev/null
 
     if ! command -v xsel &>/dev/null; then
@@ -376,6 +479,13 @@ XSEL() {
 
 JQ() {
     START_SPINNER "${BGREEN}JQ${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jq &>/dev/null; then
+        echo -e "${YELLOW}[~] JQ - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install jq -y &>/dev/null
 
     if ! command -v jq &>/dev/null; then
@@ -390,6 +500,13 @@ JQ() {
 
 YQ() {
     START_SPINNER "${BGREEN}YQ${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v yq &>/dev/null; then
+        echo -e "${YELLOW}[~] YQ - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q -O /usr/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 &>/dev/null
     chmod +x /usr/bin/yq
 
@@ -413,6 +530,13 @@ LIBPCAP_DEV() {
 
 NPM() {
     START_SPINNER "${BGREEN}NPM${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v npm &>/dev/null; then
+        echo -e "${YELLOW}[~] NPM - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install npm -y &>/dev/null
 
     if ! command -v npm &>/dev/null; then
@@ -427,6 +551,12 @@ NPM() {
 
 CSV2JSON() {
     START_SPINNER "${BGREEN}CSV2JSON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v csv2json &>/dev/null; then
+        echo -e "${YELLOW}[~] CSV2JSON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
 
     wget -q https://github.com/knadh/csv2json/releases/download/v0.1.1/csv2json_0.1.1_linux_amd64.tar.gz
     tar -xzf csv2json_0.1.1_linux_amd64.tar.gz
@@ -445,6 +575,12 @@ CSV2JSON() {
 
 CSVTK() {
     START_SPINNER "${BGREEN}CSVTK${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v csvtk &>/dev/null; then
+        echo -e "${YELLOW}[~] CSVTK - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
 
     wget -q https://github.com/shenwei356/csvtk/releases/download/v0.32.0/csvtk_linux_amd64.tar.gz
     tar -xzf csvtk_linux_amd64.tar.gz
@@ -487,6 +623,13 @@ BUILD_ESSENTIAL() {
 
 CHROMIUM() {
     START_SPINNER "${BGREEN}CHROMIUM${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v chromium &>/dev/null; then
+        echo -e "${YELLOW}[~] CHROMIUM - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install chromium -y &>/dev/null
 
     if ! command -v chromium &>/dev/null; then
@@ -501,6 +644,13 @@ CHROMIUM() {
 
 CHROME() {
     START_SPINNER "${BGREEN}CHROME${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v google-chrome &>/dev/null; then
+        echo -e "${YELLOW}[~] CHROME - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     dpkg -i google-chrome-stable_current_amd64.deb &>/dev/null
     rm -rf google-chrome-stable_current_amd64.deb
@@ -519,6 +669,13 @@ CHROME() {
 
 PIPX() {
     START_SPINNER "${BGREEN}PIPX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pipx &>/dev/null; then
+        echo -e "${YELLOW}[~] PIPX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install pipx -y &>/dev/null
 
     if ! command -v pipx &>/dev/null; then
@@ -533,6 +690,13 @@ PIPX() {
 
 CMAKE() {
     START_SPINNER "${BGREEN}CMAKE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cmake &>/dev/null; then
+        echo -e "${YELLOW}[~] CMAKE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install cmake -y &>/dev/null
 
     if ! command -v cmake &>/dev/null; then
@@ -547,6 +711,25 @@ CMAKE() {
 
 RUST() {
     START_SPINNER "${BGREEN}RUST${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v rustup &>/dev/null; then
+        echo -e "${YELLOW}[~] RUSTUP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    if [[ "$UPDATE" == false ]] && command -v rustc &>/dev/null; then
+        echo -e "${YELLOW}[~] RUSTC - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    if [[ "$UPDATE" == false ]] && command -v cargo &>/dev/null; then
+        echo -e "${YELLOW}[~] CARGO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null
     source ~/.bashrc
 
@@ -574,6 +757,13 @@ RUST() {
 
 PDFTOTEXT() {
     START_SPINNER "${BGREEN}PDFTOTEXT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pdftotext &>/dev/null; then
+        echo -e "${YELLOW}[~] PDFTOTEXT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install poppler-utils -y &>/dev/null
 
     if ! command -v pdftotext &>/dev/null; then
@@ -588,6 +778,13 @@ PDFTOTEXT() {
 
 PARALLEL() {
     START_SPINNER "${BGREEN}PARALLEL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v parallel &>/dev/null; then
+        echo -e "${YELLOW}[~] PARALLEL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install parallel -y &>/dev/null
 
     if ! command -v parallel &>/dev/null; then
@@ -602,6 +799,13 @@ PARALLEL() {
 
 CEWL() {
     START_SPINNER "${BGREEN}CEWL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cewl &>/dev/null; then
+        echo -e "${YELLOW}[~] CEWL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install cewl -y &>/dev/null
 
     if ! command -v cewl &>/dev/null; then
@@ -616,6 +820,13 @@ CEWL() {
 
 PROXYCHAINS_SETUP() {
     START_SPINNER "${BGREEN}PROXYCHAINS_SETUP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v proxychains &>/dev/null; then
+        echo -e "${YELLOW}[~] PROXYCHAINS_SETUP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     curl -s "https://raw.githubusercontent.com/rix4uni/proxychains_setup/main/setup.sh" | bash &>/dev/null
 
     if ! command -v proxychains &>/dev/null; then
@@ -630,6 +841,13 @@ PROXYCHAINS_SETUP() {
 
 GOCL() {
     START_SPINNER "${BGREEN}GOCL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v GOCL &>/dev/null; then
+        echo -e "${YELLOW}[~] gocl - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://github.com/rix4uni/gocl/releases/download/v0.0.4/gocl-linux-amd64-0.0.4.tgz
     tar -xvzf gocl-linux-amd64-0.0.4.tgz &>/dev/null
     rm -rf gocl-linux-amd64-0.0.4.tgz
@@ -648,6 +866,13 @@ GOCL() {
 
 SHODAN() {
     START_SPINNER "${BGREEN}SHODAN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v shodan &>/dev/null; then
+        echo -e "${YELLOW}[~] SHODAN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     apt install python3-shodan -y &>/dev/null
 
     if ! command -v shodan &>/dev/null; then
@@ -662,6 +887,13 @@ SHODAN() {
 
 ARJUN() {
     START_SPINNER "${BGREEN}ARJUN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v arjun &>/dev/null; then
+        echo -e "${YELLOW}[~] ARJUN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip3 install arjun --no-cache-dir &>/dev/null
 
     if ! command -v arjun &>/dev/null; then
@@ -676,6 +908,13 @@ ARJUN() {
 
 TLDINFO() {
     START_SPINNER "${BGREEN}TLDINFO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v tldinfo &>/dev/null; then
+        echo -e "${YELLOW}[~] TLDINFO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/tldinfo.git &>/dev/null
 
     if ! command -v tldinfo &>/dev/null; then
@@ -690,6 +929,13 @@ TLDINFO() {
 
 SUBWIZ() {
     START_SPINNER "${BGREEN}SUBWIZ${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subwiz &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBWIZ - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/hadriansecurity/subwiz.git &>/dev/null
 
     if ! command -v subwiz &>/dev/null; then
@@ -704,6 +950,13 @@ SUBWIZ() {
 
 URO() {
     START_SPINNER "${BGREEN}URO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v uro &>/dev/null; then
+        echo -e "${YELLOW}[~] URO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip3 install uro --no-cache-dir &>/dev/null
 
     if ! command -v uro &>/dev/null; then
@@ -718,6 +971,13 @@ URO() {
 
 X8() {
     START_SPINNER "${BGREEN}X8${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v x8 &>/dev/null; then
+        echo -e "${YELLOW}[~] X8 - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://github.com/Sh1Yo/x8/releases/download/v4.3.0/x86_64-linux-x8.gz
     gunzip x86_64-linux-x8.gz
     mv x86_64-linux-x8 x8
@@ -736,6 +996,13 @@ X8() {
 
 FINDOMAIN() {
     START_SPINNER "${BGREEN}FINDOMAIN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v findomain &>/dev/null; then
+        echo -e "${YELLOW}[~] FINDOMAIN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://github.com/Findomain/Findomain/releases/download/9.0.4/findomain-linux.zip
     unzip -q findomain-linux.zip
     rm -rf findomain-linux.zip
@@ -754,6 +1021,13 @@ FINDOMAIN() {
 
 BBOT() {
     START_SPINNER "${BGREEN}BBOT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v bbot &>/dev/null; then
+        echo -e "${YELLOW}[~] BBOT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force bbot &>/dev/null
 
     if ! command -v bbot &>/dev/null; then
@@ -768,6 +1042,13 @@ BBOT() {
 
 WAYMORE() {
     START_SPINNER "${BGREEN}WAYMORE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v waymore &>/dev/null; then
+        echo -e "${YELLOW}[~] WAYMORE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip3 install waymore --no-cache-dir &>/dev/null
 
     if ! command -v waymore &>/dev/null; then
@@ -782,6 +1063,13 @@ WAYMORE() {
 
 XNLINKFINDER() {
     START_SPINNER "${BGREEN}XNLINKFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xnLinkFinder &>/dev/null; then
+        echo -e "${YELLOW}[~] XNLINKFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip3 install xnLinkFinder --no-cache-dir &>/dev/null
 
     if ! command -v xnLinkFinder &>/dev/null; then
@@ -796,6 +1084,13 @@ XNLINKFINDER() {
 
 FEROXBUSTER() {
     START_SPINNER "${BGREEN}FEROXBUSTER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v feroxbuster &>/dev/null; then
+        echo -e "${YELLOW}[~] FEROXBUSTER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://github.com/epi052/feroxbuster/releases/download/v2.11.0/feroxbuster_amd64.deb.zip &>/dev/null
     unzip -q feroxbuster_amd64.deb.zip
     dpkg -i feroxbuster_2.11.0-1_amd64.deb &>/dev/null
@@ -813,6 +1108,13 @@ FEROXBUSTER() {
 
 ALTDNS() {
     START_SPINNER "${BGREEN}ALTDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v altdns &>/dev/null; then
+        echo -e "${YELLOW}[~] ALTDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/infosec-au/altdns.git &>/dev/null
 
     if ! command -v altdns &>/dev/null; then
@@ -827,6 +1129,13 @@ ALTDNS() {
 
 MASSCAN() {
     START_SPINNER "${BGREEN}MASSCAN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v masscan &>/dev/null; then
+        echo -e "${YELLOW}[~] MASSCAN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/robertdavidgraham/masscan.git --depth 1 &>/dev/null
     cd masscan
     make &>/dev/null
@@ -846,6 +1155,13 @@ MASSCAN() {
 
 MASSDNS() {
     START_SPINNER "${BGREEN}MASSDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v massdns &>/dev/null; then
+        echo -e "${YELLOW}[~] MASSDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/blechschmidt/massdns.git --depth 1 &>/dev/null
     cd massdns
     make &>/dev/null
@@ -865,6 +1181,13 @@ MASSDNS() {
 
 RUSTSCAN() {
     START_SPINNER "${BGREEN}RUSTSCAN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v rustscan &>/dev/null; then
+        echo -e "${YELLOW}[~] RUSTSCAN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     wget -q https://github.com/RustScan/RustScan/releases/download/2.3.0/rustscan-2.3.0-x86_64-linux.zip
     unzip -q rustscan-2.3.0-x86_64-linux.zip
     chmod +x tmp/rustscan-2.3.0-x86_64-linux/rustscan
@@ -883,6 +1206,13 @@ RUSTSCAN() {
 
 GHAURI() {
     START_SPINNER "${BGREEN}GHAURI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ghauri &>/dev/null; then
+        echo -e "${YELLOW}[~] GHAURI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     # pipx install --force git+https://github.com/r0oth3x49/ghauri.git &>/dev/null
 
     git clone https://github.com/r0oth3x49/ghauri.git --depth 1 &>/dev/null
@@ -904,6 +1234,13 @@ GHAURI() {
 
 SQLMAP() {
     START_SPINNER "${BGREEN}SQLMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v sqlmap &>/dev/null; then
+        echo -e "${YELLOW}[~] SQLMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/sqlmapproject/sqlmap.git --depth 1 tools/sqlmap &>/dev/null
     sed -i "s/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='n', boolean=True) else REDIRECTION.NO/g" tools/sqlmap/lib/request/redirecthandler.py
 
@@ -919,6 +1256,13 @@ SQLMAP() {
 
 INTERLACE() {
     START_SPINNER "${BGREEN}INTERLACE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v interlace &>/dev/null; then
+        echo -e "${YELLOW}[~] INTERLACE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/codingo/Interlace.git &>/dev/null
 
     if ! command -v interlace &>/dev/null; then
@@ -933,6 +1277,13 @@ INTERLACE() {
 
 HTTPX() {
     START_SPINNER "${BGREEN}HTTPX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v httpx &>/dev/null; then
+        echo -e "${YELLOW}[~] HTTPX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/httpx &>/dev/null
 
     if ! command -v httpx &>/dev/null; then
@@ -947,6 +1298,13 @@ HTTPX() {
 
 XSUBFIND3R() {
     START_SPINNER "${BGREEN}XSUBFIND3R${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xsubfind3r &>/dev/null; then
+        echo -e "${YELLOW}[~] XSUBFIND3R - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hueristiq/xsubfind3r -c "cmd/xsubfind3r" &>/dev/null
 
     if ! command -v xsubfind3r &>/dev/null; then
@@ -961,6 +1319,13 @@ XSUBFIND3R() {
 
 JSUBFINDER() {
     START_SPINNER "${BGREEN}JSUBFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jsubfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] JSUBFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/ThreatUnkown/jsubfinder &>/dev/null
 
     if ! command -v jsubfinder &>/dev/null; then
@@ -975,6 +1340,13 @@ JSUBFINDER() {
 
 NUCLEI() {
     START_SPINNER "${BGREEN}NUCLEI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v nuclei &>/dev/null; then
+        echo -e "${YELLOW}[~] NUCLEI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/nuclei &>/dev/null
 
     if ! command -v nuclei &>/dev/null; then
@@ -1001,6 +1373,13 @@ NUCLEI_TEMPLATE() {
 
 SUBFINDER() {
     START_SPINNER "${BGREEN}SUBFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/subfinder &>/dev/null
 
     if ! command -v subfinder &>/dev/null; then
@@ -1015,6 +1394,13 @@ SUBFINDER() {
 
 CVEMAP() {
     START_SPINNER "${BGREEN}CVEMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cvemap &>/dev/null; then
+        echo -e "${YELLOW}[~] CVEMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/cvemap &>/dev/null
 
     if ! command -v cvemap &>/dev/null; then
@@ -1029,6 +1415,13 @@ CVEMAP() {
 
 KATANA() {
     START_SPINNER "${BGREEN}KATANA${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v katana &>/dev/null; then
+        echo -e "${YELLOW}[~] KATANA - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/katana &>/dev/null
 
     if ! command -v katana &>/dev/null; then
@@ -1043,6 +1436,13 @@ KATANA() {
 
 NAABU() {
     START_SPINNER "${BGREEN}NAABU${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v naabu &>/dev/null; then
+        echo -e "${YELLOW}[~] NAABU - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/naabu &>/dev/null
 
     if ! command -v naabu &>/dev/null; then
@@ -1057,6 +1457,13 @@ NAABU() {
 
 NMAP() {
     START_SPINNER "${BGREEN}NMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v nmap &>/dev/null; then
+        echo -e "${YELLOW}[~] NMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/nmap/nmap.git --depth 1 &>/dev/null
     cd nmap
     ./configure &>/dev/null
@@ -1065,7 +1472,7 @@ NMAP() {
     cd ..
     rm -rf nmap
 
-    if ! command -v naabu &>/dev/null; then
+    if ! command -v nmap &>/dev/null; then
         echo -e "${BRED}[x] NMAP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
@@ -1077,6 +1484,13 @@ NMAP() {
 
 MAPCIDR() {
     START_SPINNER "${BGREEN}MAPCIDR${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v mapcidr &>/dev/null; then
+        echo -e "${YELLOW}[~] MAPCIDR - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/mapcidr &>/dev/null
 
     if ! command -v mapcidr &>/dev/null; then
@@ -1091,6 +1505,13 @@ MAPCIDR() {
 
 SHUFFLEDNS() {
     START_SPINNER "${BGREEN}SHUFFLEDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v shuffledns &>/dev/null; then
+        echo -e "${YELLOW}[~] SHUFFLEDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/shuffledns &>/dev/null
 
     if ! command -v shuffledns &>/dev/null; then
@@ -1105,6 +1526,13 @@ SHUFFLEDNS() {
 
 UNCOVER() {
     START_SPINNER "${BGREEN}UNCOVER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v uncover &>/dev/null; then
+        echo -e "${YELLOW}[~] UNCOVER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/uncover &>/dev/null
 
     if ! command -v uncover &>/dev/null; then
@@ -1119,6 +1547,13 @@ UNCOVER() {
 
 ASNMAP() {
     START_SPINNER "${BGREEN}ASNMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v asnmap &>/dev/null; then
+        echo -e "${YELLOW}[~] ASNMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/asnmap &>/dev/null
 
     if ! command -v asnmap &>/dev/null; then
@@ -1133,6 +1568,13 @@ ASNMAP() {
 
 CDNCHECK() {
     START_SPINNER "${BGREEN}CDNCHECK${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cdncheck &>/dev/null; then
+        echo -e "${YELLOW}[~] CDNCHECK - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/cdncheck &>/dev/null
 
     if ! command -v cdncheck &>/dev/null; then
@@ -1147,6 +1589,13 @@ CDNCHECK() {
 
 DNSX() {
     START_SPINNER "${BGREEN}DNSX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dnsx &>/dev/null; then
+        echo -e "${YELLOW}[~] DNSX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/dnsx &>/dev/null
 
     if ! command -v dnsx &>/dev/null; then
@@ -1161,6 +1610,13 @@ DNSX() {
 
 CHAOS() {
     START_SPINNER "${BGREEN}CHAOS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v chaos &>/dev/null; then
+        echo -e "${YELLOW}[~] CHAOS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/chaos-client -c "cmd/chaos" &>/dev/null
 
     if ! command -v chaos &>/dev/null; then
@@ -1175,6 +1631,13 @@ CHAOS() {
 
 TLDFINDER() {
     START_SPINNER "${BGREEN}TLDFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v tldfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] TLDFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/tldfinder &>/dev/null
 
     if ! command -v tldfinder &>/dev/null; then
@@ -1189,6 +1652,13 @@ TLDFINDER() {
 
 ALTERX() {
     START_SPINNER "${BGREEN}ALTERX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v alterx &>/dev/null; then
+        echo -e "${YELLOW}[~] ALTERX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/alterx &>/dev/null
 
     if ! command -v alterx &>/dev/null; then
@@ -1203,6 +1673,13 @@ ALTERX() {
 
 TLSX() {
     START_SPINNER "${BGREEN}TLSX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v tlsx &>/dev/null; then
+        echo -e "${YELLOW}[~] TLSX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/tlsx &>/dev/null
 
     if ! command -v tlsx &>/dev/null; then
@@ -1217,6 +1694,13 @@ TLSX() {
 
 INTERACTSH_CLIENT() {
     START_SPINNER "${BGREEN}INTERACTSH_CLIENT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v interactsh-client &>/dev/null; then
+        echo -e "${YELLOW}[~] INTERACTSH_CLIENT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/interactsh -c "cmd/interactsh-client" &>/dev/null
 
     if ! command -v interactsh-client &>/dev/null; then
@@ -1231,6 +1715,13 @@ INTERACTSH_CLIENT() {
 
 NOTIFY() {
     START_SPINNER "${BGREEN}NOTIFY${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v notify &>/dev/null; then
+        echo -e "${YELLOW}[~] NOTIFY - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/notify &>/dev/null
 
     if ! command -v notify &>/dev/null; then
@@ -1245,6 +1736,13 @@ NOTIFY() {
 
 HTTPROBE() {
     START_SPINNER "${BGREEN}HTTPROBE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v httprobe &>/dev/null; then
+        echo -e "${YELLOW}[~] HTTPROBE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/httprobe &>/dev/null
 
     if ! command -v httprobe &>/dev/null; then
@@ -1259,6 +1757,13 @@ HTTPROBE() {
 
 ASSETFINDER() {
     START_SPINNER "${BGREEN}ASSETFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v assetfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] ASSETFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/assetfinder &>/dev/null
 
     if ! command -v assetfinder &>/dev/null; then
@@ -1273,6 +1778,13 @@ ASSETFINDER() {
 
 WAYBACKURLS() {
     START_SPINNER "${BGREEN}WAYBACKURLS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v waybackurls &>/dev/null; then
+        echo -e "${YELLOW}[~] WAYBACKURLS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/waybackurls &>/dev/null
 
     if ! command -v waybackurls &>/dev/null; then
@@ -1287,6 +1799,13 @@ WAYBACKURLS() {
 
 FFF() {
     START_SPINNER "${BGREEN}FFF${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v fff &>/dev/null; then
+        echo -e "${YELLOW}[~] FFF - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/fff &>/dev/null
 
     if ! command -v fff &>/dev/null; then
@@ -1301,6 +1820,13 @@ FFF() {
 
 MEG() {
     START_SPINNER "${BGREEN}MEG${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v meg &>/dev/null; then
+        echo -e "${YELLOW}[~] MEG - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/meg &>/dev/null
 
     if ! command -v meg &>/dev/null; then
@@ -1315,6 +1841,13 @@ MEG() {
 
 ANEW() {
     START_SPINNER "${BGREEN}ANEW${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v anew &>/dev/null; then
+        echo -e "${YELLOW}[~] ANEW - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/anew &>/dev/null
 
     if ! command -v anew &>/dev/null; then
@@ -1329,6 +1862,13 @@ ANEW() {
 
 GRON() {
     START_SPINNER "${BGREEN}GRON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gron &>/dev/null; then
+        echo -e "${YELLOW}[~] GRON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/gron &>/dev/null
 
     if ! command -v gron &>/dev/null; then
@@ -1343,6 +1883,13 @@ GRON() {
 
 UNFURL() {
     START_SPINNER "${BGREEN}UNFURL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v unfurl &>/dev/null; then
+        echo -e "${YELLOW}[~] UNFURL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/unfurl &>/dev/null
 
     if ! command -v unfurl &>/dev/null; then
@@ -1357,6 +1904,13 @@ UNFURL() {
 
 GF() {
     START_SPINNER "${BGREEN}GF${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gf &>/dev/null; then
+        echo -e "${YELLOW}[~] GF - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/gf &>/dev/null
 
     if ! command -v gf &>/dev/null; then
@@ -1379,6 +1933,13 @@ GF_PATTERNS() {
 
 QSREPLACE() {
     START_SPINNER "${BGREEN}QSREPLACE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v qsreplace &>/dev/null; then
+        echo -e "${YELLOW}[~] QSREPLACE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/tomnomnom/qsreplace &>/dev/null
 
     if ! command -v qsreplace &>/dev/null; then
@@ -1393,6 +1954,13 @@ QSREPLACE() {
 
 SUBDOG() {
     START_SPINNER "${BGREEN}SUBDOG${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subdog &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBDOG - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/subdog &>/dev/null
 
     if ! command -v subdog &>/dev/null; then
@@ -1407,6 +1975,13 @@ SUBDOG() {
 
 HAKTRAILSFREE() {
     START_SPINNER "${BGREEN}HAKTRAILSFREE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v haktrailsfree &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKTRAILSFREE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/haktrailsfree &>/dev/null
 
     if ! command -v haktrailsfree &>/dev/null; then
@@ -1421,6 +1996,13 @@ HAKTRAILSFREE() {
 
 ORG2ASN() {
     START_SPINNER "${BGREEN}ORG2ASN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v org2asn &>/dev/null; then
+        echo -e "${YELLOW}[~] ORG2ASN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/org2asn &>/dev/null
 
     if ! command -v org2asn &>/dev/null; then
@@ -1435,6 +2017,13 @@ ORG2ASN() {
 
 WHOXYSUBS() {
     START_SPINNER "${BGREEN}WHOXYSUBS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v whoxysubs &>/dev/null; then
+        echo -e "${YELLOW}[~] WHOXYSUBS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/whoxysubs &>/dev/null
 
     if ! command -v whoxysubs &>/dev/null; then
@@ -1449,6 +2038,13 @@ WHOXYSUBS() {
 
 UDON() {
     START_SPINNER "${BGREEN}UDON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v udon &>/dev/null; then
+        echo -e "${YELLOW}[~] UDON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/dhn/udon &>/dev/null
 
     if ! command -v udon &>/dev/null; then
@@ -1463,6 +2059,13 @@ UDON() {
 
 TECHX() {
     START_SPINNER "${BGREEN}TECHX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v techx &>/dev/null; then
+        echo -e "${YELLOW}[~] TECHX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/techx &>/dev/null
 
     if ! command -v techx &>/dev/null; then
@@ -1477,6 +2080,13 @@ TECHX() {
 
 IP2ORG() {
     START_SPINNER "${BGREEN}IP2ORG${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ip2org &>/dev/null; then
+        echo -e "${YELLOW}[~] IP2ORG - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/ip2org &>/dev/null
 
     if ! command -v ip2org &>/dev/null; then
@@ -1491,6 +2101,13 @@ IP2ORG() {
 
 CERTINFO() {
     START_SPINNER "${BGREEN}CERTINFO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v certinfo &>/dev/null; then
+        echo -e "${YELLOW}[~] CERTINFO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/certinfo &>/dev/null
 
     if ! command -v certinfo &>/dev/null; then
@@ -1505,6 +2122,13 @@ CERTINFO() {
 
 XSSCHECKER() {
     START_SPINNER "${BGREEN}XSSCHECKER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xsschecker &>/dev/null; then
+        echo -e "${YELLOW}[~] XSSCHECKER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/xsschecker &>/dev/null
 
     if ! command -v xsschecker &>/dev/null; then
@@ -1519,6 +2143,13 @@ XSSCHECKER() {
 
 GOSQLI() {
     START_SPINNER "${BGREEN}GOSQLI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gosqli &>/dev/null; then
+        echo -e "${YELLOW}[~] GOSQLI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/gosqli &>/dev/null
 
     if ! command -v gosqli &>/dev/null; then
@@ -1533,6 +2164,13 @@ GOSQLI() {
 
 PORTMAP() {
     START_SPINNER "${BGREEN}PORTMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v portmap &>/dev/null; then
+        echo -e "${YELLOW}[~] PORTMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/portmap &>/dev/null
 
     if ! command -v portmap &>/dev/null; then
@@ -1547,6 +2185,13 @@ PORTMAP() {
 
 PARAMFINDER() {
     START_SPINNER "${BGREEN}PARAMFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v paramfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] PARAMFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/paramfinder &>/dev/null
 
     if ! command -v paramfinder &>/dev/null; then
@@ -1561,6 +2206,13 @@ PARAMFINDER() {
 
 GXSS() {
     START_SPINNER "${BGREEN}GXSS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v Gxss &>/dev/null; then
+        echo -e "${YELLOW}[~] GXSS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/Gxss &>/dev/null
 
     if ! command -v Gxss &>/dev/null; then
@@ -1575,6 +2227,13 @@ GXSS() {
 
 MSARJUN() {
     START_SPINNER "${BGREEN}MSARJUN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v msarjun &>/dev/null; then
+        echo -e "${YELLOW}[~] MSARJUN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/msarjun &>/dev/null
 
     if ! command -v msarjun &>/dev/null; then
@@ -1589,6 +2248,13 @@ MSARJUN() {
 
 HAKRAWLER() {
     START_SPINNER "${BGREEN}HAKRAWLER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v hakrawler &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKRAWLER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/hakrawler &>/dev/null
 
     if ! command -v hakrawler &>/dev/null; then
@@ -1603,6 +2269,13 @@ HAKRAWLER() {
 
 HAKREVDNS() {
     START_SPINNER "${BGREEN}HAKREVDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v hakrevdns &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKREVDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/hakrevdns &>/dev/null
 
     if ! command -v hakrevdns &>/dev/null; then
@@ -1617,6 +2290,13 @@ HAKREVDNS() {
 
 HAKLISTGEN() {
     START_SPINNER "${BGREEN}HAKLISTGEN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v haklistgen &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKLISTGEN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/haklistgen &>/dev/null
 
     if ! command -v haklistgen &>/dev/null; then
@@ -1631,6 +2311,13 @@ HAKLISTGEN() {
 
 HAKORIGINFINDER() {
     START_SPINNER "${BGREEN}HAKORIGINFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v hakoriginfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKORIGINFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/hakoriginfinder &>/dev/null
 
     if ! command -v hakoriginfinder &>/dev/null; then
@@ -1645,6 +2332,13 @@ HAKORIGINFINDER() {
 
 HAKCHECKURL() {
     START_SPINNER "${BGREEN}HAKCHECKURL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v hakcheckurl &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKCHECKURL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/hakcheckurl &>/dev/null
 
     if ! command -v hakcheckurl &>/dev/null; then
@@ -1659,6 +2353,13 @@ HAKCHECKURL() {
 
 HAKTRAILS() {
     START_SPINNER "${BGREEN}HAKTRAILS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v haktrails &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKTRAILS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/haktrails &>/dev/null
 
     if ! command -v haktrails &>/dev/null; then
@@ -1673,6 +2374,13 @@ HAKTRAILS() {
 
 HAKIP2HOST() {
     START_SPINNER "${BGREEN}HAKIP2HOST${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v hakip2host &>/dev/null; then
+        echo -e "${YELLOW}[~] HAKIP2HOST - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hakluke/hakip2host &>/dev/null
 
     if ! command -v hakip2host &>/dev/null; then
@@ -1687,6 +2395,13 @@ HAKIP2HOST() {
 
 FFUF() {
     START_SPINNER "${BGREEN}FFUF${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ffuf &>/dev/null; then
+        echo -e "${YELLOW}[~] FFUF - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/ffuf/ffuf &>/dev/null
 
     if ! command -v ffuf &>/dev/null; then
@@ -1701,6 +2416,13 @@ FFUF() {
 
 DIRSEARCH() {
     START_SPINNER "${BGREEN}DIRSEARCH${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dirsearch &>/dev/null; then
+        echo -e "${YELLOW}[~] DIRSEARCH - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/maurosoria/dirsearch.git &>/dev/null
 
     if ! command -v dirsearch &>/dev/null; then
@@ -1715,6 +2437,13 @@ DIRSEARCH() {
 
 GOWITNESS() {
     START_SPINNER "${BGREEN}GOWITNESS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gowitness &>/dev/null; then
+        echo -e "${YELLOW}[~] GOWITNESS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/sensepost/gowitness &>/dev/null
 
     if ! command -v gowitness &>/dev/null; then
@@ -1729,6 +2458,13 @@ GOWITNESS() {
 
 GITHUB_SUBDOMAINS() {
     START_SPINNER "${BGREEN}GITHUB_SUBDOMAINS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v github-subdomains &>/dev/null; then
+        echo -e "${YELLOW}[~] GITHUB_SUBDOMAINS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/gwen001/github-subdomains &>/dev/null
 
     if ! command -v github-subdomains &>/dev/null; then
@@ -1743,6 +2479,13 @@ GITHUB_SUBDOMAINS() {
 
 AMASS() {
     START_SPINNER "${BGREEN}AMASS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v amass &>/dev/null; then
+        echo -e "${YELLOW}[~] AMASS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     go install -v github.com/owasp-amass/amass/v3/...@master &>/dev/null
 
     if ! command -v amass &>/dev/null; then
@@ -1757,6 +2500,13 @@ AMASS() {
 
 SHOSUBGO() {
     START_SPINNER "${BGREEN}SHOSUBGO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v shosubgo &>/dev/null; then
+        echo -e "${YELLOW}[~] SHOSUBGO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/incogbyte/shosubgo &>/dev/null
 
     if ! command -v shosubgo &>/dev/null; then
@@ -1771,6 +2521,13 @@ SHOSUBGO() {
 
 GAU() {
     START_SPINNER "${BGREEN}GAU${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gau &>/dev/null; then
+        echo -e "${YELLOW}[~] GAU - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/lc/gau &>/dev/null
 
     if ! command -v gau &>/dev/null; then
@@ -1785,6 +2542,13 @@ GAU() {
 
 SUBJS() {
     START_SPINNER "${BGREEN}SUBJS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subjs &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBJS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/lc/subjs &>/dev/null
 
     if ! command -v subjs &>/dev/null; then
@@ -1799,6 +2563,13 @@ SUBJS() {
 
 GOSPIDER() {
     START_SPINNER "${BGREEN}GOSPIDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gospider &>/dev/null; then
+        echo -e "${YELLOW}[~] GOSPIDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/jaeles-project/gospider &>/dev/null
 
     if ! command -v gospider &>/dev/null; then
@@ -1813,6 +2584,13 @@ GOSPIDER() {
 
 JAELES() {
     START_SPINNER "${BGREEN}JAELES${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jaeles &>/dev/null; then
+        echo -e "${YELLOW}[~] JAELES - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/jaeles-project/jaeles &>/dev/null
 
     if ! command -v jaeles &>/dev/null; then
@@ -1827,6 +2605,13 @@ JAELES() {
 
 GETJS() {
     START_SPINNER "${BGREEN}GETJS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v getJS &>/dev/null; then
+        echo -e "${YELLOW}[~] GETJS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/003random/getJS &>/dev/null
 
     if ! command -v getJS &>/dev/null; then
@@ -1841,6 +2626,13 @@ GETJS() {
 
 JSLUICE() {
     START_SPINNER "${BGREEN}JSLUICE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jsluice &>/dev/null; then
+        echo -e "${YELLOW}[~] JSLUICE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/BishopFox/jsluice &>/dev/null
 
     if ! command -v jsluice &>/dev/null; then
@@ -1855,6 +2647,13 @@ JSLUICE() {
 
 SHORTSCAN() {
     START_SPINNER "${BGREEN}SHORTSCAN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v shortscan &>/dev/null; then
+        echo -e "${YELLOW}[~] SHORTSCAN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/bitquark/shortscan &>/dev/null
 
     if ! command -v shortscan &>/dev/null; then
@@ -1869,6 +2668,13 @@ SHORTSCAN() {
 
 GUNGNIR() {
     START_SPINNER "${BGREEN}GUNGNIR${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gungnir &>/dev/null; then
+        echo -e "${YELLOW}[~] GUNGNIR - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/g0ldencybersec/gungnir &>/dev/null
 
     if ! command -v gungnir &>/dev/null; then
@@ -1883,6 +2689,13 @@ GUNGNIR() {
 
 SNS() {
     START_SPINNER "${BGREEN}SNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v sns &>/dev/null; then
+        echo -e "${YELLOW}[~] SNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/sw33tLie/sns &>/dev/null
 
     if ! command -v sns &>/dev/null; then
@@ -1897,6 +2710,13 @@ SNS() {
 
 PUREDNS() {
     START_SPINNER "${BGREEN}PUREDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v puredns &>/dev/null; then
+        echo -e "${YELLOW}[~] PUREDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/d3mondev/puredns &>/dev/null
 
     if ! command -v puredns &>/dev/null; then
@@ -1911,6 +2731,13 @@ PUREDNS() {
 
 DMUT() {
     START_SPINNER "${BGREEN}DMUT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dmut &>/dev/null; then
+        echo -e "${YELLOW}[~] DMUT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/bp0lr/dmut &>/dev/null
 
     if ! command -v dmut &>/dev/null; then
@@ -1925,6 +2752,13 @@ DMUT() {
 
 GOBUSTER() {
     START_SPINNER "${BGREEN}GOBUSTER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gobuster &>/dev/null; then
+        echo -e "${YELLOW}[~] GOBUSTER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/OJ/gobuster &>/dev/null
 
     if ! command -v gobuster &>/dev/null; then
@@ -1939,6 +2773,13 @@ GOBUSTER() {
 
 SMAP() {
     START_SPINNER "${BGREEN}SMAP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v smap &>/dev/null; then
+        echo -e "${YELLOW}[~] SMAP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/s0md3v/smap &>/dev/null
 
     if ! command -v smap &>/dev/null; then
@@ -1953,6 +2794,13 @@ SMAP() {
 
 DALFOX() {
     START_SPINNER "${BGREEN}DALFOX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dalfox &>/dev/null; then
+        echo -e "${YELLOW}[~] DALFOX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hahwul/dalfox &>/dev/null
 
     if ! command -v dalfox &>/dev/null; then
@@ -1967,6 +2815,13 @@ DALFOX() {
 
 CERO() {
     START_SPINNER "${BGREEN}CERO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cero &>/dev/null; then
+        echo -e "${YELLOW}[~] CERO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/glebarez/cero &>/dev/null
 
     if ! command -v cero &>/dev/null; then
@@ -1981,6 +2836,13 @@ CERO() {
 
 GOTATOR() {
     START_SPINNER "${BGREEN}GOTATOR${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gotator &>/dev/null; then
+        echo -e "${YELLOW}[~] GOTATOR - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/Josue87/gotator &>/dev/null
 
     if ! command -v gotator &>/dev/null; then
@@ -1995,6 +2857,13 @@ GOTATOR() {
 
 ANALYTICSRELATIONSHIPS() {
     START_SPINNER "${BGREEN}ANALYTICSRELATIONSHIPS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v analyticsrelationships &>/dev/null; then
+        echo -e "${YELLOW}[~] ANALYTICSRELATIONSHIPS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/Josue87/analyticsrelationships &>/dev/null
 
     if ! command -v analyticsrelationships &>/dev/null; then
@@ -2009,6 +2878,13 @@ ANALYTICSRELATIONSHIPS() {
 
 MANTRA() {
     START_SPINNER "${BGREEN}MANTRA${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v mantra &>/dev/null; then
+        echo -e "${YELLOW}[~] MANTRA - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/MrEmpy/mantra &>/dev/null
 
     if ! command -v mantra &>/dev/null; then
@@ -2023,6 +2899,13 @@ MANTRA() {
 
 CRT() {
     START_SPINNER "${BGREEN}CRT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v crt &>/dev/null; then
+        echo -e "${YELLOW}[~] CRT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/cemulus/crt &>/dev/null
 
     if ! command -v crt &>/dev/null; then
@@ -2037,6 +2920,13 @@ CRT() {
 
 URLGRAB() {
     START_SPINNER "${BGREEN}URLGRAB${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v urlgrab &>/dev/null; then
+        echo -e "${YELLOW}[~] URLGRAB - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/iamstoxe/urlgrab &>/dev/null
 
     if ! command -v urlgrab &>/dev/null; then
@@ -2051,6 +2941,13 @@ URLGRAB() {
 
 GOLINKFINDER() {
     START_SPINNER "${BGREEN}GOLINKFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v GoLinkFinder &>/dev/null; then
+        echo -e "${YELLOW}[~] GoLinkFinder - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/GoLinkFinder &>/dev/null
 
     if ! command -v GoLinkFinder &>/dev/null; then
@@ -2065,6 +2962,13 @@ GOLINKFINDER() {
 
 LINX() {
     START_SPINNER "${BGREEN}LINX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v linx &>/dev/null; then
+        echo -e "${YELLOW}[~] LINX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/riza/linx &>/dev/null
 
     if ! command -v linx &>/dev/null; then
@@ -2079,6 +2983,13 @@ LINX() {
 
 KXSS() {
     START_SPINNER "${BGREEN}KXSS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v kxss &>/dev/null; then
+        echo -e "${YELLOW}[~] KXSS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/Emoe/kxss &>/dev/null
 
     if ! command -v kxss &>/dev/null; then
@@ -2093,6 +3004,13 @@ KXSS() {
 
 GALER() {
     START_SPINNER "${BGREEN}GALER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v galer &>/dev/null; then
+        echo -e "${YELLOW}[~] GALER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/dwisiswant0/galer &>/dev/null
 
     if ! command -v galer &>/dev/null; then
@@ -2107,6 +3025,13 @@ GALER() {
 
 JSFINDER() {
     START_SPINNER "${BGREEN}JSFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jsfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] JSFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/kacakb/jsfinder &>/dev/null
 
     if ! command -v jsfinder &>/dev/null; then
@@ -2121,6 +3046,13 @@ JSFINDER() {
 
 PATHFINDER() {
     START_SPINNER "${BGREEN}PATHFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pathfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] PATHFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/Print3M/pathfinder &>/dev/null
 
     if ! command -v pathfinder &>/dev/null; then
@@ -2135,6 +3067,13 @@ PATHFINDER() {
 
 TRUFFLEHOG() {
     START_SPINNER "${BGREEN}TRUFFLEHOG${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v trufflehog &>/dev/null; then
+        echo -e "${YELLOW}[~] TRUFFLEHOG - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/trufflesecurity/trufflehog &>/dev/null
 
     if ! command -v trufflehog &>/dev/null; then
@@ -2149,6 +3088,13 @@ TRUFFLEHOG() {
 
 JSHUNTER() {
     START_SPINNER "${BGREEN}JSHUNTER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jshunter &>/dev/null; then
+        echo -e "${YELLOW}[~] JSHUNTER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/cc1a2b/JShunter &>/dev/null
 
     if ! command -v jshunter &>/dev/null; then
@@ -2163,6 +3109,13 @@ JSHUNTER() {
 
 PPFUZZ() {
     START_SPINNER "${BGREEN}PPFUZZ${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ppfuzz &>/dev/null; then
+        echo -e "${YELLOW}[~] PPFUZZ - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     # Taking too much time/ram to build
     # git clone https://github.com/dwisiswant0/ppfuzz.git --depth 1 &>/dev/null
     # cd ppfuzz
@@ -2188,6 +3141,13 @@ PPFUZZ() {
 
 BRUTESPRAY() {
     START_SPINNER "${BGREEN}BRUTESPRAY${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v brutespray &>/dev/null; then
+        echo -e "${YELLOW}[~] BRUTESPRAY - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/x90skysn3k/brutespray &>/dev/null
 
     if ! command -v brutespray &>/dev/null; then
@@ -2202,6 +3162,13 @@ BRUTESPRAY() {
 
 LINKINSPECTOR() {
     START_SPINNER "${BGREEN}LINKINSPECTOR${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v linkinspector &>/dev/null; then
+        echo -e "${YELLOW}[~] LINKINSPECTOR - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/linkinspector &>/dev/null
 
     if ! command -v linkinspector &>/dev/null; then
@@ -2216,6 +3183,13 @@ LINKINSPECTOR() {
 
 WORDGEN() {
     START_SPINNER "${BGREEN}WORDGEN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v wordgen &>/dev/null; then
+        echo -e "${YELLOW}[~] WORDGEN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/wordgen &>/dev/null
 
     if ! command -v wordgen &>/dev/null; then
@@ -2230,6 +3204,13 @@ WORDGEN() {
 
 FUZZULI() {
     START_SPINNER "${BGREEN}FUZZULI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v fuzzuli &>/dev/null; then
+        echo -e "${YELLOW}[~] FUZZULI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/musana/fuzzuli &>/dev/null
 
     if ! command -v fuzzuli &>/dev/null; then
@@ -2244,6 +3225,13 @@ FUZZULI() {
 
 PYXSS() {
     START_SPINNER "${BGREEN}PYXSS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pyxss &>/dev/null; then
+        echo -e "${YELLOW}[~] PYXSS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/pyxss.git &>/dev/null
 
     if ! command -v pyxss &>/dev/null; then
@@ -2258,6 +3246,13 @@ PYXSS() {
 
 PLER() {
     START_SPINNER "${BGREEN}PLER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pler &>/dev/null; then
+        echo -e "${YELLOW}[~] PLER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pip install python-pler &>/dev/null
 
     if ! command -v pler &>/dev/null; then
@@ -2272,6 +3267,13 @@ PLER() {
 
 ARINRANGE() {
     START_SPINNER "${BGREEN}ARINRANGE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v arinrange &>/dev/null; then
+        echo -e "${YELLOW}[~] ARINRANGE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/arinrange.git &>/dev/null
 
     if ! command -v arinrange &>/dev/null; then
@@ -2286,6 +3288,13 @@ ARINRANGE() {
 
 BUILTWITHSUBS() {
     START_SPINNER "${BGREEN}BUILTWITHSUBS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v builtwithsubs &>/dev/null; then
+        echo -e "${YELLOW}[~] BUILTWITHSUBS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/BUILTWITHSUBS.git &>/dev/null
 
     if ! command -v builtwithsubs &>/dev/null; then
@@ -2300,6 +3309,13 @@ BUILTWITHSUBS() {
 
 GOOP() {
     START_SPINNER "${BGREEN}GOOP${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v goop &>/dev/null; then
+        echo -e "${YELLOW}[~] GOOP - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/nyancrimew/goop &>/dev/null
 
     if ! command -v goop &>/dev/null; then
@@ -2314,6 +3330,13 @@ GOOP() {
 
 COMMIX() {
     START_SPINNER "${BGREEN}COMMIX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v commix &>/dev/null; then
+        echo -e "${YELLOW}[~] COMMIX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/commixproject/commix.git --depth 1 &>/dev/null
     cd commix
     sed -i "s/version='[0-9]\+\.[0-9]\+[^']*'/version='4.0'/g" setup.py
@@ -2333,6 +3356,13 @@ COMMIX() {
 
 PVREPLACE() {
     START_SPINNER "${BGREEN}PVREPLACE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pvreplace &>/dev/null; then
+        echo -e "${YELLOW}[~] PVREPLACE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/pvreplace &>/dev/null
 
     if ! command -v pvreplace &>/dev/null; then
@@ -2347,6 +3377,13 @@ PVREPLACE() {
 
 SSB() {
     START_SPINNER "${BGREEN}SSB${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ssb &>/dev/null; then
+        echo -e "${YELLOW}[~] SSB - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/pwnesia/ssb &>/dev/null
 
     if ! command -v ssb &>/dev/null; then
@@ -2361,6 +3398,13 @@ SSB() {
 
 FTPX() {
     START_SPINNER "${BGREEN}FTPX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ftpx &>/dev/null; then
+        echo -e "${YELLOW}[~] FTPX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/ftpx &>/dev/null
 
     if ! command -v ftpx &>/dev/null; then
@@ -2375,6 +3419,13 @@ FTPX() {
 
 DNSTAKE() {
     START_SPINNER "${BGREEN}DNSTAKE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dnstake &>/dev/null; then
+        echo -e "${YELLOW}[~] DNSTAKE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/pwnesia/dnstake &>/dev/null
 
     if ! command -v dnstake &>/dev/null; then
@@ -2389,6 +3440,13 @@ DNSTAKE() {
 
 MX_TAKEOVER() {
     START_SPINNER "${BGREEN}MX_TAKEOVER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v mx-takeover &>/dev/null; then
+        echo -e "${YELLOW}[~] MX_TAKEOVER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/musana/mx-takeover &>/dev/null
 
     if ! command -v mx-takeover &>/dev/null; then
@@ -2403,6 +3461,13 @@ MX_TAKEOVER() {
 
 SUBZY() {
     START_SPINNER "${BGREEN}SUBZY${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subzy &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBZY - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/subzy &>/dev/null
 
     if ! command -v subzy &>/dev/null; then
@@ -2417,6 +3482,13 @@ SUBZY() {
 
 URLDEDUPE() {
     START_SPINNER "${BGREEN}URLDEDUPE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v urldedupe &>/dev/null; then
+        echo -e "${YELLOW}[~] URLDEDUPE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/ameenmaali/urldedupe.git --depth 1 &>/dev/null
     cd urldedupe
     cmake CMakeLists.txt &>/dev/null
@@ -2437,6 +3509,13 @@ URLDEDUPE() {
 
 TIMELIMITX() {
     START_SPINNER "${BGREEN}TIMELIMITX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v timelimitx &>/dev/null; then
+        echo -e "${YELLOW}[~] TIMELIMITX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/timelimitx &>/dev/null
 
     if ! command -v timelimitx &>/dev/null; then
@@ -2451,6 +3530,13 @@ TIMELIMITX() {
 
 SOURCEMAPPER() {
     START_SPINNER "${BGREEN}SOURCEMAPPER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v sourcemapper &>/dev/null; then
+        echo -e "${YELLOW}[~] SOURCEMAPPER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/denandz/sourcemapper &>/dev/null
 
     if ! command -v sourcemapper &>/dev/null; then
@@ -2465,6 +3551,13 @@ SOURCEMAPPER() {
 
 JSCRAWLER() {
     START_SPINNER "${BGREEN}JSCRAWLER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v jscrawler &>/dev/null; then
+        echo -e "${YELLOW}[~] JSCRAWLER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/jscrawler.git &>/dev/null
 
     if ! command -v jscrawler &>/dev/null; then
@@ -2479,6 +3572,13 @@ JSCRAWLER() {
 
 GORKER() {
     START_SPINNER "${BGREEN}GORKER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gorker &>/dev/null; then
+        echo -e "${YELLOW}[~] GORKER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     pipx install --force git+https://github.com/rix4uni/gorker.git &>/dev/null
 
     if ! command -v gorker &>/dev/null; then
@@ -2493,6 +3593,13 @@ GORKER() {
 
 ROBOTXT() {
     START_SPINNER "${BGREEN}ROBOTXT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v robotxt &>/dev/null; then
+        echo -e "${YELLOW}[~] ROBOTXT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/robotxt &>/dev/null
 
     if ! command -v robotxt &>/dev/null; then
@@ -2507,6 +3614,13 @@ ROBOTXT() {
 
 ROBOXTRACTOR() {
     START_SPINNER "${BGREEN}ROBOXTRACTOR${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v roboxtractor &>/dev/null; then
+        echo -e "${YELLOW}[~] ROBOXTRACTOR - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/Josue87/roboxtractor &>/dev/null
 
     if ! command -v roboxtractor &>/dev/null; then
@@ -2521,6 +3635,13 @@ ROBOXTRACTOR() {
 
 PATHCRAWLER() {
     START_SPINNER "${BGREEN}PATHCRAWLER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v pathcrawler &>/dev/null; then
+        echo -e "${YELLOW}[~] PATHCRAWLER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/pathcrawler &>/dev/null
 
     if ! command -v pathcrawler &>/dev/null; then
@@ -2535,6 +3656,13 @@ PATHCRAWLER() {
 
 CRAWLEY() {
     START_SPINNER "${BGREEN}CRAWLEY${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v crawley &>/dev/null; then
+        echo -e "${YELLOW}[~] CRAWLEY - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/s0rg/crawley &>/dev/null
 
     if ! command -v crawley &>/dev/null; then
@@ -2549,6 +3677,13 @@ CRAWLEY() {
 
 XCRAWL3R() {
     START_SPINNER "${BGREEN}XCRAWL3R${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xcrawl3r &>/dev/null; then
+        echo -e "${YELLOW}[~] XCRAWL3R - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hueristiq/xcrawl3r &>/dev/null
 
     if ! command -v xcrawl3r &>/dev/null; then
@@ -2563,6 +3698,13 @@ XCRAWL3R() {
 
 XURLFIND3R() {
     START_SPINNER "${BGREEN}XURLFIND3R${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xurlfind3r &>/dev/null; then
+        echo -e "${YELLOW}[~] XURLFIND3R - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/hueristiq/xurlfind3r &>/dev/null
 
     if ! command -v xurlfind3r &>/dev/null; then
@@ -2577,6 +3719,13 @@ XURLFIND3R() {
 
 GITHUB_ENDPOINTS() {
     START_SPINNER "${BGREEN}GITHUB_ENDPOINTS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v github-endpoints &>/dev/null; then
+        echo -e "${YELLOW}[~] GITHUB_ENDPOINTS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/gwen001/github-endpoints &>/dev/null
 
     if ! command -v github-endpoints &>/dev/null; then
@@ -2591,6 +3740,13 @@ GITHUB_ENDPOINTS() {
 
 URLFINDER() {
     START_SPINNER "${BGREEN}URLFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v urlfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] URLFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/projectdiscovery/urlfinder &>/dev/null
 
     if ! command -v urlfinder &>/dev/null; then
@@ -2605,6 +3761,13 @@ URLFINDER() {
 
 CARIDDI() {
     START_SPINNER "${BGREEN}CARIDDI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cariddi &>/dev/null; then
+        echo -e "${YELLOW}[~] CARIDDI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/edoardottt/cariddi &>/dev/null
 
     if ! command -v cariddi &>/dev/null; then
@@ -2619,6 +3782,13 @@ CARIDDI() {
 
 UFORALL() {
     START_SPINNER "${BGREEN}UFORALL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v uforall &>/dev/null; then
+        echo -e "${YELLOW}[~] UFORALL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/uforall &>/dev/null
 
     if ! command -v uforall &>/dev/null; then
@@ -2633,6 +3803,13 @@ UFORALL() {
 
 EMAILFINDER() {
     START_SPINNER "${BGREEN}EMAILFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v emailfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] EMAILFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/emailfinder &>/dev/null
 
     if ! command -v emailfinder &>/dev/null; then
@@ -2647,6 +3824,13 @@ EMAILFINDER() {
 
 FAVIRECON() {
     START_SPINNER "${BGREEN}FAVIRECON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v favirecon &>/dev/null; then
+        echo -e "${YELLOW}[~] FAVIRECON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/edoardottt/favirecon &>/dev/null
 
     if ! command -v favirecon &>/dev/null; then
@@ -2661,6 +3845,13 @@ FAVIRECON() {
 
 FAVINFO() {
     START_SPINNER "${BGREEN}FAVINFO${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v favinfo &>/dev/null; then
+        echo -e "${YELLOW}[~] FAVINFO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/favinfo &>/dev/null
 
     if ! command -v favinfo &>/dev/null; then
@@ -2675,6 +3866,13 @@ FAVINFO() {
 
 DLEVEL() {
     START_SPINNER "${BGREEN}DLEVEL${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dlevel &>/dev/null; then
+        echo -e "${YELLOW}[~] DLEVEL - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/dlevel &>/dev/null
 
     if ! command -v dlevel &>/dev/null; then
@@ -2689,6 +3887,13 @@ DLEVEL() {
 
 SUBDOMAINFUZZ() {
     START_SPINNER "${BGREEN}SUBDOMAINFUZZ${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v subdomainfuzz &>/dev/null; then
+        echo -e "${YELLOW}[~] SUBDOMAINFUZZ - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/subdomainfuzz &>/dev/null
 
     if ! command -v subdomainfuzz &>/dev/null; then
@@ -2703,6 +3908,13 @@ SUBDOMAINFUZZ() {
 
 GOURLEX() {
     START_SPINNER "${BGREEN}GOURLEX${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gourlex &>/dev/null; then
+        echo -e "${YELLOW}[~] GOURLEX - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/trap-bytes/gourlex &>/dev/null
 
     if ! command -v gourlex &>/dev/null; then
@@ -2717,6 +3929,13 @@ GOURLEX() {
 
 CSPFINDER() {
     START_SPINNER "${BGREEN}CSPFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v cspfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] CSPFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/cspfinder &>/dev/null
 
     if ! command -v cspfinder &>/dev/null; then
@@ -2731,6 +3950,13 @@ CSPFINDER() {
 
 CSPRECON() {
     START_SPINNER "${BGREEN}CSPRECON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v csprecon &>/dev/null; then
+        echo -e "${YELLOW}[~] CSPRECON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/edoardottt/csprecon &>/dev/null
 
     if ! command -v csprecon &>/dev/null; then
@@ -2745,6 +3971,13 @@ CSPRECON() {
 
 GITREPOENUM() {
     START_SPINNER "${BGREEN}GITREPOENUM${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v gitrepoenum &>/dev/null; then
+        echo -e "${YELLOW}[~] GITREPOENUM - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/gitrepoenum &>/dev/null
 
     if ! command -v gitrepoenum &>/dev/null; then
@@ -2759,6 +3992,13 @@ GITREPOENUM() {
 
 S3SCANNER() {
     START_SPINNER "${BGREEN}S3SCANNER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v s3scanner &>/dev/null; then
+        echo -e "${YELLOW}[~] S3SCANNER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     go install -v github.com/sa7mon/s3scanner@latest &>/dev/null
 
     if ! command -v s3scanner &>/dev/null; then
@@ -2773,6 +4013,13 @@ S3SCANNER() {
 
 SPK() {
     START_SPINNER "${BGREEN}SPK${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v spk &>/dev/null; then
+        echo -e "${YELLOW}[~] SPK - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/dhn/spk &>/dev/null
 
     if ! command -v spk &>/dev/null; then
@@ -2787,6 +4034,13 @@ SPK() {
 
 RIPGEN() {
     START_SPINNER "${BGREEN}RIPGEN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ripgen &>/dev/null; then
+        echo -e "${YELLOW}[~] RIPGEN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     cargo install ripgen &>/dev/null
 
     if ! command -v ripgen &>/dev/null; then
@@ -2801,6 +4055,13 @@ RIPGEN() {
 
 GOALTDNS() {
     START_SPINNER "${BGREEN}GOALTDNS${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v goaltdns &>/dev/null; then
+        echo -e "${YELLOW}[~] GOALTDNS - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     go install -v github.com/subfinder/goaltdns@latest &>/dev/null
 
     if ! command -v goaltdns &>/dev/null; then
@@ -2815,6 +4076,13 @@ GOALTDNS() {
 
 DNSGEN() {
     START_SPINNER "${BGREEN}DNSGEN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v dnsgen &>/dev/null; then
+        echo -e "${YELLOW}[~] DNSGEN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     python3 -m pip install dnsgen --no-cache-dir &>/dev/null
 
     if ! command -v dnsgen &>/dev/null; then
@@ -2829,6 +4097,13 @@ DNSGEN() {
 
 RCERT() {
     START_SPINNER "${BGREEN}RCERT${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v rcert &>/dev/null; then
+        echo -e "${YELLOW}[~] RCERT - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     git clone https://github.com/rix4uni/rcert.git --depth 1 &>/dev/null
     cd rcert
     chmod +x rcert
@@ -2848,6 +4123,13 @@ RCERT() {
 
 IPFINDER() {
     START_SPINNER "${BGREEN}IPFINDER${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v ipfinder &>/dev/null; then
+        echo -e "${YELLOW}[~] IPFINDER - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
     gocl -i github.com/rix4uni/ipfinder &>/dev/null
 
     if ! command -v ipfinder &>/dev/null; then
@@ -2941,7 +4223,7 @@ WORDLISTS() {
 # Required tools
 REQUIRED(){
     PYTHON3
-    PYTHON3_PIP
+    PIP3
     SETUPTOOLS
     GCC
     GIT
