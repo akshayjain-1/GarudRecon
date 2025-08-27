@@ -325,6 +325,10 @@ Example:
   garudrecon workflow amass --input <domain> --output <file> [--verbose]
   garudrecon workflow ls
   garudrecon workflow ls [module]
+  garudrecon workflow cat [module]
+  garudrecon workflow add [module]
+  garudrecon workflow edit [module]
+  garudrecon workflow delete [module]
 ```
 
 Check invalid

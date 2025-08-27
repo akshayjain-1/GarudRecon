@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULES_DIR="modules"
+MODULES_DIR="$HOME/.garudrecon/modules"
 TOOL="$1"
 shift
 
@@ -15,15 +15,19 @@ Usage:
   garudrecon workflow [flags]
 
 Flags:
-  -i, --input			Pass the input
-  -o, --output			Location where you want to save output
-  -v, --verbose 		enable verbose mode
-  -h, --help   			help for cronjobs
+  -i, --input     Pass the input
+  -o, --output      Location where you want to save output
+  -v, --verbose     enable verbose mode
+  -h, --help        help for cronjobs
 
 Example:
   garudrecon workflow amass --input <domain> --output <file> [--verbose]
   garudrecon workflow ls
   garudrecon workflow ls [module]
+  garudrecon workflow cat [module]
+  garudrecon workflow add [module]
+  garudrecon workflow edit [module]
+  garudrecon workflow delete [module]
 EOF
 }
 
@@ -75,6 +79,102 @@ if [[ "$TOOL" == "ls" ]]; then
   fi
   exit 0
 fi
+
+if [[ "$TOOL" == "cat" ]]; then
+  if [[ -n "$1" ]]; then
+    MODULE_FILE="$MODULES_DIR/$1.json"
+
+    if [[ -f "$MODULE_FILE" ]]; then
+      cat "$MODULE_FILE"
+    else
+      echo "Module '$MODULE_FILE' not found."
+      exit 1
+    fi
+  else
+    echo "No module name provided."
+    exit 1
+  fi
+  exit 0
+fi
+
+
+if [[ "$TOOL" == "add" ]]; then
+  if [[ -n "$1" ]]; then
+    MODULE_FILE="$MODULES_DIR/$1.json"
+
+    # create modules dir if it doesn't exist
+    mkdir -p "$MODULES_DIR"
+
+    if [[ -f "$MODULE_FILE" ]]; then
+      echo "Module '$MODULE_FILE' already exists."
+    else
+      # create a new json file with basic structure
+      cat > "$MODULE_FILE" <<EOF
+[{
+  "command": [
+    ""
+  ],
+  "example": "",
+  "description": ""
+}]
+EOF
+      echo "Created new module: $MODULE_FILE"
+    fi
+  else
+    echo "No module name provided."
+    exit 1
+  fi
+  exit 0
+fi
+
+if [[ "$TOOL" == "edit" ]]; then
+  if [[ -n "$1" ]]; then
+    MODULE_FILE="$MODULES_DIR/$1.json"
+
+    # create modules dir if missing
+    mkdir -p "$MODULES_DIR"
+
+    # if file doesn't exist, create an empty json
+    if [[ ! -f "$MODULE_FILE" ]]; then
+      cat > "$MODULE_FILE" <<EOF
+[{
+  "command": [
+    ""
+  ],
+  "example": "",
+  "description": ""
+}]
+EOF
+      echo "Created new module: $MODULE_FILE"
+    fi
+
+    # open in nano
+    nano "$MODULE_FILE"
+  else
+    echo "No module name provided."
+    exit 1
+  fi
+  exit 0
+fi
+
+if [[ "$TOOL" == "delete" ]]; then
+  if [[ -n "$1" ]]; then
+    MODULE_FILE="$MODULES_DIR/$1.json"
+
+    if [[ -f "$MODULE_FILE" ]]; then
+      rm -rf "$MODULE_FILE"
+      echo "Module '$MODULE_FILE' deleted."
+    else
+      echo "Module '$MODULE_FILE' not found."
+      exit 1
+    fi
+  else
+    echo "No module name provided."
+    exit 1
+  fi
+  exit 0
+fi
+
 
 # --- normal module execution ---
 # Parse arguments
