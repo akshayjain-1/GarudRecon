@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | certinfo -silent -c 50 | unew -el -i -t ${OUTPUT}"
   ],

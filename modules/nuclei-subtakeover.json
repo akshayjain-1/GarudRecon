@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | nuclei -duc -silent -nc -nh -tags takeover -severity info,low,medium,high,critical -retries 3 -rl 150 -t ~/.garudrecon/takeovers | unew -el ${OUTPUT}"
   ],

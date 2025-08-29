@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "rcert -list ${INPUT} | unew -el -i -t ${OUTPUT}"
   ],

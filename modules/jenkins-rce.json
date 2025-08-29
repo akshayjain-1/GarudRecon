@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | httpx -duc -silent | unew -el -i -t -q httpx.subs",
     "cat httpx.subs | nuclei -duc -silent -nc -t ~/nucleihub-templates/nucleihub-templates/unauthenticated-jenkins-rce.yaml | unew -el -i -t ${OUTPUT}"

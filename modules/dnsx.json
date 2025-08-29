@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | dnsx -duc -silent -nc -a -aaaa -cname -ns -txt -srv -ptr -mx -soa -axfr -caa -retry 3 -t 100 -r ${RESOLVERS} | unew -el -i -t ${OUTPUT}"
   ],

@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "curl -s \"https://raw.githubusercontent.com/rix4uni/scope/refs/heads/main/data/GithubRepo/${INPUT}\" | awk '{ s=$0; sub(/^[A-Za-z][A-Za-z0-9+.-]*:\\/\\//, \"\", s); if (gsub(/\\//, \"\", s)==1) print $0 }' | unew -q ~/allgithubrepo/github.orgs",
     "curl -s \"https://raw.githubusercontent.com/rix4uni/scope/refs/heads/main/data/GithubRepo/${INPUT}\" | awk '{ s=$0; sub(/^[A-Za-z][A-Za-z0-9+.-]*:\\/\\//, \"\", s); if (gsub(/\\//, \"\", s)==2) print $0 }' | sed 's|$|.git|' | unew -q ~/allgithubrepo/github.repos",

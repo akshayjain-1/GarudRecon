@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "chaos -duc -silent -d ${INPUT} -key $(shuf -n 1 ~/.config/chaos/chaos-api.txt) | unew -el -i -t ${OUTPUT}"
   ],

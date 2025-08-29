@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "curl -s \"https://raw.githubusercontent.com/rix4uni/BugBountyData/refs/heads/main/data/${INPUT}.txt\" | unew -el -i -t ${OUTPUT}"
   ],

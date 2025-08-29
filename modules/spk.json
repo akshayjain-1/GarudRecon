@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "for ORG in $(cat ${INPUT});do spk -silent -s \"$ORG\" | unew -el -t ${OUTPUT};done"
   ],

@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "shortscan ${INPUT} -F -s -p 1 | unew -el -i -t ${OUTPUT}"
   ],

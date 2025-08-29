@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "echo ${INPUT} | waybackurls | unew -el -i -t ${OUTPUT}"
   ],

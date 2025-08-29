@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | naabu -duc -silent -c 25 -rate 1000 -timeout 1000 -retries 3 -top-ports 100 2>/dev/null | unew -el -i -t ${OUTPUT}"
   ],

@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | hakrawler -insecure -t 8 -timeout 15 -d 7 2>/dev/null | unew -el -i -t ${OUTPUT}"
   ],

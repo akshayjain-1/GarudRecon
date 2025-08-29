@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | cspfinder -silent | unew -el -i -t ${OUTPUT}"
   ],

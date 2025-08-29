@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | gowitness scan file -f - --screenshot-fullpage --delay 0 --timeout 30 --threads 50 --save-content --write-db --screenshot-skip-save --write-screenshots"
   ],

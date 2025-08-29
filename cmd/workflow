@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULES_DIR="$HOME/.garudrecon/modules"
+MODULES_DIR="modules"
 TOOL="$1"
 shift
 
@@ -15,10 +15,10 @@ Usage:
   garudrecon workflow [flags]
 
 Flags:
-  -i, --input     Pass the input
+  -i, --input       Pass the input
   -o, --output      Location where you want to save output
   -v, --verbose     enable verbose mode
-  -h, --help        help for cronjobs
+  -h, --help        help for modules
 
 Example:
   garudrecon workflow amass --input <domain> --output <file> [--verbose]
@@ -41,7 +41,6 @@ print_table() {
   for module in "${modules[@]}"; do
     example=$(jq -r '.[0].example' "$MODULES_DIR/$module")
     description=$(jq -r '.[0].description' "$MODULES_DIR/$module")
-    # categories=$(jq -r '.[0].categories' "$MODULES_DIR/$module")
 
     rows+=("$module|$example|$description")
   done
@@ -111,6 +110,9 @@ if [[ "$TOOL" == "add" ]]; then
       # create a new json file with basic structure
       cat > "$MODULE_FILE" <<EOF
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     ""
   ],
@@ -136,16 +138,7 @@ if [[ "$TOOL" == "edit" ]]; then
 
     # if file doesn't exist, create an empty json
     if [[ ! -f "$MODULE_FILE" ]]; then
-      cat > "$MODULE_FILE" <<EOF
-[{
-  "command": [
-    ""
-  ],
-  "example": "",
-  "description": ""
-}]
-EOF
-      echo "Created new module: $MODULE_FILE"
+      echo "Module '$MODULE_FILE' not found."
     fi
 
     # open in nano
@@ -209,6 +202,41 @@ if [[ -z "$INPUT" || -z "$OUTPUT" ]]; then
   show_help
   exit 1
 fi
+
+# --- check requirements ---
+REQUIREMENTS=$(jq -c '.[0].requirements[]?' "$MODULES_DIR/$TOOL.json")
+
+check_requirements() {
+  local req="$1"
+  local bin install
+
+  bin=$(echo "$req" | jq -r '.bin')
+  install=$(echo "$req" | jq -r '.install')
+
+  if ! command -v "$bin" &>/dev/null; then
+    if $VERBOSE; then
+      echo "[!] $bin not installed. Installing..."
+    fi
+    eval "$install"
+    if ! command -v "$bin" &>/dev/null; then
+      echo "[x] Failed to install $bin, please install manually."
+      exit 1
+    fi
+    if $VERBOSE; then
+      echo "[+] $bin installed successfully."
+    fi
+  else
+    if $VERBOSE; then
+      echo "[*] $bin already installed."
+    fi
+  fi
+}
+
+# loop through requirements
+while IFS= read -r req; do
+  check_requirements "$req"
+done <<< "$REQUIREMENTS"
+
 
 # Get commands (can be single string or array)
 COMMANDS=$(jq -r '.[0].command[]?' "$MODULES_DIR/$TOOL.json")

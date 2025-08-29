@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "arjun -i ${INPUT} -oT ${OUTPUT}"
   ],

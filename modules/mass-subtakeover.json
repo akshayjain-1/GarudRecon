@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "subzy run --timeout 15 --concurrency 10 --hide_fails --targets ${INPUT} | sed -E 's/\\x1b\\[[0-9;]*m//g' | egrep -av '\\[NOT VULNERABLE\\]' | unew -el ${OUTPUT}",
     "cat ${INPUT} | nuclei -duc -silent -nc -nh -tags takeover -severity info,low,medium,high,critical -retries 3 -rl 150 -t ${TAKEOVERS_BASEDIR} | unew -el ${OUTPUT}"

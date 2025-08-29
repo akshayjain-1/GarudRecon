@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "assetfinder --subs-only ${INPUT} | unew -el -i -t ${OUTPUT}"
   ],

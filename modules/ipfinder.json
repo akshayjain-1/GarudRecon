@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "echo 'ssl:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",
     "echo 'hostname:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",

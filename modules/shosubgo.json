@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "shosubgo -d ${INPUT} -s $(shuf -n 1 ~/.config/shosubgo/shosubgo-api.txt) | unew -el -i -t ${OUTPUT}"
   ],

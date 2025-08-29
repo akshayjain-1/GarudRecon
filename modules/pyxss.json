@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | unew -q -split 10000 xsschecker_split.txt",
     "parallel --ungroup -j2 \"cat {} | pyxss --silent --no-color -o {= s:xsschecker_split:xss: =}\" ::: xsschecker_split*.txt",

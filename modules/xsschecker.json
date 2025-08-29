@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "cat ${INPUT} | urldedupe -s | unew -el -t -q filteredurls.txt",
     "cat filteredurls.txt | pvreplace -silent -payload ~/.garudrecon/wordlist/xss-small.txt -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q xss_pvreplace.txt",

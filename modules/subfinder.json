@@ -1,4 +1,7 @@
 [{
+  "requirements": [
+    { "bin": "", "install": "" }
+  ],
   "command": [
     "subfinder -duc -silent -d ${INPUT} -all | unew -el -i -t -q ${OUTPUT}",
     "echo \"We can also do subdomain takeover on these targets\""
