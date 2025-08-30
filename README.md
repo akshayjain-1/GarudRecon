@@ -96,8 +96,8 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 
 ### Download prebuilt binaries
 ```
-wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.0.6.zip
-unzip v0.0.6.zip
+wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.0.9.zip
+unzip v0.0.9.zip
 cd GarudRecon
 garudrecon install -f ALL
 ```
