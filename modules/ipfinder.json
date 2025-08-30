@@ -1,6 +1,7 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "ipfinder", "install": "gocl -i github.com/rix4uni/ipfinder" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "echo 'ssl:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",

@@ -1,6 +1,6 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "arjun", "install": "pip3 install arjun --no-cache-dir" }
   ],
   "command": [
     "arjun -i ${INPUT} -oT ${OUTPUT}"

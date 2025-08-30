@@ -1,6 +1,9 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "urldedupe", "install": "git clone https://github.com/ameenmaali/urldedupe.git --depth 1 && cd urldedupe && cmake CMakeLists.txt && make && mv urldedupe /usr/local/bin/ && cd .. && rm -rf urldedupe" },
+    { "bin": "pvreplace", "install": "gocl -i github.com/rix4uni/pvreplace" },
+    { "bin": "xsschecker", "install": "gocl -i github.com/rix4uni/xsschecker" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "cat ${INPUT} | urldedupe -s | unew -el -t -q filteredurls.txt",

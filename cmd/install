@@ -1003,7 +1003,7 @@ FINDOMAIN() {
         return
     fi
 
-    wget -q https://github.com/Findomain/Findomain/releases/download/9.0.4/findomain-linux.zip
+    wget -q https://github.com/Findomain/Findomain/releases/download/10.0.1/findomain-linux.zip
     unzip -q findomain-linux.zip
     rm -rf findomain-linux.zip
     chmod +x findomain

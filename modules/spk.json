@@ -1,6 +1,7 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "spk", "install": "gocl -i github.com/dhn/spk" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "for ORG in $(cat ${INPUT});do spk -silent -s \"$ORG\" | unew -el -t ${OUTPUT};done"

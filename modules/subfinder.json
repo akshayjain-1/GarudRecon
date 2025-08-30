@@ -1,10 +1,10 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "subfinder", "install": "gocl -i github.com/projectdiscovery/subfinder" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
-    "subfinder -duc -silent -d ${INPUT} -all | unew -el -i -t -q ${OUTPUT}",
-    "echo \"We can also do subdomain takeover on these targets\""
+    "subfinder -duc -silent -d ${INPUT} -all | unew -el -i -t -q ${OUTPUT}"
   ],
   "example": "garudrecon workflow subfinder --input domain.com --output domain.com.subfinder",
   "description": "Scan subdomain enumeration with subfinder"

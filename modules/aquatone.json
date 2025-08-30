@@ -1,6 +1,6 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "aquatone", "install": "" }
   ],
   "command": [
     "cat ${INPUT} | aquatone -out ${OUTPUT}"

@@ -1,6 +1,7 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "cspfinder", "install": "gocl -i github.com/rix4uni/cspfinder" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "cat ${INPUT} | cspfinder -silent | unew -el -i -t ${OUTPUT}"

@@ -1,6 +1,7 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "cero", "install": "gocl -i github.com/glebarez/cero" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "cat ${INPUT} | cero | unew -el -i -t ${OUTPUT}"

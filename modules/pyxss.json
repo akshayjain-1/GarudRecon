@@ -1,6 +1,8 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "parallel", "install": "apt install parallel -y" },
+    { "bin": "pyxss", "install": "pipx install --force git+https://github.com/rix4uni/pyxss.git" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "cat ${INPUT} | unew -q -split 10000 xsschecker_split.txt",

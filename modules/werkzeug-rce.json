@@ -1,6 +1,8 @@
 [{
   "requirements": [
-    { "bin": "", "install": "" }
+    { "bin": "httpx", "install": "gocl -i github.com/projectdiscovery/httpx" },
+    { "bin": "nuclei", "install": "gocl -i github.com/projectdiscovery/nuclei" },
+    { "bin": "unew", "install": "go install github.com/rix4uni/unew@latest" }
   ],
   "command": [
     "cat ${INPUT} | httpx -duc -silent | unew -el -i -t -q httpx.subs",
