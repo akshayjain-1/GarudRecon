@@ -137,20 +137,24 @@ VARIABLES() {
         echo -e "alias xp='xsel -o -b'" >> ~/.bashrc
         echo -e "alias cfile='explorer.exe .'" >> ~/.bashrc
 
-        export PATH=$PATH:/usr/local/go/bin
-        export PATH=$PATH:~/go/bin
-        export PATH=$PATH:~/.local/bin
-        export PATH=$PATH:~/.cargo/bin
-        export PATH="$HOME/.local/bin:$PATH"
-
-        echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:~/.local/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:~/.cargo/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:/usr/bin/google-chrome' >> ~/.bashrc
+        cat << 'EOF' >> ~/.bashrc
+export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.cargo/bin"
+export PATH="$PATH:/usr/bin/google-chrome"
+EOF
     fi
-    source $HOME/.bashrc
-    source $HOME/.cargo/env
+
+    # ✅ Apply PATH immediately for *this* script run
+    export PATH="$PATH:/usr/local/go/bin"
+    export PATH="$PATH:$HOME/go/bin"
+    export PATH="$PATH:$HOME/.local/bin"
+    export PATH="$PATH:$HOME/.cargo/bin"
+    export PATH="$PATH:/usr/bin/google-chrome"
+
+    # Cargo env (rustup)
+    [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] VARIABLES - SETUP${RESET}: ${TIME} seconds"
