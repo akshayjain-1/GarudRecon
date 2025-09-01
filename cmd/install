@@ -236,6 +236,8 @@ UNEWFLUSH() {
 # PACKAGES
 PACKAGES() {
     START_SPINNER "${BGREEN}PACKAGES${RESET}"
+    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list
+    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
     dpkg --configure -a &>/dev/null
     apt --fix-broken install -y &>/dev/null
     apt update -y &>/dev/null
