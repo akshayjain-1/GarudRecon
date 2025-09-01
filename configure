@@ -39,8 +39,8 @@ echo "2) MEDIUMSCOPE"
 echo "3) LARGESCOPE"
 echo "4) WORKFLOW"
 echo "5) CRONJOBS"
-echo "6) ALL"
-read -p "Enter your choice [1-6]: " choice
+echo "6) ALL (default)"
+read -p "Enter your choice [1-6, press Enter for ALL]: " choice
 
 case $choice in
     1) scope="SMALLSCOPE" ;;
@@ -48,7 +48,7 @@ case $choice in
     3) scope="LARGESCOPE" ;;
     4) scope="WORKFLOW" ;;
     5) scope="CRONJOBS" ;;
-    6) scope="ALL" ;;
+    6|"") scope="ALL" ;;   # empty input defaults to ALL
     *) echo "Invalid choice, defaulting to ALL"; scope="ALL" ;;
 esac
 
