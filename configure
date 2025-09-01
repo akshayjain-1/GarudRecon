@@ -37,16 +37,18 @@ echo "Choose installation scope:"
 echo "1) SMALLSCOPE"
 echo "2) MEDIUMSCOPE"
 echo "3) LARGESCOPE"
-echo "4) CRONJOBS"
-echo "5) ALL"
-read -p "Enter your choice [1-5]: " choice
+echo "4) WORKFLOW"
+echo "5) CRONJOBS"
+echo "6) ALL"
+read -p "Enter your choice [1-6]: " choice
 
 case $choice in
     1) scope="SMALLSCOPE" ;;
     2) scope="MEDIUMSCOPE" ;;
     3) scope="LARGESCOPE" ;;
-    4) scope="CRONJOBS" ;;
-    5) scope="ALL" ;;
+    4) scope="WORKFLOW" ;;
+    5) scope="CRONJOBS" ;;
+    6) scope="ALL" ;;
     *) echo "Invalid choice, defaulting to ALL"; scope="ALL" ;;
 esac
 
