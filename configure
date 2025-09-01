@@ -68,22 +68,35 @@ garudrecon install -f "$scope"
 # send config files
 cp -r .config/* $HOME/.config
 
-echo -e "\nAdd api keys to these files:"
-find .config -type f | sed 's|^|~/|'
 
-echo -e "\nOr if you have backup $HOME/.config in github:"
-echo -e "git clone https://github.com/yourusername/private-config.git --depth 1"
-echo -e "cp -r private-config/* $HOME/.config && rm -rf private-config"
+# Define colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
 
-echo -e "\nOr if you have backup $HOME/.config in github but it's a private repo:"
-echo -e "git clone https://<TOKEN>@github.com/yourusername/private-config.git --depth 1"
-echo -e "cp -r private-config/* $HOME/.config && rm -rf private-config"
+echo -e "${BOLD}${CYAN}==> API Keys Configuration${NC}"
+echo -e "${YELLOW}Add your API keys to these files:${NC}"
+find .config -type f | sed "s|^|${GREEN}~/|; s|\$|${NC}|"
+
+echo -e "\n${BOLD}${CYAN}==> Restore from Backup (GitHub)${NC}"
+echo -e "${YELLOW}If you have a backup in a public repo:${NC}"
+echo -e "  ${BLUE}git clone https://github.com/yourusername/private-config.git --depth 1${NC}"
+echo -e "  ${BLUE}cp -r private-config/* /root/.config && rm -rf private-config${NC}"
+
+echo -e "\n${YELLOW}If your backup is in a ${RED}private repo${YELLOW}:${NC}"
+echo -e "  ${BLUE}git clone https://<TOKEN>@github.com/yourusername/private-config.git --depth 1${NC}"
+echo -e "  ${BLUE}cp -r private-config/* /root/.config && rm -rf private-config${NC}"
 
 
 # Get total RAM in GB (rounded down)
 TOTAL_RAM_GB=$(free -g | awk '/^Mem:/{print $2}')
 
-echo -e "\nDetected System RAM: ${TOTAL_RAM_GB} GB"
+echo -e "\n${BOLD}${CYAN}==> System Info${NC}"
+echo -e "${YELLOW}Detected System RAM:${NC} ${GREEN}${TOTAL_RAM_GB} GB${NC}"
 
 if [ "$TOTAL_RAM_GB" -le 1 ]; then
     CONFIG="garudrecon_1g.cfg"
@@ -101,10 +114,7 @@ else
     CONFIG="garudrecon_max.cfg"  # fallback
 fi
 
-echo -e "Recommended config file: $CONFIG"
-
+echo -e "${YELLOW}Recommended config file:${NC} ${GREEN}$CONFIG${NC}\n"
 
 cd ..
-
-# remove
 rm -rf GarudRecon
