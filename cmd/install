@@ -282,6 +282,7 @@ PIP3() {
     fi
 
     apt install python3-pip -y &>/dev/null
+    pip3 install --upgrade pip setuptools wheel packaging --no-cache-dir &>/dev/null
 
     if ! command -v pip3 &>/dev/null; then
         echo -e "${BRED}[x] PIP3 - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
