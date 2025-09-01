@@ -141,6 +141,7 @@ VARIABLES() {
         export PATH=$PATH:~/go/bin
         export PATH=$PATH:~/.local/bin
         export PATH=$PATH:~/.cargo/bin
+        export PATH="$HOME/.local/bin:$PATH"
 
         echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
         echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
@@ -739,7 +740,6 @@ RUST() {
     source ~/.bashrc
 
     if ! command -v rustup &>/dev/null; then
-        export PATH="$HOME/.local/bin:$PATH"
         echo -e "${BRED}[x] RUSTUP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
