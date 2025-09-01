@@ -172,6 +172,7 @@ GO() {
     fi
 
     curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash &>/dev/null
+    source ~/.bashrc
 
     if ! command -v go &>/dev/null; then
         echo -e "${BRED}[x] GO - INSTALLATION FAILED${RESET}: ${TIME} seconds"
