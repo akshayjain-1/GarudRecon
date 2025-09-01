@@ -236,12 +236,13 @@ UNEWFLUSH() {
 # PACKAGES
 PACKAGES() {
     START_SPINNER "${BGREEN}PACKAGES${RESET}"
-    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list
-    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list &>/dev/null
+    sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources &>/dev/null
     dpkg --configure -a &>/dev/null
     apt --fix-broken install -y &>/dev/null
     apt update -y &>/dev/null
     apt upgrade -y &>/dev/null
+    apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev
 
     # https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
     rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED &>/dev/null
