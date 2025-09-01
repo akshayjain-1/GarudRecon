@@ -80,7 +80,9 @@ NC='\033[0m' # No Color
 
 echo -e "${BOLD}${CYAN}==> API Keys Configuration${NC}"
 echo -e "${YELLOW}Add your API keys to these files:${NC}"
-find .config -type f | sed "s|^|${GREEN}~/|; s|\$|${NC}|"
+find .config -type f | while read -r file; do
+    echo -e "${GREEN}~/${file}${NC}"
+done
 
 echo -e "\n${BOLD}${CYAN}==> Restore from Backup (GitHub)${NC}"
 echo -e "${YELLOW}If you have a backup in a public repo:${NC}"
