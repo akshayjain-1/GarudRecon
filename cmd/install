@@ -152,6 +152,7 @@ EOF
     export PATH="$PATH:$HOME/.local/bin"
     export PATH="$PATH:$HOME/.cargo/bin"
     export PATH="$PATH:/usr/bin/google-chrome"
+    export PATH="$HOME/go/bin:$PATH"
 
     # Cargo env (rustup)
     [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
