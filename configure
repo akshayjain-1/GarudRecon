@@ -1,9 +1,20 @@
-git clone https://github.com/rix4uni/GarudRecon.git --depth 1 &>/dev/null
+#!/bin/bash
 
-cd GarudRecon
+INSTALL_DIR="$HOME/GarudRecon"
+
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo "[*] Updating GarudRecon..."
+    cd "$INSTALL_DIR" || exit 1
+    git reset --hard >/dev/null 2>&1   # clean local changes
+    git pull --rebase --autostash >/dev/null 2>&1
+else
+    echo "[*] Cloning GarudRecon..."
+    git clone --depth 1 https://github.com/rix4uni/GarudRecon.git "$INSTALL_DIR"
+    cd "$INSTALL_DIR" || exit 1
+fi
 
 # create garudrecon directory if not exit
-mkdir -p $HOME/.garudrecon
+mkdir -p "$HOME/.garudrecon"
 
 # delete all files/directory in $HOME/.garudrecon except scans directory
 find $HOME/.garudrecon -mindepth 1 -maxdepth 1 ! -name scans ! -name cronjobscan -exec rm -rf {} +
