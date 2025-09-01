@@ -33,7 +33,24 @@ sed -i -e 's|MODULES_DIR="modules"|MODULES_DIR="$HOME/.garudrecon/modules"|' $HO
 
 
 # install tools
-garudrecon install -f ALL
+echo "Choose installation scope:"
+echo "1) SMALLSCOPE"
+echo "2) MEDIUMSCOPE"
+echo "3) LARGESCOPE"
+echo "4) CRONJOBS"
+echo "5) ALL"
+read -p "Enter your choice [1-5]: " choice
+
+case $choice in
+    1) scope="SMALLSCOPE" ;;
+    2) scope="MEDIUMSCOPE" ;;
+    3) scope="LARGESCOPE" ;;
+    4) scope="CRONJOBS" ;;
+    5) scope="ALL" ;;
+    *) echo "Invalid choice, defaulting to ALL"; scope="ALL" ;;
+esac
+
+garudrecon install -f "$scope"
 
 # send config files
 cp -r .config/* $HOME/.config
