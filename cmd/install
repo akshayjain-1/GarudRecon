@@ -680,6 +680,7 @@ PIPX() {
     fi
 
     apt install pipx -y &>/dev/null
+    pipx ensurepath &>/dev/null
 
     if ! command -v pipx &>/dev/null; then
         echo -e "${BRED}[x] PIPX - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
