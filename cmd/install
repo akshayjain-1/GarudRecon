@@ -738,19 +738,19 @@ RUST() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null
     source ~/.bashrc
 
-    if ! command -v rustup &>/dev/null; then
+    if ! command -v rustup &>/dev/null && [[ ! -x "$HOME/.local/bin/rustup" ]]; then
         echo -e "${BRED}[x] RUSTUP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
     fi
 
-    if ! command -v rustc &>/dev/null; then
+    if ! command -v rustc &>/dev/null && [[ ! -x "$HOME/.local/bin/rustc" ]]; then
         echo -e "${BRED}[x] RUSTC - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
     fi
 
-    if ! command -v cargo &>/dev/null; then
+    if ! command -v cargo &>/dev/null && [[ ! -x "$HOME/.local/bin/cargo" ]]; then
         echo -e "${BRED}[x] CARGO - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
@@ -922,7 +922,7 @@ TLDINFO() {
 
     pipx install --force git+https://github.com/rix4uni/tldinfo.git &>/dev/null
 
-    if ! command -v tldinfo &>/dev/null; then
+    if ! command -v tldinfo &>/dev/null && [[ ! -x "$HOME/.local/bin/tldinfo" ]]; then
         echo -e "${BRED}[x] TLDINFO - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
