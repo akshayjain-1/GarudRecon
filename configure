@@ -9,7 +9,7 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     git pull --rebase --autostash >/dev/null 2>&1
 else
     echo "[*] Cloning GarudRecon..."
-    git clone --depth 1 https://github.com/rix4uni/GarudRecon.git "$INSTALL_DIR"
+    git clone --depth 1 https://github.com/rix4uni/GarudRecon.git "$INSTALL_DIR" &>/dev/null
     cd "$INSTALL_DIR" || exit 1
 fi
 

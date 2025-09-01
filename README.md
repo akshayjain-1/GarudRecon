@@ -98,15 +98,13 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 ```
 wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.0.9.zip
 unzip v0.0.9.zip
-cd GarudRecon
-garudrecon install -f ALL
+bash configure
 ```
 
 ### Using Git Clone
 ```
 git clone --depth 1 https://github.com/rix4uni/GarudRecon.git
-cd GarudRecon
-garudrecon install -f ALL
+bash configure
 ```
 
 ## Usage
