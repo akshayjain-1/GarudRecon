@@ -78,7 +78,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-echo -e "${BOLD}${CYAN}==> API Keys Configuration${NC}"
+echo -e "\n${BOLD}${CYAN}==> API Keys Configuration${NC}"
 echo -e "${YELLOW}Add your API keys to these files:${NC}"
 find .config -type f | while read -r file; do
     echo -e "${GREEN}~/${file}${NC}"
