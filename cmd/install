@@ -141,7 +141,6 @@ VARIABLES() {
         export PATH=$PATH:~/go/bin
         export PATH=$PATH:~/.local/bin
         export PATH=$PATH:~/.cargo/bin
-        export PATH="$HOME/.local/bin:$PATH"
 
         echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
         echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
@@ -149,7 +148,8 @@ VARIABLES() {
         echo 'export PATH=$PATH:~/.cargo/bin' >> ~/.bashrc
         echo 'export PATH=$PATH:/usr/bin/google-chrome' >> ~/.bashrc
     fi
-    source ~/.bashrc
+    source $HOME/.bashrc
+    source $HOME/.cargo/env
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] VARIABLES - SETUP${RESET}: ${TIME} seconds"
@@ -738,19 +738,20 @@ RUST() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null
     source ~/.bashrc
 
-    if ! command -v rustup &>/dev/null && [[ ! -x "$HOME/.local/bin/rustup" ]]; then
+    if ! command -v rustup &>/dev/null; then
+        export PATH="$HOME/.local/bin:$PATH"
         echo -e "${BRED}[x] RUSTUP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
     fi
 
-    if ! command -v rustc &>/dev/null && [[ ! -x "$HOME/.local/bin/rustc" ]]; then
+    if ! command -v rustc &>/dev/null; then
         echo -e "${BRED}[x] RUSTC - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
     fi
 
-    if ! command -v cargo &>/dev/null && [[ ! -x "$HOME/.local/bin/cargo" ]]; then
+    if ! command -v cargo &>/dev/null; then
         echo -e "${BRED}[x] CARGO - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
@@ -922,7 +923,7 @@ TLDINFO() {
 
     pipx install --force git+https://github.com/rix4uni/tldinfo.git &>/dev/null
 
-    if ! command -v tldinfo &>/dev/null && [[ ! -x "$HOME/.local/bin/tldinfo" ]]; then
+    if ! command -v tldinfo &>/dev/null; then
         echo -e "${BRED}[x] TLDINFO - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
