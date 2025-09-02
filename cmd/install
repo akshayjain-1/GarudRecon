@@ -416,7 +416,7 @@ DOS2UNIX() {
         return
     fi
 
-    apt install dos2unix &>/dev/null
+    apt install dos2unix -y &>/dev/null
 
     if ! command -v dos2unix &>/dev/null; then
         echo -e "${BRED}[x] DOS2UNIX - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
@@ -645,6 +645,7 @@ CHROMIUM() {
     fi
 
     apt install chromium -y &>/dev/null
+    apt install chromium-browser -y &>/dev/null
 
     if ! command -v chromium &>/dev/null; then
         echo -e "${BRED}[x] CHROMIUM - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
