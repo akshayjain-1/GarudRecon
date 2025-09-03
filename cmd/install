@@ -166,7 +166,7 @@ GO() {
     START_SPINNER "${BGREEN}GO${RESET}"
 
     if [[ "$UPDATE" == false ]] && command -v go &>/dev/null; then
-        echo -e "${YELLOW}[~] GO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        echo -e "${YELLOW}[~] GO - INSTALLATION SKIPPED${RESET}: ${TIME} seconds"
         STOP_SPINNER
         return
     fi
