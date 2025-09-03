@@ -242,7 +242,7 @@ PACKAGES() {
     apt --fix-broken install -y &>/dev/null
     apt update -y &>/dev/null
     apt upgrade -y &>/dev/null
-    apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev &>/dev/null
+    apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync &>/dev/null
 
     # https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
     rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED &>/dev/null
@@ -1987,6 +1987,27 @@ SUBDOG() {
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] SUBDOG - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
+OOSEXCLUDE() {
+    START_SPINNER "${BGREEN}OOSEXCLUDE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v oosexclude &>/dev/null; then
+        echo -e "${YELLOW}[~] OOSEXCLUDE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    gocl -i github.com/rix4uni/oosexclude &>/dev/null
+
+    if ! command -v oosexclude &>/dev/null; then
+        echo -e "${BRED}[x] OOSEXCLUDE - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] OOSEXCLUDE - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 HAKTRAILSFREE() {
@@ -4331,6 +4352,7 @@ CRONJOBS(){
     SUBFINDER
     AMASS
     SUBDOG
+    OOSEXCLUDE
     XSUBFIND3R
     FINDOMAIN
     CHAOS
@@ -4408,6 +4430,7 @@ ALL(){
     GF_PATTERNS
     QSREPLACE
     SUBDOG
+    OOSEXCLUDE
     HAKTRAILSFREE
     ORG2ASN
     WHOXYSUBS
