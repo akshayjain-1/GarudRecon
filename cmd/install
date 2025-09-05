@@ -968,6 +968,27 @@ SUBWIZ() {
     echo -e "${BGREEN}[+] SUBWIZ - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
+RECOLLAPSE() {
+    START_SPINNER "${BGREEN}RECOLLAPSE${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v recollapse &>/dev/null; then
+        echo -e "${YELLOW}[~] RECOLLAPSE - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    pipx install --force git+https://github.com/0xacb/recollapse.git &>/dev/null
+
+    if ! command -v recollapse &>/dev/null; then
+        echo -e "${BRED}[x] RECOLLAPSE - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] RECOLLAPSE - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
 URO() {
     START_SPINNER "${BGREEN}URO${RESET}"
 
@@ -4386,6 +4407,7 @@ ALL(){
     ARJUN
     TLDINFO
     SUBWIZ
+    RECOLLAPSE
     URO
     X8
     FINDOMAIN

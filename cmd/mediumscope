@@ -1938,7 +1938,7 @@ GETJS(){
 JSCRAWLER(){
 	START_SPINNER "${BGREEN}JSCRAWLER${RESET}"
 
-	timelimitx -t ${JSCRAWLER_TIMELIMITX} "cat ${SUBDOMAINDIR}/alivesubs.txt | jscrawler --silent --complete --timeout 15 --threads 50 | egrep -av '\(' | sed 's/\\$//' | unew -el -i -t -q ${URLSDIR}/jscrawler.urls"
+	timelimitx -t ${JSCRAWLER_TIMELIMITX} "cat ${SUBDOMAINDIR}/alivesubs.txt | jscrawler --silent --complete --timeout 15 --threads 50 2>/dev/null | egrep -av '\(' | sed 's/\\$//' | unew -el -i -t -q ${URLSDIR}/jscrawler.urls"
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/urls/${URLSDIR}/jscrawler.urls 2>/dev/null | unew -el -i -t -q ${URLSDIR}/jscrawler.urls
