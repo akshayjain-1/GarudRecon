@@ -217,7 +217,10 @@ check_requirements() {
     if $VERBOSE; then
       echo "[!] $bin not installed. Installing..."
     fi
-    eval "$install"
+    if $VERBOSE; then
+      eval "$install"
+    fi
+    eval "$install" &>/dev/null
     if ! command -v "$bin" &>/dev/null; then
       echo "[x] Failed to install $bin, please install manually."
       exit 1
