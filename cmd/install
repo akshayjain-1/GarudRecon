@@ -176,7 +176,6 @@ GO() {
 
     # Remove broken Go installation
     sudo rm -rf /usr/local/go
-    source ~/.bashrc
 
     if ! command -v go &>/dev/null; then
         echo -e "${BRED}[x] GO - INSTALLATION FAILED${RESET}: ${TIME} seconds"
