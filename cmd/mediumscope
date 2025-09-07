@@ -77,6 +77,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Parse arguments
+USER_EXCLUDES=()
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         -d|--domain)
@@ -85,10 +86,9 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -ef|--exclude-functions)
             IFS=',' read -ra raw_funcs <<< "$2"
-            EXCLUDE_FUNCS=()
             for func in "${raw_funcs[@]}"; do
                 trimmed_func=$(echo "$func" | xargs)
-                EXCLUDE_FUNCS+=("$trimmed_func")
+                USER_EXCLUDES+=("$trimmed_func")
             done
             shift 2
             ;;
@@ -168,11 +168,20 @@ fi
 
 # Load configuration
 if [[ -f "$CONFIG_PATH" ]]; then
+    # shellcheck disable=SC1090
     source "$CONFIG_PATH"
 else
     echo "Error: Configuration file '$CONFIG_PATH' not found."
     exit 1
 fi
+
+# Initialize with defaults from config
+if [[ ${#DEFAULT_EXCLUDE_FUNCS[@]} -gt 0 ]]; then
+    EXCLUDE_FUNCS=("${DEFAULT_EXCLUDE_FUNCS[@]}")
+fi
+
+# Merge user excludes on top
+EXCLUDE_FUNCS+=("${USER_EXCLUDES[@]}")
 
 PRINTBANNER
 
@@ -378,10 +387,11 @@ STOP_SPINNER(){
 STARTED_AT=$(date +"%d-%m-%Y_%H:%M:%S")
 START_EPOCH=$(date +%s)
 
+# Debug print
+echo "[DEBUG] Excluded functions: ${EXCLUDE_FUNCS[*]}"
+
 echo -e "Using $CONFIG_PATH"
 echo -e "Saving all files in $UNIQUEDOMAINDIR"
-
-# echo -e "Start doing these manually:"
 
 
 DOWNLOAD_UPDATED_RESOLVERS(){
