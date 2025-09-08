@@ -96,8 +96,8 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 
 ### Download prebuilt binaries
 ```
-wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.0.9.zip
-unzip v0.0.9.zip
+wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.1.0.zip
+unzip v0.1.0.zip
 cd GarudRecon
 bash configure
 ```
@@ -384,26 +384,61 @@ Example:
 
 | OS         | Supported | Easy Install | Tested        |
 | ---------- | --------- | ------------ | ------------- |
-| Ubuntu     | Yes       | Yes          | Ubuntu 24.04  |
-| Kali       | Yes       | Yes          | Kali 2025.2   |
-| Debian     | Yes       | Yes          | No		    |
-| Windows    | Yes       | Yes          | WSL Ubuntu 	|
-| MacOS      | Yes       | Yes          | No    		|
-| Arch Linux | Yes       | No           | No            |
-|            |           |              |               |
+| Ubuntu     | ✅       | ✅          | Ubuntu 24.04   |
+| Kali       | ✅       | ✅          | Kali 2025.2    |
+| Debian     | ✅       | ✅          | ❌             |
+| Windows    | ✅       | ✅          | WSL Ubuntu     |
+| MacOS      | ✅       | ✅          | ❌             |
+| Arch Linux | ✅       | ❌          | ❌             |
 
-## Change Values According to you systems ram
+## Default Excluded Functions, You can change if you want
 
-| NAME                 | 1GB RAM | 2GB RAM | 4GB RAM | 8GB RAM | Description                                                                                |
-| -------------------- | ------- | ------- | ------- | ------- | ------------------------------------------------------------------------------------------ |
-| ARE_U_USING_VPS       | Yes     | Yes     | Yes     | Yes     | If you running this tool on vps change `ARE_U_USING_VPS="FALSE" into ARE_U_USING_VPS="TRUE"` |
-| AMASS                | No      | Yes     | Yes     | Yes     |                                                                                            |
-| BBOT                 | No      | Yes     | Yes     | Yes     |                                                                                            |
-| FFUFBRUTE            | No      | Yes     | Yes     | Yes     | Got from https://x.com/ArmanSameer95/status/1680811916053078019                            |
-| Screenshotting Tools | No      | Yes     | Yes     | Yes     |                                                                                            |
-| VULNTECHX            | No      | No      | Yes     | Yes     | Finds Vuln Based on website tech                                                           |
-| PYXSS                | No      | Yes     | Yes     | Yes     | Checks XSS False Positive                                                                  |
-| GALER                | No      | No      | Yes     | Yes     |                                                                                            |
+| NAME                      | 1GB RAM | 2GB RAM | 4GB RAM | 6GB RAM | 8GB RAM | 16GB RAM |
+| ------------------------- | ------- | ------- | ------- | ------- | ------- | -------- |
+| BBOT                      | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| ONEFORALL                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| KAEFERJAEGER              | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| TRICKESTCLOUD             | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| DNSXBRUTE                 | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| SUBWIZ                    | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| RECURSIVESUBENUM          | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| ALTDNS                    | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| PUREDNS                   | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| ALTERX                    | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| GOTATOR                   | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| DNSGEN                    | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| GOALTDNS                  | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| RIPGEN                    | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| DMUT                      | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| DNSCEWL                   | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| ALLSUBDOMAINPERMUTATIONS  | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| MANUAL_SUBDOMAIN_RESOLVING| ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| PUREDNS                   | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| SHUFFLEDNS                | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| MASSDNS                   | ❌      | ❌     | ❌      | ✅     | ✅      | ✅      |
+| FFUFBRUTE                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| FFUFVHOST                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| GOWITNESS                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| AQUATONE                  | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| EYEWITNESS                | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| HTTPX_SS                  | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| FFUFDIRENUM               | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| DIRSEARCH                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| FEROXBUSTER               | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| WFUZZ                     | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| CRAWLEY                   | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| GALER                     | ❌      | ❌     | ❌      | ❌     | ❌      | ❌      |
+| MSARJUN                   | ❌      | ✅     | ✅      | ✅     | ✅      | ✅      |
+| X8                        | ❌      | ✅     | ✅      | ✅     | ✅      | ✅      |
+| CEWL                      | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| UNFURL                    | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| CUSTOM_PARAM              | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| COOK                      | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| PYDICTOR                  | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| FFUF_CUSTOM_PARAM         | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| VULNTECHX                 | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+| PYXSS                     | ❌      | ❌     | ✅      | ✅     | ✅      | ✅      |
+
 
 ## Tools
 
