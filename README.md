@@ -341,9 +341,9 @@ done
 ```
 
 #### Output
-<img src="img/output/workflow.png"/>
-<img src="img/output/workflow2.png"/>
-<img src="img/output/workflow3.png"/>
+<img src="img/output/GarudRecon-workflow-@rix4uni.png"/>
+<img src="img/output/GarudRecon-workflow-subfinder-@rix4uni.png"/>
+<img src="img/output/GarudRecon-workflow-subfinder-output-@rix4uni.png"/>
 </details>
 
 
