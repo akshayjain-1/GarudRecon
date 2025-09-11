@@ -14,6 +14,7 @@ RECON_LFI=false
 RECON_SUBTAKEOVER=false
 RECON_RCE=false
 RECON_IIS=false
+ACTIVE_ENUM=false
 
 # New variable
 RESUME_MODE=false
@@ -96,6 +97,10 @@ while [[ "$#" -gt 0 ]]; do
 	        RECON_SUBDOMAIN=true
 	        shift
 	        ;;
+        -a|--active)
+            ACTIVE_ENUM=true
+            shift
+            ;;
 	    -su|--recon-subdomainurls)
 	        RECON_SUBDOMAIN_URLS=true
 	        shift
@@ -1022,81 +1027,74 @@ RECURSIVESUBENUM(){
 ALTDNS(){
 	START_SPINNER "${BGREEN}ALTDNS${RESET}"
 
-	altdns -i ${ROOT_SUBDOMAINDIR}/allsubs.txt -o ${SUBDOMAINDIR}/altdns.subs -w ${ROOT_WORDLISTDIR}/perms.txt
+	altdns -i ${ROOT_SUBDOMAINDIR}/allsubs.txt -o ${SUBDOMAINDIR}/altdns.activesubs -w ${ROOT_WORDLISTDIR}/perms.txt
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] ALTDNS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/altdns.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
-PUREDNS(){
+PUREDNS_BRUTEFORCE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns bruteforce wordlists/2m-subdomains.txt -d wildcards.txt -r $RESOLVERS_WORDLIST --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns_output.txt
+	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r $RESOLVERS_WORDLIST --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns-bruteforce.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] PUREDNS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] PUREDNS_BRUTEFORCE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns-bruteforce.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ALTERX(){
 	START_SPINNER "${BGREEN}ALTERX${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | alterx -silent -o ${SUBDOMAINDIR}/alterx.subs
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | alterx -duc -silent -o ${SUBDOMAINDIR}/alterx.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] ALTERX${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/alterx.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] ALTERX${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/alterx.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 GOTATOR(){
 	START_SPINNER "${BGREEN}GOTATOR${RESET}"
 
-	gotator -silent -sub ${ROOT_SUBDOMAINDIR}/allsubs.txt -perm ${ROOT_WORDLISTDIR}/perms.txt -depth ${GOTATOR_DEPTH} -numbers ${GOTATOR_NUMBERS} -mindup -adv -md | head -c ${GOTATOR_MAX_SIZE} >> ${SUBDOMAINDIR}/gotator.subs
+	gotator -silent -sub ${ROOT_SUBDOMAINDIR}/allsubs.txt -perm ${ROOT_WORDLISTDIR}/perms.txt -depth ${GOTATOR_DEPTH} -numbers ${GOTATOR_NUMBERS} -mindup -adv -md | head -c ${GOTATOR_MAX_SIZE} >> ${SUBDOMAINDIR}/gotator.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] GOTATOR${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/gotator.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] GOTATOR${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/gotator.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 DNSGEN(){
 	START_SPINNER "${BGREEN}DNSGEN${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dnsgen -w ${ROOT_WORDLISTDIR}/perms.txt - >> ${SUBDOMAINDIR}/dnsgen.subs
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dnsgen -w ${ROOT_WORDLISTDIR}/perms.txt - >> ${SUBDOMAINDIR}/dnsgen.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] DNSGEN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dnsgen.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] DNSGEN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dnsgen.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 GOALTDNS(){
 	START_SPINNER "${BGREEN}GOALTDNS${RESET}"
 
-	goaltdns -l ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${ROOT_WORDLISTDIR}/perms.txt -o ${SUBDOMAINDIR}/goaltdns.subs
+	goaltdns -l ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${ROOT_WORDLISTDIR}/perms.txt -o ${SUBDOMAINDIR}/goaltdns.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] GOALTDNS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/goaltdns.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] GOALTDNS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/goaltdns.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 RIPGEN(){
 	START_SPINNER "${BGREEN}RIPGEN${RESET}"
 
-	ripgen -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${ROOT_WORDLISTDIR}/perms.txt > ${SUBDOMAINDIR}/ripgen.subs
+	ripgen -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${ROOT_WORDLISTDIR}/perms.txt > ${SUBDOMAINDIR}/ripgen.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] RIPGEN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ripgen.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] RIPGEN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ripgen.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 DMUT(){
 	START_SPINNER "${BGREEN}DMUT${RESET}"
 
-	cat subdomainList.txt | dmut -d mutations.txt -w 100 --dns-timeout 300 --dns-retries 5 --dns-errorLimit 25 --show-stats -o results.txt
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dmut -d ${ROOT_WORDLISTDIR}/perms.txt -s $RESOLVERS_WORDLIST -w 100 --dns-timeout 300 --dns-retries 3 --dns-errorLimit 10 --show-stats -o ${SUBDOMAINDIR}/dmut.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] DMUT${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dnscewl.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
-}
-
-DNSCEWL(){
-	START_SPINNER "${BGREEN}DNSCEWL${RESET}"
-
-	STOP_SPINNER
-	echo -e "${BGREEN}[+] DNSCEWL${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dnscewl.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] DMUT${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dmut.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 
@@ -1110,87 +1108,22 @@ ALLSUBDOMAINPERMUTATIONS(){
 }
 
 
-MANUAL_SUBDOMAIN_RESOLVING(){
-	START_SPINNER "${BGREEN}MANUAL_SUBDOMAIN_RESOLVING${RESET}"
-
-    echo -e "${GRAY}[!] $SUBDOMAINDIR/allpermutationssubs.txt resolve subdomain in vps, it can be google cloud shell and then add after resolved ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs. Please choose an option:${RESET}"
-    echo -e "${GRAY}1. Wait for up to 1440 minutes, still resolving subdomain but allow me to continue if i'm done earlier by pressing Enter button"
-    echo -e "${GRAY}2. Done, I have resolved subdomain don't wait now"
-    echo -e "${GRAY}3. Skip, I don't have time for manually doing this work"
-
-    # Read user input with a timeout of 1 minute
-    read -t ${MANUAL_SUBDOMAIN_RESOLVING_OPTION_WAIT} -p "Select an option (1/2/3): " option
-
-    # If no input after 60 seconds, automatically select Option 1
-    if [ -z "$option" ]; then
-        option=${MANUAL_SUBDOMAIN_RESOLVING_OPTION_SELECT}
-        echo -e "\n${GRAY}[+] No input received, automatically choosing Option ${MANUAL_SUBDOMAIN_RESOLVING_OPTION_SELECT}${RESET}"
-    fi
-
-    case "$option" in
-        1)
-            echo -e "${BGREEN}[+] Waiting for up to 1440 minutes. Press Enter if you're done early...${RESET}"
-
-            # Display prompt once and enter wait loop
-            counter=0
-            while true; do
-                read -t 60 -n 1 input
-                if [ $? -eq 0 ]; then
-                    echo -e "${BGREEN}[+] Done early! Proceeding...${RESET}"
-                    break
-                fi
-                # Exit after 30 minutes if Enter is not pressed
-                ((counter++))
-                if [ $counter -eq ${MANUAL_SUBDOMAIN_RESOLVING_TIME} ]; then
-                    echo -e "${BGREEN}[+] 1440 minutes have passed. Proceeding...${RESET}"
-                    break
-                fi
-            done
-            ;;
-        2)
-            echo -e "${BGREEN}[+] Done with resolving subdomain. Proceeding...${RESET}"
-            ;;
-        3)
-            echo -e "${YELLOW}[!] Skipping don't have to for manually doing this work.${RESET}"
-            return
-            ;;
-        *)
-            echo -e "${YELLOW}[!] Invalid option. Skipping manual removing unnecessary urls manually.${RESET}"
-            return
-            ;;
-    esac
-
-    # Display the count of lines in allpermutationssubs.txt
-	STOP_SPINNER
-    echo -e "${BGREEN}[+] MANUAL_SUBDOMAIN_RESOLVING${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allpermutationssubs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
-}
-
 # Subdomain Resolving
-PUREDNS(){
+PUREDNS_RESOLVE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
-	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
-		DOWNLOAD_UPDATED_RESOLVERS
-		puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST --resolvers-trusted wordlists/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs
-	else
-		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
-		MANUAL_SUBDOMAIN_RESOLVING
-	fi
+	DOWNLOAD_UPDATED_RESOLVERS
+	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST --resolvers-trusted wordlists/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] PUREDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] PUREDNS_RESOLVE${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 SHUFFLEDNS(){
 	START_SPINNER "${BGREEN}SHUFFLEDNS${RESET}"
 
-	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
-		DOWNLOAD_UPDATED_RESOLVERS
-		shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs
-	else
-		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
-		MANUAL_SUBDOMAIN_RESOLVING
-	fi
+	DOWNLOAD_UPDATED_RESOLVERS
+	shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] SHUFFLEDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1199,14 +1132,9 @@ SHUFFLEDNS(){
 MASSDNS(){
 	START_SPINNER "${BGREEN}MASSDNS${RESET}"
 
-	if [ "$ARE_U_USING_VPS" = "TRUE" ]; then
-		echo -e "I will add later.."
-		massdns -r $RESOLVERS_WORDLIST -q -t A -o S -w ./$domain/subdomain/all_subdomain.txt ./$domain/ips/massdns.raw
-    	cat ./$domain/ips/massdns.raw | grep -a -e ' A ' |  cut -d 'A' -f 2 | tr -d ' ' | anew -q ./$domain/ips/resolved_ips.txt
-	else
-		# if ARE_U_USING_VPS is FALSE then ask user to resolve subdomain in vps, it can be google cloud shell
-		MANUAL_SUBDOMAIN_RESOLVING
-	fi
+	echo -e "I will add later.."
+	massdns -r $RESOLVERS_WORDLIST -q -t A -o S -w ./$domain/subdomain/all_subdomain.txt ./$domain/ips/massdns.raw
+    cat ./$domain/ips/massdns.raw | grep -a -e ' A ' |  cut -d 'A' -f 2 | tr -d ' ' | anew -q ./$domain/ips/resolved_ips.txt
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] MASSDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/massdns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -2432,7 +2360,7 @@ XSS(){
 		fi
 
 		# Common steps for both TRUE and FALSE conditions
-		cat ${VULNDIR}/xss_pvreplace.txt | xsschecker -nc -match 'rix4uni' -vuln -t ${XSSCHECKER_THREADS} -timeout ${XSSCHECKER_TIMEOUT} -retries ${XSSCHECKER_RETRIES} 2>/dev/null | sed 's/^Vulnerable: \[[^]]*\] \[[^]]*\] //' | unew -el -t -q ${VULNDIR}/xsschecker.txt
+		cat ${VULNDIR}/xss_pvreplace.txt | xsschecker -nc -match 'rix4uni' -vuln -t ${XSSCHECKER_THREADS} -timeout ${XSSCHECKER_TIMEOUT} -retries ${XSSCHECKER_RETRIES} -filter 2>/dev/null | unew -el -t -q ${VULNDIR}/xsschecker.txt
 	fi
 
 	if [ "$XSS_SCAN_MODE" = "ADVANCED" ]; then
@@ -2445,7 +2373,7 @@ XSS(){
 		fi
 
 		# Common steps for both TRUE and FALSE conditions
-		cat ${VULNDIR}/xss_pvreplace.txt | xsschecker -nc -match 'rix4uni' -vuln -t ${XSSCHECKER_THREADS} -timeout ${XSSCHECKER_TIMEOUT} -retries ${XSSCHECKER_RETRIES} 2>/dev/null | sed 's/^Vulnerable: \[[^]]*\] \[[^]]*\] //' | unew -el -t -q ${VULNDIR}/xsschecker.txt
+		cat ${VULNDIR}/xss_pvreplace.txt | xsschecker -nc -match 'rix4uni' -vuln -t ${XSSCHECKER_THREADS} -timeout ${XSSCHECKER_TIMEOUT} -retries ${XSSCHECKER_RETRIES} -filter 2>/dev/null | unew -el -t -q ${VULNDIR}/xsschecker.txt
 
 		# Checks XSS False Positive
 		cat ${VULNDIR}/xsschecker.txt | unew -q -split ${XSSCHECKER_SPLIT} ${VULNDIR}/xsschecker_split.txt
@@ -2768,14 +2696,13 @@ DELETE_TMPDIR(){
 
 	# if DELETE_TMPDIR is TRUE then delete large files
 	if [ "$DELETE_TMPDIR" = "TRUE" ]; then
-		rm -rf ${SUBDOMAINDIR}/altdns.subs
-		rm -rf ${SUBDOMAINDIR}/puredns.subs
-		rm -rf ${SUBDOMAINDIR}/alterx.subs
-		rm -rf ${SUBDOMAINDIR}/gotator.subs
-		rm -rf ${SUBDOMAINDIR}/dnsgen.subs
-		rm -rf ${SUBDOMAINDIR}/goaltdns.subs
-		rm -rf ${SUBDOMAINDIR}/ripgen.subs
-		rm -rf ${SUBDOMAINDIR}/dnscewl.subs
+		rm -rf ${SUBDOMAINDIR}/altdns.activesubs
+		rm -rf ${SUBDOMAINDIR}/puredns.activesubs
+		rm -rf ${SUBDOMAINDIR}/alterx.activesubs
+		rm -rf ${SUBDOMAINDIR}/gotator.activesubs
+		rm -rf ${SUBDOMAINDIR}/dnsgen.activesubs
+		rm -rf ${SUBDOMAINDIR}/goaltdns.activesubs
+		rm -rf ${SUBDOMAINDIR}/ripgen.activesubs
 		rm -rf ${SUBDOMAINDIR}/allpermutationssubs.txt
 	fi
 
@@ -2833,24 +2760,24 @@ RECON(){
 	# run "RECURSIVESUBENUM"
 
 
-	# Subdomain Permutations
-	# run "ALTDNS"
-	# run "PUREDNS"
-	# run "ALTERX"
-	# run "GOTATOR"
-	# run "DNSGEN"
-	# run "GOALTDNS"
-	# run "RIPGEN"
-	# run "DMUT"
-	# run "DNSCEWL"
-	# run "ALLSUBDOMAINPERMUTATIONS"
-	# run "MANUAL_SUBDOMAIN_RESOLVING"
+	if [[ "$ACTIVE_ENUM" == true ]]; then
+		# Subdomain Permutations
+		run "ALTDNS"
+		run "PUREDNS_BRUTEFORCE"
+		run "ALTERX"
+		run "GOTATOR"
+		run "DNSGEN"
+		run "GOALTDNS"
+		run "RIPGEN"
+		run "DMUT"
+		run "ALLSUBDOMAINPERMUTATIONS"
 
 
-	# Subdomain Resolving
-	# run "PUREDNS"
-	# run "SHUFFLEDNS"
-	# run "MASSDNS"
+		# Subdomain Resolving
+		run "PUREDNS_RESOLVE"
+		run "SHUFFLEDNS"
+		run "MASSDNS"
+	fi
 
 
 	# Subdomain DNS Enumeration
@@ -3002,24 +2929,24 @@ if [[ "$RECON_SUBDOMAIN" == true ]]; then
 	# run "RECURSIVESUBENUM"
 
 
-	# Subdomain Permutations
-	# run "ALTDNS"
-	# run "PUREDNS"
-	# run "ALTERX"
-	# run "GOTATOR"
-	# run "DNSGEN"
-	# run "GOALTDNS"
-	# run "RIPGEN"
-	# run "DMUT"
-	# run "DNSCEWL"
-	# run "ALLSUBDOMAINPERMUTATIONS"
-	# run "MANUAL_SUBDOMAIN_RESOLVING"
+	if [[ "$ACTIVE_ENUM" == true ]]; then
+		# Subdomain Permutations
+		run "ALTDNS"
+		run "PUREDNS_BRUTEFORCE"
+		run "ALTERX"
+		run "GOTATOR"
+		run "DNSGEN"
+		run "GOALTDNS"
+		run "RIPGEN"
+		run "DMUT"
+		run "ALLSUBDOMAINPERMUTATIONS"
 
 
-	# Subdomain Resolving
-	# run "PUREDNS"
-	# run "SHUFFLEDNS"
-	# run "MASSDNS"
+		# Subdomain Resolving
+		run "PUREDNS_RESOLVE"
+		run "SHUFFLEDNS"
+		run "MASSDNS"
+	fi
 
 
 	# Subdomain DNS Enumeration
@@ -3132,28 +3059,29 @@ else
 	run "JSUBFINDER"
 	run "ALLSUBDOMAIN"
 	run "DNSXBRUTE"
-	run "SUBWIZ"
-	# run "RECURSIVESUBENUM"
 
 
-	# Subdomain Permutations
-	# run "ALTDNS"
-	# run "PUREDNS"
-	# run "ALTERX"
-	# run "GOTATOR"
-	# run "DNSGEN"
-	# run "GOALTDNS"
-	# run "RIPGEN"
-	# run "DMUT"
-	# run "DNSCEWL"
-	# run "ALLSUBDOMAINPERMUTATIONS"
-	# run "MANUAL_SUBDOMAIN_RESOLVING"
+	if [[ "$ACTIVE_ENUM" == true ]]; then
+		run "SUBWIZ"
+		# run "RECURSIVESUBENUM"
+
+		# Subdomain Permutations
+		run "ALTDNS"
+		run "PUREDNS_BRUTEFORCE"
+		run "ALTERX"
+		run "GOTATOR"
+		run "DNSGEN"
+		run "GOALTDNS"
+		run "RIPGEN"
+		run "DMUT"
+		run "ALLSUBDOMAINPERMUTATIONS"
 
 
-	# Subdomain Resolving
-	# run "PUREDNS"
-	# run "SHUFFLEDNS"
-	# run "MASSDNS"
+		# Subdomain Resolving
+		run "PUREDNS_RESOLVE"
+		run "SHUFFLEDNS"
+		run "MASSDNS"
+	fi
 
 
 	# Subdomain DNS Enumeration
