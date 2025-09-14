@@ -83,6 +83,18 @@ After that i tried in python, golang but i did'nt liked "String Concatenation", 
 >  
 > Make sure your shell is set to **bash**.
 
+## Errors
+```
+- If you getting this error
+/root/.garudrecon/cmd/install: line 202: unew: command not found
+/root/.garudrecon/cmd/install: line 231: unew: command not found
+
+- Then install go manually
+curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash
+
+- Now run this command
+bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
+```
 
 ### Docker
 ```
