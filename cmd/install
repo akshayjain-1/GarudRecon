@@ -247,6 +247,7 @@ PACKAGES() {
     apt update -y &>/dev/null
     apt upgrade -y &>/dev/null
     apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync &>/dev/null
+    wget -q https://raw.githubusercontent.com/rix4uni/dotfiles/refs/heads/main/tmux/tmux-termius.conf -O ~/.tmux.conf
 
     # https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
     rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED &>/dev/null
@@ -421,6 +422,7 @@ DOS2UNIX() {
     fi
 
     apt install dos2unix -y &>/dev/null
+    dos2unix ~/.tmux.conf
 
     if ! command -v dos2unix &>/dev/null; then
         echo -e "${BRED}[x] DOS2UNIX - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
@@ -4292,6 +4294,7 @@ REQUIRED(){
     PIPREQS
     SSHPASS
     CURL
+    DOS2UNIX
     WGET
     ZIP
     XSEL
