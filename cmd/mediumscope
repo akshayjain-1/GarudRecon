@@ -2058,6 +2058,10 @@ ALLURLS(){
 
 	cat ${URLSDIR}/*.urls | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -el -t -q ${ROOT_URLSDIR}/allurls.txt
 
+	# Interesting urls
+	cat ${ROOT_URLSDIR}/allurls.txt | grep -aiE "\b(login|signin|auth|register|signup|contact|feedback|subscribe|unsubscribe|reset|upload|submit|comment|review|message|file-upload|post|api)\b" | unew -el -t -q ${ROOT_URLSDIR}/interesting_urls.txt
+
+
 	cat ${ROOT_URLSDIR}/allurls.txt | urldedupe -s | eval ${URLS_FILTER} | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -el -t -q ${URLSDIR}/filteredurls.txt
 
 	# Reuse old scanned data
