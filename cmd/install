@@ -422,7 +422,7 @@ DOS2UNIX() {
     fi
 
     apt install dos2unix -y &>/dev/null
-    dos2unix ~/.tmux.conf
+    dos2unix ~/.tmux.conf &>/dev/null
 
     if ! command -v dos2unix &>/dev/null; then
         echo -e "${BRED}[x] DOS2UNIX - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
