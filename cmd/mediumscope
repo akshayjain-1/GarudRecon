@@ -1173,7 +1173,7 @@ MASSCAN(){
 	START_SPINNER "${BGREEN}MASSCAN${RESET}"
 
 	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | xargs -n1 dig +short | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/allsubs_resolved.txt
-	masscan -p1-65535 -iL ${ROOT_SUBDOMAINDIR}/allsubs_resolved.txt --max-rate 10000 -oX masscan.xml 2>/dev/null
+	masscan -p1-65535 -iL ${ROOT_SUBDOMAINDIR}/allsubs_resolved.txt --max-rate 10000 -oX ${ROOT_SUBDOMAINDIR}/masscan.xml 2>/dev/null
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] MASSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/masscan.xml || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
