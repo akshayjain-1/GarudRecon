@@ -262,6 +262,9 @@ Usage:
 Flags:
   -d, --domain                          Scan a domain (e.g. domain.com)
   -ef, --exclude-functions              Exclude a function from running (e.g. AMASS)
+  -s, --recon-subdomain                 Run Subdomain Enumeration only
+  -a, --active                          Run Active Subdomain Enumeration also (e.g. puredns, altdns)
+  -su, --recon-subdomainurls            Run Subdomain Enumeration + Url Crawling only
   -rx, --recon-xss                      Run full recon with XSS checks
   -rs, --recon-sqli                     Run full recon with SQLi checks
   -rl, --recon-lfi                      Run full recon with LFI checks
@@ -274,8 +277,17 @@ Flags:
   -h, --help                            help for mediumscope
 
 Example:
-# Full recon
+# Full recon with all vulnerability scan
   garudrecon mediumscope -d domain.com
+
+# Recon Subdomain Enumeration only
+  garudrecon mediumscope -d domain.com -s
+
+# Run Active Subdomain Enumeration also (e.g. puredns, altdns)
+  garudrecon mediumscope -d domain.com -s -a
+
+# Recon Subdomain Enumeration + Url Crawling only
+  garudrecon mediumscope -d domain.com -su
 
 # Recon with XSS only
   garudrecon mediumscope -d domain.com -rx
