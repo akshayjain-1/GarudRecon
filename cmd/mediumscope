@@ -1172,33 +1172,29 @@ NAABU(){
 MASSCAN(){
 	START_SPINNER "${BGREEN}MASSCAN${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
-	masscan -p1-65535 -iL ${ROOT_SUBDOMAINDIR}/allsubs.txt --max-rate 10000
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | xargs -n1 dig +short | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/allsubs_resolved.txt
+	masscan -p1-65535 -iL ${ROOT_SUBDOMAINDIR}/allsubs_resolved.txt --max-rate 10000 -oX masscan.xml 2>/dev/null
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] MASSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/naabu.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] MASSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/masscan.xml || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 RUSTSCAN(){
 	START_SPINNER "${BGREEN}RUSTSCAN${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
-
-	rustscan -a ${ROOT_SUBDOMAINDIR}/allsubs.txt
+	rustscan -a ${ROOT_SUBDOMAINDIR}/allsubs.txt --ulimit 5000 2>/dev/null | unew -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/rustscan.txt
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] RUSTSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/naabu.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] RUSTSCAN${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/rustscan.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 NMAP(){
 	START_SPINNER "${BGREEN}NMAP${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports 1000 | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
-
-	nmap -iL ${ROOT_SUBDOMAINDIR}/allsubs.txt -sS -T4 -Pn -p 1-1000 --open 2>/dev/null
+	sudo nmap -sS -sV -O -iL ${ROOT_SUBDOMAINDIR}/allsubs.txt -oN ${ROOT_SUBDOMAINDIR}/nmap.txt -oX ${ROOT_SUBDOMAINDIR}/nmap.xml -oG ${ROOT_SUBDOMAINDIR}/nmap.gnmap -v0
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] NMAP${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/naabu.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] NMAP${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/nmap.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 
