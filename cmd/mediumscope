@@ -848,7 +848,7 @@ WHOXYSUBS(){
 	START_SPINNER "${BGREEN}WHOXYSUBS${RESET}"
 
 	cat ${SUBDOMAINDIR}/orgs.txt | whoxysubs --silent -s company | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
-	cat ${SUBDOMAINDIR}/emails.txt | whoxysubs --silent -s email | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
+	cat ${SUBDOMAINDIR}/emails.txt 2>/dev/null | whoxysubs --silent -s email | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
 	echo "$TARGET" | whoxysubs --silent -s keyword | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
 	# echo "elon musk" | whoxysubs --silent -s name | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
 
@@ -1006,7 +1006,7 @@ SUBWIZ(){
 	START_SPINNER "${BGREEN}SUBWIZ${RESET}"
 
 	subwiz -i ${ROOT_SUBDOMAINDIR}/allsubs.txt --num_predictions ${SUBWIZ_NUM_PREDICTIONS} -o ${SUBDOMAINDIR}/tmp_subwiz.subs &>/dev/null
-	cat ${SUBDOMAINDIR}/tmp_subwiz.subs | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/subwiz.subs
+	cat ${SUBDOMAINDIR}/tmp_subwiz.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/subwiz.subs
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/subwiz.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/subwiz.subs
@@ -1041,10 +1041,10 @@ PUREDNS_BRUTEFORCE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r $RESOLVERS_WORDLIST --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns-bruteforce.activesubs
+	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r $RESOLVERS_WORDLIST --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns.activesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] PUREDNS_BRUTEFORCE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns-bruteforce.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] PUREDNS_BRUTEFORCE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ALTERX(){
@@ -1083,15 +1083,6 @@ GOALTDNS(){
 	echo -e "${BGREEN}[+] GOALTDNS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/goaltdns.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
-RIPGEN(){
-	START_SPINNER "${BGREEN}RIPGEN${RESET}"
-
-	ripgen -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${WORDLIST_BASEDIR}/perms.txt > ${SUBDOMAINDIR}/ripgen.activesubs
-
-	STOP_SPINNER
-	echo -e "${BGREEN}[+] RIPGEN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/ripgen.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
-}
-
 DMUT(){
 	START_SPINNER "${BGREEN}DMUT${RESET}"
 
@@ -1102,13 +1093,13 @@ DMUT(){
 }
 
 
-ALLSUBDOMAINPERMUTATIONS(){
-	START_SPINNER "${BGREEN}ALLSUBDOMAINPERMUTATIONS${RESET}"
+ALLSUBDOMAIN_PERMUTATIONS(){
+	START_SPINNER "${BGREEN}ALLSUBDOMAIN_PERMUTATIONS${RESET}"
 
-	cat ${SUBDOMAINDIR}/*.subs | unew -el -i -t -q ${SUBDOMAINDIR}/allpermutationssubs.txt
+	cat ${SUBDOMAINDIR}/*.activesubs | unew -el -i -t -q ${SUBDOMAINDIR}/allpermutationssubs.txt
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] ALLSUBDOMAINPERMUTATIONS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allpermutationssubs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] ALLSUBDOMAIN_PERMUTATIONS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allpermutationssubs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 
@@ -1117,20 +1108,20 @@ PUREDNS_RESOLVE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST --resolvers-trusted wordlists/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs
+	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${RESOLVERS_WORDLIST} --resolvers-trusted ${RESOLVERS_TRUSTED_WORDLIST} --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] PUREDNS_RESOLVE${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] PUREDNS_RESOLVE${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 SHUFFLEDNS(){
 	START_SPINNER "${BGREEN}SHUFFLEDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs
+	shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns.resolvesubs
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] SHUFFLEDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/shuffledns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] SHUFFLEDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/shuffledns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 MASSDNS(){
@@ -1141,7 +1132,17 @@ MASSDNS(){
     cat ./$domain/ips/massdns.raw | grep -a -e ' A ' |  cut -d 'A' -f 2 | tr -d ' ' | anew -q ./$domain/ips/resolved_ips.txt
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] MASSDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/massdns_resolve.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] MASSDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/massdns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
+
+ALLSUBDOMAIN_RESOLVING(){
+	START_SPINNER "${BGREEN}ALLSUBDOMAIN_RESOLVING${RESET}"
+
+	cat ${SUBDOMAINDIR}/*.resolvesubs | unew -el -i -t -q ${SUBDOMAINDIR}/allresolvesubs.txt
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] ALLSUBDOMAIN_RESOLVING${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allresolvesubs.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 
@@ -2058,10 +2059,6 @@ ALLURLS(){
 
 	cat ${URLSDIR}/*.urls | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -el -t -q ${ROOT_URLSDIR}/allurls.txt
 
-	# Interesting urls
-	cat ${ROOT_URLSDIR}/allurls.txt | grep -aiE "\b(login|signin|auth|register|signup|contact|feedback|subscribe|unsubscribe|reset|upload|submit|comment|review|message|file-upload|post|api)\b" | unew -el -t -q ${ROOT_URLSDIR}/interesting_urls.txt
-
-
 	cat ${ROOT_URLSDIR}/allurls.txt | urldedupe -s | eval ${URLS_FILTER} | grep -aE "(https?://$TARGET(:[0-9]+)?(/)|\.$TARGET[:/])" | unew -el -t -q ${URLSDIR}/filteredurls.txt
 
 	# Reuse old scanned data
@@ -2071,6 +2068,17 @@ ALLURLS(){
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] ALLURLS${RESET}: $(wc -l 2>/dev/null < ${ROOT_URLSDIR}/allurls.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 	echo -e "${BGREEN}[+] FILTEREDALLURLS${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/filteredurls.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
+INTERESTING_URLS(){
+	START_SPINNER "${BGREEN}ALLURLS${RESET}"
+
+	cat ${ROOT_URLSDIR}/allurls.txt | grep -aiE "\b(login|signin|auth|register|signup|contact|feedback|subscribe|unsubscribe|reset|upload|submit|comment|review|message|file-upload|post|api)\b" | unew -el -t -q ${ROOT_URLSDIR}/forms.manualcheck
+	cat ${ROOT_URLSDIR}/allurls.txt | grep -aiE "\.zip|\.rar|\.tar|\.gz|\.config|\.log|\.bak|\.backup|\.java|\.old|\.xlsx|\.json|\.pdf|\.doc|\.docx|\.pptx|\.csv|\.htaccess|\.7z" | unew -el -t -q ${ROOT_URLSDIR}/sensitive_keywords.manualcheck
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] FORMS_MANUALCHECK${RESET}: $(wc -l 2>/dev/null < ${ROOT_URLSDIR}/forms.manualcheck || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] SENSITIVE_KEYWORDS_MANUALCHECK${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/sensitive_keywords.manualcheck || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 SUBDOMAIN_SCRAPING(){
@@ -2706,7 +2714,6 @@ DELETE_TMPDIR(){
 		rm -rf ${SUBDOMAINDIR}/gotator.activesubs
 		rm -rf ${SUBDOMAINDIR}/dnsgen.activesubs
 		rm -rf ${SUBDOMAINDIR}/goaltdns.activesubs
-		rm -rf ${SUBDOMAINDIR}/ripgen.activesubs
 		rm -rf ${SUBDOMAINDIR}/allpermutationssubs.txt
 	fi
 
@@ -2772,15 +2779,15 @@ RECON(){
 		run "GOTATOR"
 		run "DNSGEN"
 		run "GOALTDNS"
-		run "RIPGEN"
 		run "DMUT"
-		run "ALLSUBDOMAINPERMUTATIONS"
+		run "ALLSUBDOMAIN_PERMUTATIONS"
 
 
 		# Subdomain Resolving
 		run "PUREDNS_RESOLVE"
 		run "SHUFFLEDNS"
 		run "MASSDNS"
+		run "ALLSUBDOMAIN_RESOLVING"
 	fi
 
 
@@ -2878,6 +2885,7 @@ RECON(){
 	run "MSARJUN"
 	run "X8"
 	run "ALLURLS"
+	run "INTERESTING_URLS"
 	# run "SUBDOMAIN_SCRAPING"
 	# run "JS_SUBDOMAINS"
 	run "MANUAL_ALLURLS_FILTER"
@@ -2941,15 +2949,15 @@ if [[ "$RECON_SUBDOMAIN" == true ]]; then
 		run "GOTATOR"
 		run "DNSGEN"
 		run "GOALTDNS"
-		run "RIPGEN"
 		run "DMUT"
-		run "ALLSUBDOMAINPERMUTATIONS"
+		run "ALLSUBDOMAIN_PERMUTATIONS"
 
 
 		# Subdomain Resolving
 		run "PUREDNS_RESOLVE"
 		run "SHUFFLEDNS"
 		run "MASSDNS"
+		run "ALLSUBDOMAIN_RESOLVING"
 	fi
 
 
@@ -3076,15 +3084,15 @@ else
 		run "GOTATOR"
 		run "DNSGEN"
 		run "GOALTDNS"
-		run "RIPGEN"
 		run "DMUT"
-		run "ALLSUBDOMAINPERMUTATIONS"
+		run "ALLSUBDOMAIN_PERMUTATIONS"
 
 
 		# Subdomain Resolving
 		run "PUREDNS_RESOLVE"
 		run "SHUFFLEDNS"
 		run "MASSDNS"
+		run "ALLSUBDOMAIN_RESOLVING"
 	fi
 
 
@@ -3182,6 +3190,7 @@ else
 	run "MSARJUN"
 	run "X8"
 	run "ALLURLS"
+	run "INTERESTING_URLS"
 	# run "SUBDOMAIN_SCRAPING"
 	# run "JS_SUBDOMAINS"
 	run "MANUAL_ALLURLS_FILTER"
