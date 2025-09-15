@@ -1041,7 +1041,7 @@ PUREDNS_BRUTEFORCE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns.activesubs
+	puredns bruteforce --quiet $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns.activesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] PUREDNS_BRUTEFORCE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1108,7 +1108,7 @@ PUREDNS_RESOLVE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --resolvers-trusted ${ROOT_WORDLISTDIR}/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs
+	puredns resolve --quiet ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --resolvers-trusted ${ROOT_WORDLISTDIR}/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] PUREDNS_RESOLVE${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
