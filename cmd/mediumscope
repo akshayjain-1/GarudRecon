@@ -1203,7 +1203,7 @@ NMAP(){
 HTTPX(){
 	START_SPINNER "${BGREEN}HTTPX${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/naabu.txt | httpx -duc -silent -nc -td -t ${HTTPX_THREADS} | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/httpx.txt
+	cat ${ROOT_SUBDOMAINDIR}/naabu.txt | httpx -duc -silent -nc -sc -title -td -cl -ct -t ${HTTPX_THREADS} | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/httpx.txt
 
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/alivesubs.txt
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | sed -e 's/https\?:\/\/\(www\.\)\?//' -e 's/:.*$//' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/withoutprotocolsubs.txt
