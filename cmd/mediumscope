@@ -847,9 +847,9 @@ BUILTWITH(){
 WHOXYSUBS(){
 	START_SPINNER "${BGREEN}WHOXYSUBS${RESET}"
 
-	cat ${SUBDOMAINDIR}/orgs.txt | whoxysubs --silent -s company | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
-	cat ${SUBDOMAINDIR}/emails.txt 2>/dev/null | whoxysubs --silent -s email | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
-	echo "$TARGET" | whoxysubs --silent -s keyword | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
+	cat ${SUBDOMAINDIR}/orgs.txt | whoxysubs --silent -s company | jq -r '.[].domain_name' | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
+	cat ${SUBDOMAINDIR}/emails.txt 2>/dev/null | whoxysubs --silent -s email | jq -r '.[].domain_name'| unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
+	echo "$TARGET" | whoxysubs --silent -s keyword | jq -r '.[].domain_name' | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
 	# echo "elon musk" | whoxysubs --silent -s name | unew -el -i -t -q ${SUBDOMAINDIR}/whoxysubs.subs
 
 	# Reuse old scanned data
