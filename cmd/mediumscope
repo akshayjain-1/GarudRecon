@@ -983,16 +983,16 @@ DNSXBRUTE(){
 	START_SPINNER "${BGREEN}DNSXBRUTE${RESET}"
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "QUICK" ]; then
-		dnsx -duc -silent -d $TARGET -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d $TARGET -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r ${ROOT_WORDLISTDIR}/resolvers.txt | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
 	fi
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "NORMAL" ]; then
-		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r ${ROOT_WORDLISTDIR}/resolvers.txt | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
 	fi
 
 	if [ "$DNSXBRUTE_SCAN_MODE" = "ADVANCED" ]; then
-		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
-		dnsx -duc -silent -d ${SUBDOMAINDIR}/dnsxbrute.subs -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r $RESOLVERS_WORDLIST | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbruteadv.subs
+		dnsx -duc -silent -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r ${ROOT_WORDLISTDIR}/resolvers.txt | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbrute.subs
+		dnsx -duc -silent -d ${SUBDOMAINDIR}/dnsxbrute.subs -w ${DNSXBRUTE_DEFAULT_CUSTOM_WORDLIST} -a -r ${ROOT_WORDLISTDIR}/resolvers.txt | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/dnsxbruteadv.subs
 	fi
 
 	# Reuse old scanned data
@@ -1041,7 +1041,7 @@ PUREDNS_BRUTEFORCE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r $RESOLVERS_WORDLIST --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns.activesubs
+	puredns bruteforce $FFUFBRUTE_DEFAULT_CUSTOM_WORDLIST -d ${ROOT_SUBDOMAINDIR}/allsubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w puredns.activesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] PUREDNS_BRUTEFORCE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/puredns.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1086,7 +1086,7 @@ GOALTDNS(){
 DMUT(){
 	START_SPINNER "${BGREEN}DMUT${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dmut -d ${WORDLIST_BASEDIR}/perms.txt -s $RESOLVERS_WORDLIST -w 100 --dns-timeout 300 --dns-retries 3 --dns-errorLimit 10 --show-stats -o ${SUBDOMAINDIR}/dmut.activesubs
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dmut -d ${WORDLIST_BASEDIR}/perms.txt -s ${ROOT_WORDLISTDIR}/resolvers.txt -w 100 --dns-timeout 300 --dns-retries 3 --dns-errorLimit 10 --show-stats -o ${SUBDOMAINDIR}/dmut.activesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] DMUT${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dmut.activesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1108,7 +1108,7 @@ PUREDNS_RESOLVE(){
 	START_SPINNER "${BGREEN}PUREDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${RESOLVERS_WORDLIST} --resolvers-trusted ${RESOLVERS_TRUSTED_WORDLIST} --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs
+	puredns resolve ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt --resolvers-trusted ${ROOT_WORDLISTDIR}/resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests ${PUREDNS_WILDCARD_TESTS} -w ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] PUREDNS_RESOLVE${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/puredns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1118,7 +1118,7 @@ SHUFFLEDNS(){
 	START_SPINNER "${BGREEN}SHUFFLEDNS${RESET}"
 
 	DOWNLOAD_UPDATED_RESOLVERS
-	shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r $RESOLVERS_WORDLIST -o ${ROOT_SUBDOMAINDIR}/shuffledns.resolvesubs
+	shuffledns -silent -l ${SUBDOMAINDIR}/allpermutationssubs.txt -r ${ROOT_WORDLISTDIR}/resolvers.txt -o ${ROOT_SUBDOMAINDIR}/shuffledns.resolvesubs
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] SHUFFLEDNS${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/shuffledns.resolvesubs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -1128,7 +1128,7 @@ MASSDNS(){
 	START_SPINNER "${BGREEN}MASSDNS${RESET}"
 
 	echo -e "I will add later.."
-	massdns -r $RESOLVERS_WORDLIST -q -t A -o S -w ./$domain/subdomain/all_subdomain.txt ./$domain/ips/massdns.raw
+	massdns -r ${ROOT_WORDLISTDIR}/resolvers.txt -q -t A -o S -w ./$domain/subdomain/all_subdomain.txt ./$domain/ips/massdns.raw
     cat ./$domain/ips/massdns.raw | grep -a -e ' A ' |  cut -d 'A' -f 2 | tr -d ' ' | anew -q ./$domain/ips/resolved_ips.txt
 
 	STOP_SPINNER
@@ -1150,7 +1150,7 @@ ALLSUBDOMAIN_RESOLVING(){
 DNSX(){
 	START_SPINNER "${BGREEN}DNSX${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dnsx -duc -silent -nc -a -aaaa -cname -ns -txt -srv -ptr -mx -soa -axfr -caa -retry 3 -t 100 -json -r $RESOLVERS_WORDLIST -o ${SUBDOMAINDIR}/dnsx.json
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | dnsx -duc -silent -nc -a -aaaa -cname -ns -txt -srv -ptr -mx -soa -axfr -caa -retry 3 -t 100 -json -r ${ROOT_WORDLISTDIR}/resolvers.txt -o ${SUBDOMAINDIR}/dnsx.json
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] DNSX${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/dnsx.json || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
