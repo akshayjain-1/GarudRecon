@@ -787,19 +787,12 @@ IPRANGES(){
 ASNMAP(){
 	START_SPINNER "${BGREEN}ASNMAP${RESET}"
 
-	if [ "$ASNMAP_SCAN_MODE" = "NORMAL" ]; then
-		cat ${SUBDOMAINDIR}/*.subs | unew | certinfo -silent -c 50 | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	if [ "$ASNMAP_SCAN_MODE" = "ADVANCED" ]; then
-		rcert -list ${SUBDOMAINDIR}/*.subs | unew | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
-	fi
-
-	# Reuse old scanned data
-	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/certinfo.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | grep -aE "^(.*\.)?$ESCAPED_TARGET$" | unew -el -i -t -q ${SUBDOMAINDIR}/certinfo.subs
+	echo "$TARGET" | asnmap -duc -silent | unew -el -t -q ${SUBDOMAINDIR}/asnmap.txt
+	cat ${SUBDOMAINDIR}/asns.txt | asnmap -duc -silent | unew -el -t -q ${SUBDOMAINDIR}/asnmap.txt
+	cat ${SUBDOMAINDIR}/orgs.txt | asnmap -duc -silent | unew -el -t -q ${SUBDOMAINDIR}/asnmap.txt
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] ASNMAP${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/certinfo.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] ASNMAP${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/asnmap.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ANALYTICSRELATIONSHIPS(){
