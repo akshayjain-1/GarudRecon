@@ -128,8 +128,8 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 
 ### Download prebuilt binaries
 ```
-wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.1.0.zip
-unzip v0.1.0.zip
+wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.1.1.zip
+unzip v0.1.1.zip
 cd GarudRecon
 bash configure
 ```
