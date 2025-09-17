@@ -1154,7 +1154,7 @@ DNSX(){
 NAABU(){
 	START_SPINNER "${BGREEN}NAABU${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports ${NAABU_PORTS_SCAN} 2>/dev/null | unew -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | naabu -duc -silent -c ${NAABU_THREADS} -rate ${NAABU_RATELIMIT} -timeout ${NAABU_TIMEOUT} -retries ${NAABU_RETRIES} -top-ports ${NAABU_PORTS_SCAN} 2>/dev/null | unewflush -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/subdomain/naabu.txt 2>/dev/null | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/naabu.txt
