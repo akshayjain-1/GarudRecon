@@ -28,8 +28,8 @@ mv garudrecon /usr/bin/
 # make it excutble
 chmod +x $HOME/.garudrecon/cmd/* /usr/bin/garudrecon
 
-# Get total RAM in GB (rounded down)
-TOTAL_RAM_GB=$(free -g | awk '/^Mem:/{print $2}')
+# Get total RAM in GB
+TOTAL_RAM_GB=$(dmidecode -t memory | grep "Size:" | grep -v "No Module Installed" | awk '{print $2}')
 
 if [ "$TOTAL_RAM_GB" -le 1 ]; then
     CONFIG="garudrecon_1g.cfg"
