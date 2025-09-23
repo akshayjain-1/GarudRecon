@@ -39,6 +39,7 @@ Available Commands:
   largescope              Full-scale recon for deep visibility for organisation
   cidrscope               Run fullscan on cidr
   workflow                Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan)
+  fleet                   Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan on vps)
   cronjobs                Automate recurring recon tasks continuously
 
 Flags:
@@ -76,6 +77,9 @@ case "$COMMAND" in
     ;;
   workflow)
     bash "$(dirname "$0")/cmd/workflow" "$@"
+    ;;
+  fleet)
+    bash "$(dirname "$0")/cmd/fleet" "$@"
     ;;
   cronjobs)
     bash "$(dirname "$0")/cmd/cronjobs" "$@"

@@ -418,6 +418,29 @@ done
 
 
 <details>
+  <summary><b>garudrecon fleet -h</b></summary>
+
+```
+Run fleet scan (e.g. 1 vuln on all programs like mass vuln scan).
+
+Usage:
+  garudrecon fleet [flags]
+
+Flags:
+  -i, --input       Pass the input
+  -o, --output      Location where you want to save output
+  -m, --module      module name you want to run
+  -h, --help        help for modules
+
+Example:
+  garudrecon fleet -m <module> -i <wildcards> -o <file>
+  garudrecon fleet -m subfinder -i wildcards.txt -o wildcards.subs
+```
+
+</details>
+
+
+<details>
   <summary><b>garudrecon cronjobs -h</b></summary>
 
 ```

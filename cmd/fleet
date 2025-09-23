@@ -1,0 +1,129 @@
+#!/bin/bash
+
+
+# Help function
+function show_help() {
+  cat <<EOF
+Run fleet scan (e.g. 1 vuln on all programs like mass vuln scan).
+
+Usage:
+  garudrecon fleet [flags]
+
+Flags:
+  -i, --input       Pass the input
+  -o, --output      Location where you want to save output
+  -m, --module      module name you want to run
+  -h, --help        help for modules
+
+Example:
+  garudrecon fleet -m <module> -i <wildcards> -o <file>
+  garudrecon fleet -m subfinder -i wildcards.txt -o wildcards.subs
+EOF
+}
+
+
+# --- normal module execution ---
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -i|--input)
+      INPUT="$2"
+      shift 2
+      ;;
+    -o|--output)
+      OUTPUT="$2"
+      shift 2
+      ;;
+    -m|--module)
+      MODULE="$2"
+      shift 2
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# Split files logic
+mkdir -p split-output
+FILE=${INPUT}
+TOTALVPS=$(cat credentials.txt | wc -l)
+# SPLIT=$2
+
+LINES=$(wc -l < "$FILE")
+PER_VPS=$(( (LINES + $TOTALVPS - 1) / $TOTALVPS ))
+echo "TOTAL: $LINES, Lines per VPS: $PER_VPS"
+
+# Split the file
+split --numeric-suffixes=1 -a 3 -l $PER_VPS "$FILE" split-output/subs.
+
+# Renames files like: split-output/subs.001 → split-output/subs.1
+for f in split-output/subs.[0-9][0-9][0-9]; do
+    n=$(echo "$f" | sed -E 's/.*\.0*([0-9]+)/\1/')
+    mv "$f" "split-output/subs.$n" &>/dev/null
+done
+
+# Delete empty files
+find split-output -type f -empty -delete
+
+
+# Send sshkey to Mini-Child-VPS
+KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+export KEY_PATH
+parallel -a credentials.txt --colsep ':' -j20 "
+  sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
+
+  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p ~/fleet" &>/dev/null
+
+  echo "Sending file subs.{#} to {1}..."
+  scp -o StrictHostKeyChecking=no split-output/subs.{#} {1}:~/fleet/${INPUT}
+"
+
+# Create a tmux session
+grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
+
+# Run command in tmux session and send file to "main VPS"
+mkdir -p ~/fleet
+# grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux send-keys -t fleet \"cat fleet/subs.txt | httpx -duc -silent | unew fleet/subs.httpx && scp -i ~/.ssh/id_rsa_vps fleet/subs.httpx root@206.189.136.241:~/distribute/fleet/subs.httpx_{} &>/dev/null && rm -rf fleet && exit\" C-m"'
+
+grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i ~/fleet/${INPUT} -o ~/fleet/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps ~/fleet/${OUTPUT} root@206.189.136.241:~/fleet/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+
+
+WORKDIR="$HOME/fleet"
+DEST="$WORKDIR/${OUTPUT}"
+TOTALVPS=$(grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | wc -l)
+
+echo "[*] Waiting for results from $TOTALVPS VPS..."
+
+while true; do
+    DONE=$(find "$WORKDIR" -maxdepth 1 -type f -name "${OUTPUT}_*" | wc -l)
+
+    # Calculate percentage
+    PERCENT=$(( 100 * DONE / TOTALVPS ))
+
+    # Build simple progress bar (50 chars wide)
+    BAR_WIDTH=50
+    FILLED=$(( PERCENT * BAR_WIDTH / 100 ))
+    EMPTY=$(( BAR_WIDTH - FILLED ))
+    BAR=$(printf "%${FILLED}s" | tr ' ' '#')
+    SPACE=$(printf "%${EMPTY}s")
+
+    echo -ne "\rProgress: [$BAR$SPACE] $DONE / $TOTALVPS VPS ($PERCENT%)"
+
+    if [[ $DONE -ge $TOTALVPS ]]; then
+        echo -e "\n[*] All VPS finished, merging..."
+        # deduplicated and merge in 1 file
+        cat "$WORKDIR"/${OUTPUT}_* | unew -q "$DEST"
+        # rm -f "$WORKDIR"/${OUTPUT}_*
+        rm -rf split-output
+        echo "[+] Deduplicated results saved to $DEST"
+        break
+    fi
+
+    sleep 5
+done
