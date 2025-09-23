@@ -74,6 +74,12 @@ After that i tried in python, golang but i did'nt liked "String Concatenation", 
 </a>
 </p>
 
+<p align="center">
+<a href="https://cloud.intechdc.com/?affid=443&oid=99" target="_blank">
+<img src="img/referrals/intechdc.png"/>
+</a>
+</p>
+
 ## Installation
 
 > **Note:** Switch to the **root** user first (instead of using `sudo su`) before running the installation command.  
@@ -128,8 +134,8 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 
 ### Download prebuilt binaries
 ```
-wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.1.1.zip
-unzip v0.1.1.zip
+wget -q https://github.com/rix4uni/GarudRecon/archive/refs/tags/v0.1.2.zip
+unzip v0.1.2.zip
 cd GarudRecon
 bash configure
 ```

@@ -68,8 +68,8 @@ case "$COMMAND" in
   mediumscope)
     bash "$(dirname "$0")/cmd/mediumscope" "$@"
     ;;
-  largemscope)
-    bash "$(dirname "$0")/cmd/largemscope" "$@"
+  largescope)
+    bash "$(dirname "$0")/cmd/largescope" "$@"
     ;;
   cidrscope)
     bash "$(dirname "$0")/cmd/cidrscope" "$@"

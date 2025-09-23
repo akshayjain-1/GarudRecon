@@ -434,6 +434,27 @@ DOS2UNIX() {
     echo -e "${BGREEN}[+] DOS2UNIX - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
+AWSCLI() {
+    START_SPINNER "${BGREEN}AWSCLI${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v awscli &>/dev/null; then
+        echo -e "${YELLOW}[~] AWSCLI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    pip3 install awscli --upgrade --user &>/dev/null
+
+    if ! command -v awscli &>/dev/null; then
+        echo -e "${BRED}[x] AWSCLI - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] AWSCLI - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
 WGET() {
     START_SPINNER "${BGREEN}WGET${RESET}"
 
@@ -4295,6 +4316,7 @@ REQUIRED(){
     SSHPASS
     CURL
     DOS2UNIX
+    AWSCLI
     WGET
     ZIP
     XSEL
