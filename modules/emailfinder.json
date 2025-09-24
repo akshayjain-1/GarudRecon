@@ -12,6 +12,6 @@
     "cat ${INPUT} | emailfinder yahoo -e | unew -el -i -t ${OUTPUT}",
     "cat ${INPUT} | emailfinder yandex -e | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow emailfinder --input domain.com.subs --output domain.com.emailfinder",
+  "example": "garudrecon workflow emailfinder -i domain.com.subs -o domain.com.emailfinder",
   "description": "Email Enumeration with emailfinder"
 }]

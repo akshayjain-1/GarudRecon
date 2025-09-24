@@ -10,6 +10,6 @@
     "cat filteredurls.txt | pvreplace -silent -payload ~/.garudrecon/wordlist/xss-small.txt -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q xss_pvreplace.txt",
     "cat xss_pvreplace.txt | xsschecker -nc -match 'rix4uni' -vuln -t 100 -timeout 15 -retries 1 2>/dev/null | sed 's/^Vulnerable: \\[[^]]*\\] \\[[^]]*\\] //' | unew -el -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow xsschecker --input domain.com.urls --output domain.com.xsschecker",
+  "example": "garudrecon workflow xsschecker -i domain.com.urls -o domain.com.xsschecker",
   "description": "XSS with xsschecker"
 }]

@@ -6,6 +6,6 @@
   "command": [
     "echo ${INPUT} | haktrails subdomains | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow haktrails --input domain.com --output domain.com.haktrails",
+  "example": "garudrecon workflow haktrails -i domain.com -o domain.com.haktrails",
   "description": "Scan subdomain enumeration with haktrails"
 }]

@@ -6,6 +6,6 @@
   "command": [
     "shosubgo -d ${INPUT} -s $(shuf -n 1 ~/.config/shosubgo/shosubgo-api.txt) | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow shosubgo --input domain.com --output domain.com.shosubgo",
+  "example": "garudrecon workflow shosubgo -i domain.com -o domain.com.shosubgo",
   "description": "Scan subdomain enumeration with shosubgo"
 }]

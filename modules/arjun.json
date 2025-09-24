@@ -5,6 +5,6 @@
   "command": [
     "arjun -i ${INPUT} -oT ${OUTPUT}"
   ],
-  "example": "garudrecon workflow arjun --input domain.com.urls --output domain.com.arjun",
+  "example": "garudrecon workflow arjun -i domain.com.urls -o domain.com.arjun",
   "description": ""
 }]

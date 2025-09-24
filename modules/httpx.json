@@ -6,6 +6,6 @@
   "command": [
     "cat ${INPUT} | httpx -duc -silent -nc -sc -title -td -cl -ct -t 50 | unew -el -i -t -q ${OUTPUT}"
   ],
-  "example": "garudrecon workflow httpx --input domain.com.subs --output domain.com.httpx",
+  "example": "garudrecon workflow httpx -i domain.com.subs -o domain.com.httpx",
   "description": "Check alive subdomains with httpx"
 }]

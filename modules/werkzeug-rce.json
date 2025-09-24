@@ -8,6 +8,6 @@
     "cat ${INPUT} | httpx -duc -silent | unew -el -i -t -q httpx.subs",
     "cat httpx.subs | nuclei -duc -silent -nc -t ~/nucleihub-templates/nucleihub-templates/unauthenticated-werkzeug-rce.yaml | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow werkzeug --input domain.subs --output werkzeug.nuclei",
+  "example": "garudrecon workflow werkzeug -i domain.subs -o werkzeug.nuclei",
   "description": "Scan werkzeug rce with nuclei"
 }]

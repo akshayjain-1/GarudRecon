@@ -8,6 +8,6 @@
     "echo 'hostname:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}",
     "echo 'ssl.cert.subject.cn:\"$INPUT\"' | ipfinder shodan --silent | unew -el -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow ipfinder --input domain.com --output domain.com.ipfinder",
+  "example": "garudrecon workflow ipfinder -i domain.com -o domain.com.ipfinder",
   "description": ""
 }]

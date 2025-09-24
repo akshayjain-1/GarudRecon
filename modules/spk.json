@@ -6,6 +6,6 @@
   "command": [
     "for ORG in $(cat ${INPUT});do spk -silent -s \"$ORG\" | unew -el -t ${OUTPUT};done"
   ],
-  "example": "garudrecon workflow spk --input domain.com.orgs --output domain.com.spk",
+  "example": "garudrecon workflow spk -i domain.com.orgs -o domain.com.spk",
   "description": ""
 }]

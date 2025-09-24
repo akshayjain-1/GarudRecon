@@ -6,6 +6,6 @@
   "command": [
     "echo ${INPUT} | xsubfind3r --silent | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow xsubfind3r --input domain.com --output domain.com.xsubfind3r",
+  "example": "garudrecon workflow xsubfind3r -i domain.com -o domain.com.xsubfind3r",
   "description": "Scan subdomain enumeration with xsubfind3r"
 }]

@@ -6,6 +6,6 @@
   "command": [
     "cat ${INPUT} | csprecon -silent | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow csprecon --input domain.com.subs --output domain.com.csprecon",
+  "example": "garudrecon workflow csprecon -i domain.com.subs -o domain.com.csprecon",
   "description": "Scan content security policy with csprecon"
 }]

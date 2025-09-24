@@ -15,6 +15,6 @@
     "gitrepoenum vuln -i ~/allgithubrepo/commits -o ~/allgithubrepo/commits",
     "find ~/allgithubrepo/commits/ -type f -path \"*/vuln/*.txt\" -exec grep -l \"Found verified result\" {} + | unew -q ${OUTPUT}"
   ],
-  "example": "garudrecon workflow mass-gitrepo --input inscope_github_repo.txt --output gitrepoenum.vuln",
+  "example": "garudrecon workflow mass-gitrepo -i inscope_github_repo.txt -o gitrepoenum.vuln",
   "description": "Scan all github repos with gitrepoenum and trufflehog"
 }]

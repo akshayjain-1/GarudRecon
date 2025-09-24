@@ -10,6 +10,6 @@
     "cat ${INPUT} | urldedupe -s | grep -aE '=|%3D' | egrep -aiv '.(jpg|jpeg|gif|css|tif|tiff|png|ttf|woff|woff2|icon|pdf|svg|txt|js)' | egrep -av '/[0-9]+[-/][0-9]+[-/][0-9]+' | pvreplace -silent -payload favourite.txt -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | xsschecker -nc -match 'rix4uni' -vuln -t 100 -timeout 15 -retries 1 2>/dev/null | sed 's/^Vulnerable: \\[[^]]*\\] \\[[^]]*\\] //' | unew -el -t ${OUTPUT}",
     "echo -e '\\n\\033[1;32mYou can run pyxss to check false positive or check manually one by one url in chrome\\033[0m'"
   ],
-  "example": "garudrecon workflow rix4uni-xsschecker --input domain.com.urls --output domain.com.xsschecker",
+  "example": "garudrecon workflow rix4uni-xsschecker -i domain.com.urls -o domain.com.xsschecker",
   "description": "Custom XSS checker workflow with xsschecker"
 }]

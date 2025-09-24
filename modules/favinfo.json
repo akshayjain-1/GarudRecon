@@ -6,6 +6,6 @@
   "command": [
     "cat ${INPUT} | favinfo -silent | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow favinfo --input domain.com.httpx --output domain.com.favinfo",
+  "example": "garudrecon workflow favinfo -i domain.com.httpx -o domain.com.favinfo",
   "description": "Scan favicon with favinfo"
 }]

@@ -5,6 +5,6 @@
   "command": [
     "cat ${INPUT} | aquatone -out ${OUTPUT}"
   ],
-  "example": "garudrecon workflow aquatone --input domain.com.subs --output domain.com.aquatone",
+  "example": "garudrecon workflow aquatone -i domain.com.subs -o domain.com.aquatone",
   "description": ""
 }]

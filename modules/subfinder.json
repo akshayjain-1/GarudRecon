@@ -6,6 +6,6 @@
   "command": [
     "subfinder -duc -silent -d ${INPUT} -all | unew -el -i -t -q ${OUTPUT}"
   ],
-  "example": "garudrecon workflow subfinder --input domain.com --output domain.com.subfinder",
+  "example": "garudrecon workflow subfinder -i domain.com -o domain.com.subfinder",
   "description": "Scan subdomain enumeration with subfinder"
 }]

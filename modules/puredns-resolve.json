@@ -8,6 +8,6 @@
     "curl -s \"https://raw.githubusercontent.com/trickest/resolvers/refs/heads/main/resolvers-trusted.txt\" | unew -el -t -q resolvers-trusted.txt",
     "puredns resolve ${INPUT} -r resolvers.txt --resolvers-trusted resolvers-trusted.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests 0 -w ${OUTPUT}"
   ],
-  "example": "garudrecon workflow puredns-resolve --input allsubs.puredns_bruteforce --output allsubs.puredns_resolve",
+  "example": "garudrecon workflow puredns-resolve -i allsubs.puredns_bruteforce -o allsubs.puredns_resolve",
   "description": "Subdomain Resolving with puredns resolve"
 }]

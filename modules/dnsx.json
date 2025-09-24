@@ -6,6 +6,6 @@
   "command": [
     "cat ${INPUT} | dnsx -duc -silent -nc -a -aaaa -cname -ns -txt -srv -ptr -mx -soa -axfr -caa -retry 3 -t 100 -r ${RESOLVERS} | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow dnsx --input domain.com.subs --output domain.com.dnsx",
+  "example": "garudrecon workflow dnsx -i domain.com.subs -o domain.com.dnsx",
   "description": ""
 }]

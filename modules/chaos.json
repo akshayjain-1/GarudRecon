@@ -6,6 +6,6 @@
   "command": [
     "chaos -duc -silent -d ${INPUT} -key $(shuf -n 1 ~/.config/chaos/chaos-api.txt) | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow chaos --input domain.com --output domain.com.chaos",
+  "example": "garudrecon workflow chaos -i domain.com -o domain.com.chaos",
   "description": "Scan subdomain enumeration with chaos"
 }]

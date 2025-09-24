@@ -6,6 +6,6 @@
   "command": [
     "shortscan ${INPUT} -F -s -p 1 | tee -a ${OUTPUT}"
   ],
-  "example": "garudrecon workflow shortscan --input domain.com --output domain.com.shortscan",
+  "example": "garudrecon workflow shortscan -i domain.com -o domain.com.shortscan",
   "description": "Scan for IIS with shortscan"
 }]

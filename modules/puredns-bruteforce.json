@@ -8,6 +8,6 @@
     "curl -s \"https://raw.githubusercontent.com/rix4uni/resolvers/refs/heads/main/resolvers.txt\" | unew -el -t -q resolvers.txt",
     "puredns bruteforce 2m-subdomains.txt -d ${INPUT} -r resolvers.txt --skip-sanitize --skip-validation --skip-wildcard-filter --wildcard-tests 0 -w ${OUTPUT}"
   ],
-  "example": "garudrecon workflow puredns-bruteforce --input all.subs --output allsubs.puredns_bruteforce",
+  "example": "garudrecon workflow puredns-bruteforce -i all.subs -o allsubs.puredns_bruteforce",
   "description": "Subdomain Permutations with puredns bruteforce"
 }]

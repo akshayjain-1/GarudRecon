@@ -5,6 +5,6 @@
   "command": [
     "curl -s \"https://raw.githubusercontent.com/rix4uni/BugBountyData/refs/heads/main/data/${INPUT}.txt\" | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow bugbountydata --input domain.com --output domain.com.bugbountydata",
+  "example": "garudrecon workflow bugbountydata -i domain.com -o domain.com.bugbountydata",
   "description": "Scan subdomain enumeration with BugBountyData"
 }]

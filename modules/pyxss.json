@@ -7,6 +7,6 @@
   "command": [
     "cat ${INPUT} | pyxss --silent --no-color | egrep -av 'NOT VULNERABLE:' | unew -el ${OUTPUT}"
   ],
-  "example": "garudrecon workflow pyxss --input domain.com.xsschecker --output domain.com.pyxss",
+  "example": "garudrecon workflow pyxss -i domain.com.xsschecker -o domain.com.pyxss",
   "description": "Check XSS False Positive with pyxss"
 }]

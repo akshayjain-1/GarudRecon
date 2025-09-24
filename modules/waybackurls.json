@@ -6,6 +6,6 @@
   "command": [
     "echo ${INPUT} | waybackurls | unew -el -i -t ${OUTPUT}"
   ],
-  "example": "garudrecon workflow waybackurls --input domain.com.httpx --output domain.com.waybackurls",
+  "example": "garudrecon workflow waybackurls -i domain.com.httpx -o domain.com.waybackurls",
   "description": "Url Crawling with waybackurls"
 }]
