@@ -144,6 +144,7 @@ export PATH="$PATH:$HOME/go/bin"
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/.cargo/bin"
 export PATH="$PATH:/usr/bin/google-chrome"
+export PATH=$HOME/.local/bin:$PATH
 EOF
     fi
 
@@ -154,6 +155,7 @@ EOF
     export PATH="$PATH:$HOME/.cargo/bin"
     export PATH="$PATH:/usr/bin/google-chrome"
     export PATH="$HOME/go/bin:$PATH"
+    export PATH=$HOME/.local/bin:$PATH
 
     # Cargo env (rustup)
     [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
@@ -171,11 +173,11 @@ GO() {
         return
     fi
 
-    curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash &>/dev/null
-    go env &>/dev/null
-
     # Remove broken Go installation
     sudo rm -rf /usr/local/go
+
+    curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash && source ~/.bashrc &>/dev/null
+    go env &>/dev/null
 
     if ! command -v go &>/dev/null; then
         echo -e "${BRED}[x] GO - INSTALLATION FAILED${RESET}: ${TIME} seconds"
@@ -246,7 +248,7 @@ PACKAGES() {
     apt --fix-broken install -y &>/dev/null
     apt update -y &>/dev/null
     apt upgrade -y &>/dev/null
-    apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync net-tools &>/dev/null
+    apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync net-tools dmidecode &>/dev/null
     wget -q https://raw.githubusercontent.com/rix4uni/dotfiles/refs/heads/main/tmux/tmux-termius.conf -O ~/.tmux.conf
 
     # https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana

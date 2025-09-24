@@ -29,8 +29,15 @@ mv garudrecon /usr/bin/
 chmod +x $HOME/.garudrecon/cmd/* /usr/bin/garudrecon
 
 # Get total RAM in GB
-TOTAL_RAM_GB=$(dmidecode -t memory | grep "Size:" | grep -v "No Module Installed" | awk '{print $2}')
+# Try dmidecode first
+TOTAL_RAM_GB=$(dmidecode -t memory | grep -E "^\s*Size:" | grep -v "No Module Installed" | awk '{print $2}')
 
+# Fallback to free -t if dmidecode fails or returns nothing
+if [[ -z "$TOTAL_RAM_GB" ]]; then
+    TOTAL_RAM_GB=$(free -t | awk '/^Mem:/ {printf "%.0f\n", $2/1e6}')
+fi
+
+# Select config based on RAM
 if [ "$TOTAL_RAM_GB" -le 1 ]; then
     CONFIG="garudrecon_1g.cfg"
 elif [ "$TOTAL_RAM_GB" -le 2 ]; then
