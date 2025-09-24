@@ -114,6 +114,19 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 ### ✅ Example invocations:
 - Very help if we installing on github actions or 100 1GB vps
 
+👉 Installtion modes:
+```
+echo "Choose installation scope:"
+echo "1) SMALLSCOPE"
+echo "2) MEDIUMSCOPE"
+echo "3) LARGESCOPE"
+echo "4) CIDRSCOPE"
+echo "5) WORKFLOW"
+echo "6) FLEET"
+echo "7) CRONJOBS"
+echo "8) ALL (default)"
+```
+
 👉 Non-interactive without update:
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5
@@ -470,6 +483,16 @@ Example:
 <img src="img/output/cronjobs_discord.png"/>
 </details>
 
+👉 short commands automatically adds in ~/.bashrc during installation:
+```
+gs="garudrecon smallscope"
+gm="garudrecon mediumscope"
+gl="garudrecon largescope"
+gcidr="garudrecon cidrscope"
+gw="garudrecon workflow"
+gf="garudrecon fleet"
+gc="garudrecon cronjobs"
+```
 
 ## Demo
 

@@ -137,6 +137,13 @@ VARIABLES() {
         echo -e "alias xc='xsel -i -b'" >> ~/.bashrc
         echo -e "alias xp='xsel -o -b'" >> ~/.bashrc
         echo -e "alias cfile='explorer.exe .'" >> ~/.bashrc
+        echo -e "alias gs='garudrecon smallscope'" >> ~/.bashrc
+        echo -e "alias gm='garudrecon mediumscope'" >> ~/.bashrc
+        echo -e "alias gl='garudrecon largescope'" >> ~/.bashrc
+        echo -e "alias gcidr='garudrecon cidrscope'" >> ~/.bashrc
+        echo -e "alias gw='garudrecon workflow'" >> ~/.bashrc
+        echo -e "alias gf='garudrecon fleet'" >> ~/.bashrc
+        echo -e "alias gc='garudrecon cronjobs'" >> ~/.bashrc
 
         cat << 'EOF' >> ~/.bashrc
 export PATH="$PATH:/usr/local/go/bin"
@@ -2226,6 +2233,27 @@ XSSCHECKER() {
 
     STOP_SPINNER
     echo -e "${BGREEN}[+] XSSCHECKER - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
+XSSRECON() {
+    START_SPINNER "${BGREEN}XSSRECON${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v xssrecon &>/dev/null; then
+        echo -e "${YELLOW}[~] XSSRECON - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    gocl -i github.com/rix4uni/xssrecon &>/dev/null
+
+    if ! command -v xssrecon &>/dev/null; then
+        echo -e "${BRED}[x] XSSRECON - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] XSSRECON - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
 GOSQLI() {
@@ -4381,6 +4409,19 @@ LARGESCOPE(){
     NUCLEI
 }
 
+# Install only those tools that used in cidrscope
+CIDRSCOPE(){
+    VARIABLES
+    GO
+    UNEW
+    UNEWFLUSH
+    PACKAGES
+    REQUIRED
+
+    HTTPX
+    NUCLEI
+}
+
 # Install only those tools that used in workflow
 WORKFLOW(){
     VARIABLES
@@ -4508,6 +4549,7 @@ ALL(){
     IP2ORG
     CERTINFO
     XSSCHECKER
+    XSSRECON
     GOSQLI
     PORTMAP
     PARAMFINDER
