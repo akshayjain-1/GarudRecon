@@ -247,7 +247,7 @@ PACKAGES() {
     dpkg --configure -a &>/dev/null
     apt --fix-broken install -y &>/dev/null
     apt update -y &>/dev/null
-    apt upgrade -y &>/dev/null
+    # apt upgrade -y &>/dev/null
     apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync net-tools dmidecode &>/dev/null
     wget -q https://raw.githubusercontent.com/rix4uni/dotfiles/refs/heads/main/tmux/tmux-termius.conf -O ~/.tmux.conf
 
