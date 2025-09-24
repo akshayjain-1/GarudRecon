@@ -49,10 +49,20 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+
+# Creating directory
+FLEETDIR="$HOME/.garudrecon/fleet"
+FLEET_MODULEDIR="$HOME/.garudrecon/fleet/$MODULE"
+SPLITDIR="$HOME/.garudrecon/fleet/$MODULE/split-output"
+
+mkdir -p $FLEETDIR
+mkdir -p $FLEET_MODULEDIR
+mkdir -p $SPLITDIR
+
+
 # Split files logic
-mkdir -p split-output
 FILE=${INPUT}
-TOTALVPS=$(cat credentials.txt | wc -l)
+TOTALVPS=$(cat $HOME/credentials.txt | wc -l)
 # SPLIT=$2
 
 LINES=$(wc -l < "$FILE")
@@ -60,48 +70,46 @@ PER_VPS=$(( (LINES + $TOTALVPS - 1) / $TOTALVPS ))
 echo "TOTAL: $LINES, Lines per VPS: $PER_VPS"
 
 # Split the file
-split --numeric-suffixes=1 -a 3 -l $PER_VPS "$FILE" split-output/subs.
+split --numeric-suffixes=1 -a 3 -l $PER_VPS "$FILE" $SPLITDIR/subs.
 
-# Renames files like: split-output/subs.001 → split-output/subs.1
-for f in split-output/subs.[0-9][0-9][0-9]; do
+# Renames files like: $SPLITDIR/subs.001 → $SPLITDIR/subs.1
+for f in $SPLITDIR/subs.[0-9][0-9][0-9]; do
     n=$(echo "$f" | sed -E 's/.*\.0*([0-9]+)/\1/')
-    mv "$f" "split-output/subs.$n" &>/dev/null
+    mv "$f" "$SPLITDIR/subs.$n" &>/dev/null
 done
 
 # Delete empty files
-find split-output -type f -empty -delete
+find $SPLITDIR -type f -empty -delete
 
 
 # Send sshkey to Mini-Child-VPS
 KEY_PATH="$HOME/.ssh/id_ed25519.pub"
 export KEY_PATH
-parallel -a credentials.txt --colsep ':' -j20 "
+parallel -a $HOME/credentials.txt --colsep ':' -j20 "
   sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
 
-  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p ~/fleet" &>/dev/null
+  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p $FLEETDIR" &>/dev/null
 
   echo "Sending file subs.{#} to {1}..."
-  scp -o StrictHostKeyChecking=no split-output/subs.{#} {1}:~/fleet/${INPUT}
+  scp -o StrictHostKeyChecking=no $SPLITDIR/subs.{#} {1}:$FLEETDIR/${INPUT}
 "
 
 # Create a tmux session
-grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
+grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
 
 # Run command in tmux session and send file to "main VPS"
-mkdir -p ~/fleet
-# grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux send-keys -t fleet \"cat fleet/subs.txt | httpx -duc -silent | unew fleet/subs.httpx && scp -i ~/.ssh/id_rsa_vps fleet/subs.httpx root@206.189.136.241:~/distribute/fleet/subs.httpx_{} &>/dev/null && rm -rf fleet && exit\" C-m"'
+# grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux send-keys -t fleet \"cat fleet/subs.txt | httpx -duc -silent | unew fleet/subs.httpx && scp -i ~/.ssh/id_rsa_vps fleet/subs.httpx root@206.189.136.241:~/distribute/fleet/subs.httpx_{} &>/dev/null && rm -rf fleet && exit\" C-m"'
 
-grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i ~/fleet/${INPUT} -o ~/fleet/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps ~/fleet/${OUTPUT} root@206.189.136.241:~/fleet/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} root@206.189.136.241:$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
 
 
-WORKDIR="$HOME/fleet"
-DEST="$WORKDIR/${OUTPUT}"
-TOTALVPS=$(grep -vE '^\s*$|^\s*#' credentials.txt | cut -d: -f1 | wc -l)
+DEST="$FLEETDIR/${OUTPUT}"
+TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | wc -l)
 
 echo "[*] Waiting for results from $TOTALVPS VPS..."
 
 while true; do
-    DONE=$(find "$WORKDIR" -maxdepth 1 -type f -name "${OUTPUT}_*" | wc -l)
+    DONE=$(find "$FLEETDIR" -maxdepth 1 -type f -name "${OUTPUT}_*" | wc -l)
 
     # Calculate percentage
     PERCENT=$(( 100 * DONE / TOTALVPS ))
@@ -118,9 +126,9 @@ while true; do
     if [[ $DONE -ge $TOTALVPS ]]; then
         echo -e "\n[*] All VPS finished, merging..."
         # deduplicated and merge in 1 file
-        cat "$WORKDIR"/${OUTPUT}_* | unew -q "$DEST"
-        # rm -f "$WORKDIR"/${OUTPUT}_*
-        rm -rf split-output
+        cat "$FLEETDIR"/${OUTPUT}_* | unew -q "$DEST"
+        # rm -f "$FLEETDIR"/${OUTPUT}_*
+        rm -rf $SPLITDIR
         echo "[+] Deduplicated results saved to $DEST"
         break
     fi

@@ -78,7 +78,7 @@ for arg in "$@"; do
     fi
 done
 
-# Detect scope argument (first positional argument that's a number 1-6)
+# Detect scope argument (first positional argument that's a number 1-7)
 if [[ "$1" =~ ^[1-7]$ ]]; then
     choice="$1"
     case $choice in
@@ -86,7 +86,17 @@ if [[ "$1" =~ ^[1-7]$ ]]; then
         2) scope="MEDIUMSCOPE" ;;
         3) scope="LARGESCOPE" ;;
         4) scope="WORKFLOW" ;;
-        5) scope="FLEET" ;;
+        5) scope="FLEET"
+            echo "[*] FLEET mode selected. Deploying on 100+ VPS from credentials.txt..."
+
+            # FLEET deployment logic here
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh | bash"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz &&tar -xvzf unew-linux-amd64-0.0.6.tgz &&rm -rf unew-linux-amd64-0.0.6.tgz &&mv unew ~/go/bin/unew"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
+
+            echo "[*] FLEET deployment initiated."
+            exit 0
+            ;;
         6) scope="CRONJOBS" ;;
         7) scope="ALL" ;;
         *) scope="ALL" ;;  # fallback to ALL if invalid argument
@@ -101,7 +111,7 @@ else
     echo "5) FLEET"
     echo "6) CRONJOBS"
     echo "7) ALL (default)"
-    read -p "Enter your choice [1-6, press Enter for ALL]: " choice
+    read -p "Enter your choice [1-7, press Enter for ALL]: " choice
 
     case $choice in
         1) scope="SMALLSCOPE" ;;
