@@ -2713,8 +2713,6 @@ RECON(){
 	# run "ASNMAP"
 	# run "ANALYTICSRELATIONSHIPS"
 	# run "UDON"
-	run "BUILTWITH"
-	run "WHOXYSUBS"
 
 
 	# Cloud Recon
@@ -2883,8 +2881,6 @@ if [[ "$RECON_SUBDOMAIN" == true ]]; then
 	# run "ASNMAP"
 	# run "ANALYTICSRELATIONSHIPS"
 	# run "UDON"
-	run "BUILTWITH"
-	run "WHOXYSUBS"
 
 
 	# Cloud Recon
@@ -3017,8 +3013,6 @@ else
 	# run "ASNMAP"
 	# run "ANALYTICSRELATIONSHIPS"
 	# run "UDON"
-	run "BUILTWITH"
-	run "WHOXYSUBS"
 
 
 	# Cloud Recon

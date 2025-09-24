@@ -4381,7 +4381,7 @@ LARGESCOPE(){
     NUCLEI
 }
 
-# Install only those tools that used in largescope
+# Install only those tools that used in workflow
 WORKFLOW(){
     VARIABLES
     GO
@@ -4390,6 +4390,22 @@ WORKFLOW(){
     UNEW
     PACKAGES
     REQUIRED
+}
+
+# Install only those tools that used in fleet
+FLEET(){
+    VARIABLES
+    GO
+    PIPX
+    GOCL
+    UNEW
+    PACKAGES
+    PYTHON3
+    PIP3
+    SETUPTOOLS
+    DOS2UNIX
+    JQ
+    PARALLEL
 }
 
 # Install only those tools that used in cronjobs
