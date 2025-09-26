@@ -1315,8 +1315,13 @@ SQLMAP() {
         return
     fi
 
-    git clone https://github.com/sqlmapproject/sqlmap.git --depth 1 tools/sqlmap &>/dev/null
-    sed -i "s/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='n', boolean=True) else REDIRECTION.NO/g" tools/sqlmap/lib/request/redirecthandler.py
+    git clone https://github.com/sqlmapproject/sqlmap.git --depth 1 /opt/sqlmap &>/dev/null
+    sed -i "s/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO/kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='n', boolean=True) else REDIRECTION.NO/g" /opt/sqlmap/lib/request/redirecthandler.py
+    sudo rm -f /usr/local/bin/sqlmap
+    cd /opt/sqlmap
+    echo -e '#!/usr/bin/env bash\nexec python3 "'"$(pwd)"'/sqlmap.py" "$@"' | sudo tee /usr/local/bin/sqlmap &>/dev/null
+    sudo chmod +x /usr/local/bin/sqlmap
+    cd -
 
     if ! command -v sqlmap &>/dev/null; then
         echo -e "${BRED}[x] SQLMAP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
@@ -4505,7 +4510,7 @@ ALL(){
     MASSDNS
     RUSTSCAN
     GHAURI
-    # SQLMAP
+    SQLMAP
     INTERLACE
     HTTPX
     XSUBFIND3R
