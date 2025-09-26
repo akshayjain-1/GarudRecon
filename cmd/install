@@ -1292,6 +1292,7 @@ GHAURI() {
     cd ghauri
     sed -i '/class SmartRedirectHandler/,/http_error_301/ s/user_input="Y"/user_input="n"/' ghauri/common/utils.py
     python3 setup.py install &>/dev/null
+    pip install -r requirements.txt &>/dev/null
     cd ..
     rm -rf ghauri
 
