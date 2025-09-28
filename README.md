@@ -14,35 +14,51 @@
 
 ## GarudRecon
 
-GarudRecon - Recon Automation Framework
+GarudRecon is a comprehensive bash-based reconnaissance automation framework that streamlines the asset discovery and vulnerability assessment process for security professionals and bug bounty hunters. This tool orchestrates over 80+ open-source security tools to provide thorough reconnaissance capabilities across multiple attack vectors.
 
-GarudRecon is an automated reconnaissance framework designed for asset discovery,
-vulnerability detection, and continuous monitoring. It leverages a wide range of
-open-source tools to scan domains, collect subdomains, and check for various
-vulnerabilities such as:
+### Core Capabilities
+GarudRecon excels in automated discovery and vulnerability detection across several key areas:
 
-- XSS (Cross-Site Scripting)
-- SQLi (SQL Injection)
-- LFI (Local File Inclusion)
-- RCE (Remote Code Execution)
-- IIS misconfigurations
-- Subdomain Takeover
-- Open Redirects
-- Swagger UI exposures
-- .git directory leaks
-- JavaScript secrets and more.
+**Asset Discovery & Enumeration**
+- Subdomain enumeration using 20+ tools including subfinder, amass, and chaos
+- Certificate transparency monitoring through multiple CT log sources  
+- DNS enumeration with advanced bruteforcing and permutation techniques
+- Port scanning with naabu, masscan, and nmap integration
+- Virtual host discovery and web technology fingerprinting
 
-The tool supports scoped recon with flexible modes like `smallscope`, `mediumscope`,
-and `largescope`, depending on your coverage needs. You can customize scans,
-exclude specific functions, provide configuration files, and automate cron jobs
-for continuous monitoring.
+**Vulnerability Detection**
+- Cross-Site Scripting (XSS) detection with multiple payload sets
+- SQL injection testing through automated parameter fuzzing
+- Local File Inclusion (LFI) and Remote Code Execution (RCE) checks
+- Subdomain takeover vulnerability scanning
+- Open redirect detection and validation
+- Exposed .git directories and sensitive file discovery
+
+### Flexible Reconnaissance Modes
+The framework provides three distinct operational modes tailored to different engagement scopes:
+- **SmallScope Mode** - Designed for focused subdomain reconnaissance (e.g., support.domain.com) with deep vulnerability analysis on a limited attack surface.
+- **MediumScope Mode** - Comprehensive wildcard domain scanning (e.g., *.domain.com) with balanced coverage and performance optimization.
+- **LargeScope Mode** - Organization-wide reconnaissance for maximum asset discovery and extensive vulnerability coverage.
+
+### Advanced Features
+**Automated Monitoring**
+- Continuous subdomain monitoring with change detection
+- Port state change notifications  
+- JavaScript file monitoring for new endpoints
+- Automated scheduled reconnaissance via cron integration
+
+**Intelligent Resource Management**
+- RAM-optimized configurations for different system specifications
+- VPS deployment optimization settings
+- Parallel processing with configurable thread limits
+- Custom wordlist generation based on target characteristics
 
 ## History
-I created GarudRecon in 2022 but I deleted because some of api keys leaked here someone forked [GarudRecon](https://github.com/polling-repo-continua/GarudRecon)
+I originally created **GarudRecon** in 2022, but I later removed it after some API keys were accidentally leaked. Despite this, someone forked the project and preserved it [here](https://github.com/polling-repo-continua/GarudRecon).
 
-After that i tried in python, golang but i did'nt liked "String Concatenation", so i came back to bash again.
+Afterwards, I experimented with rewriting GarudRecon in **Python** and **Go**, but I found the heavy string concatenation in those languages unappealing. In the end, I decided to return to **Bash**, which felt simpler and more natural for me.
 
-### Referral Links
+## Referral Links
 
 <p align="center">
 <a href="https://m.do.co/c/43c704381b79" target="_blank">
@@ -222,7 +238,7 @@ bash configure
 ## Usage
 
 <details>
-  <summary><b>garudrecon -h</b></summary>
+  <summary><b>GarudRecon Help</b></summary>
 
 ```
 GarudRecon - Recon Automation Framework
@@ -268,7 +284,7 @@ Use "garudrecon [command] --help" for more information about a command.
 
 
 <details>
-  <summary><b>garudrecon install -h</b></summary>
+  <summary><b>GarudRecon Install</b></summary>
 
 ```
 This command sets up GarudRecon by installing the required tools and dependencies for a specified reconnaissance function. It supports installation for various predefined scopes such as SMALLSCOPE, MEDIUMSCOPE, LARGESCOPE, WORKFLOW, and CRONJOBS, or you can install everything at once using ALL.
@@ -302,7 +318,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon smallscope -h</b></summary>
+  <summary><b>SmallScope Mode</b></summary>
 
 ```
 Performs a minimal reconnaissance on the target domain, typically scoped as support.domain.com. This includes port scanning, url crawling, vulnerability checks (like XSS, SQLi, LFI, etc.).
@@ -349,7 +365,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon mediumscope -h</b></summary>
+  <summary><b>MediumScope Mode</b></summary>
 
 ```
 Performs a medium-level reconnaissance on the target domain, typically scoped as *.domain.com. This includes subdomain enumeration, vulnerability checks (like XSS, SQLi, LFI, etc.), and optional filtering of out-of-scope subdomains.
@@ -409,7 +425,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon largescope -h</b></summary>
+  <summary><b>LargeScope Mode</b></summary>
 
 ```
 ```
@@ -420,7 +436,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon cidrscope -h</b></summary>
+  <summary><b>CidrScope Mode</b></summary>
 
 ```
 ```
@@ -430,7 +446,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon workflow -h</b></summary>
+  <summary><b>Workflow Mode</b></summary>
 
 ```
 Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan).
@@ -470,7 +486,7 @@ done
 
 
 <details>
-  <summary><b>garudrecon fleet -h</b></summary>
+  <summary><b>Fleet Mode</b></summary>
 
 ```
 Run fleet scan (e.g. 1 vuln on all programs like mass vuln scan).
@@ -493,7 +509,7 @@ Example:
 
 
 <details>
-  <summary><b>garudrecon cronjobs -h</b></summary>
+  <summary><b>CronJobs Mode</b></summary>
 
 ```
 This command runs scheduled reconnaissance tasks on a specified domain, such as monitoring subdomains, ports, JavaScript files, and live hosts. It supports various monitoring functions and can be customized with configuration files and verbose output.
