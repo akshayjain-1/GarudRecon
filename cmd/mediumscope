@@ -1177,7 +1177,7 @@ HTTPX(){
 
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/alivesubs.txt
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | sed -e 's/https\?:\/\/\(www\.\)\?//' -e 's/:.*$//' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/withoutprotocolsubs.txt
-	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | grep -Ei '(^|[.-])(admin|administrator|auth|login|signin|sso|oauth|portal|dashboard|panel|cpanel|webmail|mail|exchange|dev|develop|development|test|testing|qa|quality|staging|stage|beta|alpha|demo|sandbox|lab|labs|preprod|pre-prod|prod|production|app|api|backend|frontend|web|secure|internal|intranet|extranet|private|grafana|kibana|prometheus|nagios|zabbix|cacti|splunk|elk|logs|metrics|monitoring|status|health|analytics|git|gitlab|github|bitbucket|svn|jenkins|build|ci|deploy|deployment|pipeline|db|database|mysql|postgres|mongodb|redis|elastic|elasticsearch|sql|phpmyadmin|adminer|support|help|helpdesk|ticket|tickets|service|services|customer|client|crm|vpn|remote|rdp|ssh|ftp|sftp|webvpn|citrix|vmware|horizon|backup|backups|old|legacy|archive|temp|tmp|upload|uploads|file|files)(\.|$)' | dlevel --silent --max-level | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/interesting_alivesubs.txt
+	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | grep -Ei '(^|[.-])(admin|administrator|auth|login|signin|sso|oauth|portal|dashboard|panel|cpanel|webmail|mail|exchange|dev|develop|development|test|testing|qa|quality|staging|stage|beta|alpha|demo|sandbox|lab|labs|preprod|pre-prod|prod|production|app|api|backend|frontend|web|secure|internal|intranet|extranet|private|grafana|kibana|prometheus|nagios|zabbix|cacti|splunk|elk|logs|metrics|monitoring|status|health|analytics|git|gitlab|github|bitbucket|svn|jenkins|build|ci|deploy|deployment|pipeline|db|database|mysql|postgres|mongodb|redis|elastic|elasticsearch|sql|phpmyadmin|adminer|support|help|helpdesk|ticket|tickets|service|services|customer|client|crm|vpn|remote|rdp|ssh|ftp|sftp|webvpn|citrix|vmware|horizon|backup|backups|old|legacy|archive|temp|tmp|upload|uploads|file|files)(\.|$)' | dlevel --silent --max-level | unew -el -i -t ${ROOT_SUBDOMAINDIR}/interesting_alivesubs.txt | notify -silent -duc -bulk -id ${ALIVESUBDOMAIN_NOTIFY} &>/dev/null
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] HTTPX${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/httpx.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -2366,7 +2366,7 @@ XSS(){
 		# Checks XSS False Positive
 		cat ${VULNDIR}/xsschecker.txt | unew -q -split ${XSSCHECKER_SPLIT} ${VULNDIR}/xsschecker_split.txt
 		parallel --ungroup -j${PYXSS_PARALLEL_FILE_SCAN} "cat {} | pyxss --silent --no-color -o {= s:xsschecker_split:xss: =}" ::: ${VULNDIR}/xsschecker_split*.txt &>/dev/null
-		cat ${VULNDIR}/xss[0-9]*.txt | egrep -av 'NOT VULNERABLE:' | unew -el -ef ${ROOT_VULNDIR}/xss.txt | notify -silent -duc -bulk -id ${XSS_NOTIFY} &>/dev/null
+		cat ${VULNDIR}/xss[0-9]*.txt | egrep -av 'NOT VULNERABLE:' | unew -el -ef ${ROOT_VULNDIR}/xss.txt | notify -silent -duc -id ${XSS_NOTIFY} &>/dev/null
 	fi
 
 	STOP_SPINNER
