@@ -23,13 +23,14 @@ RESUME_TARGET=""
 # Help function
 function show_help() {
   cat <<EOF
-Performs a medium-level reconnaissance on the target domain, typically scoped as *.domain.com. This includes subdomain enumeration, vulnerability checks (like XSS, SQLi, LFI, etc.), and optional filtering of out-of-scope subdomains.
+Full-scale recon for an organization.
+Deep discovery and enumeration (subdomains, ports, asset correlation, extensive vuln checks) for comprehensive coverage.
 
 Usage:
-  garudrecon mediumscope [flags]
+  garudrecon largescope [flags]
 
 Flags:
-  -d, --domain				Scan a domain (e.g. domain.com)
+  -d, --domain				Scan a domain (e.g. domain)
   -ef, --exclude-functions		Exclude a function from running (e.g. AMASS)
   -s, --recon-subdomain			Run Subdomain Enumeration only
   -a, --active				Run Active Subdomain Enumeration also (e.g. puredns, altdns)
@@ -40,38 +41,38 @@ Flags:
   -rst, --recon-subtakeover		Run full recon with Subdomain Takeover checks
   -rr, --recon-rce 	   		Run full recon with RCE checks
   -ri, --recon-iis 	   		Run full recon with IIS checks
-  -oos, --outofscope			Exclude outofscope subdomains from a list (e.g. domain.com.oos)
+  -oos, --outofscope			Exclude outofscope subdomains from a list (e.g. domain.oos)
   -c, --config				Custom configuration file path
-  -r, --resume <scan_folder>   		Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume domain.com or --resume domain.com_1). Skips functions already completed in resume.cfg.
-  -h, --help				help for mediumscope
+  -r, --resume <scan_folder>   		Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume domain or --resume domain_1). Skips functions already completed in resume.cfg.
+  -h, --help				help for largescope
 
 Example:
 # Full recon with all vulnerability scan
-  garudrecon mediumscope -d domain.com
+  garudrecon largescope -d domain
 
 # Recon Subdomain Enumeration only
-  garudrecon mediumscope -d domain.com -s
+  garudrecon largescope -d domain -s
 
 # Run Active Subdomain Enumeration also (e.g. puredns, altdns)
-  garudrecon mediumscope -d domain.com -s -a
+  garudrecon largescope -d domain -s -a
 
 # Recon Subdomain Enumeration + Url Crawling only
-  garudrecon mediumscope -d domain.com -su
+  garudrecon largescope -d domain -su
 
 # Recon with XSS only
-  garudrecon mediumscope -d domain.com -rx
+  garudrecon largescope -d domain -rx
 
 # Recon with SQLi only
-  garudrecon mediumscope -d domain.com -rs
+  garudrecon largescope -d domain -rs
 
 # Exclude functions manually
-  garudrecon mediumscope -d domain.com -ef "SUBFINDER,AMASS"
+  garudrecon largescope -d domain -ef "SUBFINDER,AMASS"
 
 # Combined
-  garudrecon mediumscope -d domain.com -rx -ef "AMASS"
+  garudrecon largescope -d domain -rx -ef "AMASS"
 
 # Skips functions already completed in resume.cfg.
-  garudrecon mediumscope -d domain.com -rx --resume domain.com_1
+  garudrecon largescope -d domain -rx --resume domain_1
 EOF
 }
 
@@ -430,25 +431,73 @@ NUCLEIHUB_TEMPLATES(){
 
 # Wildcard Enumeration
 CRUNCHBASE(){
-	START_SPINNER "${BGREEN}CRUNCHBASE${RESET}"
+    if [ ! -s "$URLSDIR/crunchbase.txt" ]; then
+        echo -e "${GRAY}[!] Collect Crunchbase acquisitions using Crunchbase dorking, then add these output in ${URLSDIR}/crunchbase.txt currently file is empty. Please choose an option:${RESET}"
+        echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still doing Crunchbase dorking but allow me to continue if i'm done earlier by pressing Enter button"
+        echo -e "${GRAY}2. Done, I have done Crunchbase dorking don't wait now"
+        echo -e "${GRAY}3. Skip, I don't have time for manual Crunchbase dorking"
 
-	# wait for 30 minutes if ${URLSDIR}/crunchbase.txt is empty
+        # Read user input with a timeout of 1 minute
+        read -t ${CRUNCHBASE_OPTION_WAIT} -p "Select an option (1/2/3): " option
+
+        # If no input after 60 seconds, automatically select Option 1
+        if [ -z "$option" ]; then
+            option=${CRUNCHBASE_OPTION_SELECT}
+            echo -e "\n${GRAY}[+] No input received from user, automatically choosing Option ${CRUNCHBASE_OPTION_SELECT}${RESET}"
+        fi
+        
+        case "$option" in
+            1)
+                echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
+                
+                # Display prompt once and enter wait loop
+                counter=0
+                while true; do
+                    read -t 60 -n 1 input
+                    if [ $? -eq 0 ]; then
+                        echo -e "${BGREEN}[+] Done early! Proceeding...${RESET}"
+                        break
+                    fi
+                    # Exit after 30 minutes if Enter is not pressed
+                    ((counter++))
+                    if [ $counter -eq ${CRUNCHBASE_TIME} ]; then
+                        echo -e "${BGREEN}[+] 30 minutes have passed. Proceeding...${RESET}"
+                        break
+                    fi
+                done
+                ;;
+            2)
+                echo -e "${BGREEN}[+] Done with Crunchbase dorking. Proceeding...${RESET}"
+                ;;
+            3)
+                echo -e "${YELLOW}[!] Skipping manual Crunchbase dorking.${RESET}"
+                return
+                ;;
+            *)
+                echo -e "${YELLOW}[!] Invalid option. Skipping manual Crunchbase dorking.${RESET}"
+                return
+                ;;
+        esac
+    fi
+
 	cat ${URLSDIR}/crunchbase.txt | unew -el -i -t -q ${SUBDOMAINDIR}/acquisitions.txt
-
-    STOP_SPINNER
-	echo -e "${BGREEN}[+] CRUNCHBASE${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/crunchbase.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] CRUNCHBASE${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/crunchbase.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ALLWILDCARDS(){
 	START_SPINNER "${BGREEN}ALLWILDCARDS${RESET}"
 
-	cat ${URLSDIR}/crunchbase.txt | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+	if grep -q "https://www.crunchbase.com" "${URLSDIR}/crunchbase.txt"; then
+		# If the file contains Crunchbase URLs
+		cat ${URLSDIR}/crunchbase.txt | grep -E "https://www.crunchbase.com/organization/|https://www.crunchbase.com/acquisition/" | sed 's/acquisition/organization/' | sed 's|.*/\(.*\)-acquires-\(.*\)--.*|https://www.crunchbase.com/organization/\2|' | sed 's|\(https://www.crunchbase.com/organization/[^/]*\).*|\1|' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+	else
+	    # If the file does NOT contain Crunchbase URLs
+		cat ${URLSDIR}/crunchbase.txt | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+	fi
 
     STOP_SPINNER
 	echo -e "${BGREEN}[+] ALLWILDCARDS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allwildcards.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
-
-sleep 1m
 
 TLDSCAN(){
 	START_SPINNER "${BGREEN}TLDSCAN${RESET}"
@@ -2769,6 +2818,8 @@ DELETE_TMPDIR(){
 
 RECON(){
 	# Subdomain Enumeration
+	run "CRUNCHBASE"
+	run "ALLWILDCARDS"
 	run "TLDSCAN"
 	run "BUGBOUNTYDATA"
 	run "SUBFINDER"
@@ -2940,6 +2991,8 @@ RECON(){
 # Run functions based on selected recon mode
 if [[ "$RECON_SUBDOMAIN" == true ]]; then
     # Subdomain Enumeration
+	run "CRUNCHBASE"
+	run "ALLWILDCARDS"
 	run "TLDSCAN"
 	run "BUGBOUNTYDATA"
 	run "SUBFINDER"
@@ -3075,6 +3128,8 @@ elif [[ "$RECON_IIS" == true ]]; then
 else
     # Default behavior: run all
     # Subdomain Enumeration
+	run "CRUNCHBASE"
+	run "ALLWILDCARDS"
 	run "TLDSCAN"
 	run "BUGBOUNTYDATA"
 	run "SUBFINDER"

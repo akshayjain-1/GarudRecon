@@ -241,38 +241,20 @@ bash configure
   <summary><b>GarudRecon Help</b></summary>
 
 ```
-GarudRecon - Recon Automation Framework
-
-GarudRecon is an automated reconnaissance framework designed for asset discovery,
-vulnerability detection, and continuous monitoring. It leverages a wide range of
-open-source tools to scan domains, collect subdomains, and check for various
-vulnerabilities such as:
-
-  • XSS (Cross-Site Scripting)
-  • SQLi (SQL Injection)
-  • LFI (Local File Inclusion)
-  • RCE (Remote Code Execution)
-  • IIS misconfigurations
-  • Subdomain Takeover
-  • Open Redirects
-  • Swagger UI exposures
-  • .git directory leaks
-  • JavaScript secrets and more.
-
-The tool supports scoped recon with flexible modes like smallscope, mediumscope,
-and largescope, depending on your coverage needs. You can customize scans,
-exclude specific functions, provide configuration files, and automate cron jobs
-for continuous monitoring.
+GarudRecon is a comprehensive bash-based reconnaissance automation framework that streamlines the asset discovery and vulnerability assessment process for security professionals and bug bounty hunters. This tool orchestrates over 80+ open-source security tools to provide thorough reconnaissance capabilities across multiple attack vectors.
 
 Usage:
   garudrecon [command]
 
 Available Commands:
-  install                 Set up the tool and dependencies
-  smallscope              Run minimal recon for subdomain (e.g. support.domain.com)
-  mediumscope             Perform moderate recon with optional vulnerability checks for wildcard domain (e.g. *.domain.com)
-  largescope              Full-scale recon for deep visibility for organisation
-  cronjobs                Automate recurring recon tasks
+  install                 Install the tool and all required dependencies.
+  smallscope              Quick recon for a single host or subdomain (e.g. support.domain.com).
+  mediumscope             Moderate recon for a wildcard domain (e.g. *.domain.com) with optional vuln checks.
+  largescope              Full-scale recon for an organization.
+  cidrscope               Run a full scan against one or more CIDR ranges.
+  workflow                Chain multiple tools into a reusable pipeline so you can run complex scans with a single command.
+  fleet                   Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
+  cronjobs                Schedule and monitor recurring recon tasks (subdomains, open ports, JS leaks, templates, alerts).
 
 Flags:
   -h, --help     help for garudrecon
@@ -287,9 +269,8 @@ Use "garudrecon [command] --help" for more information about a command.
   <summary><b>GarudRecon Install</b></summary>
 
 ```
-This command sets up GarudRecon by installing the required tools and dependencies for a specified reconnaissance function. It supports installation for various predefined scopes such as SMALLSCOPE, MEDIUMSCOPE, LARGESCOPE, WORKFLOW, and CRONJOBS, or you can install everything at once using ALL.
-
-You can also provide a custom configuration file and enable verbose output for more detailed installation logs.
+Install the tool and all required dependencies.
+Runs setup tasks and installs any system or language packages your tool needs so you can start scanning immediately.
 
 Usage:
   garudrecon install [flags]
@@ -305,7 +286,9 @@ Example:
   garudrecon install -f SMALLSCOPE
   garudrecon install -f MEDIUMSCOPE
   garudrecon install -f LARGESCOPE
+  garudrecon install -f CIDRSCOPE
   garudrecon install -f WORKFLOW
+  garudrecon install -f FLEET
   garudrecon install -f CRONJOBS
   garudrecon install -f ALL
   garudrecon install -f ALL --update
@@ -321,7 +304,8 @@ Example:
   <summary><b>SmallScope Mode</b></summary>
 
 ```
-Performs a minimal reconnaissance on the target domain, typically scoped as support.domain.com. This includes port scanning, url crawling, vulnerability checks (like XSS, SQLi, LFI, etc.).
+Quick recon for a single host or subdomain (e.g. support.domain.com).
+Lightweight, fast checks — ideal for a single target when you want quick visibility without a full-scale scan.
 
 Usage:
   garudrecon smallscope [flags]
@@ -368,7 +352,8 @@ Example:
   <summary><b>MediumScope Mode</b></summary>
 
 ```
-Performs a medium-level reconnaissance on the target domain, typically scoped as *.domain.com. This includes subdomain enumeration, vulnerability checks (like XSS, SQLi, LFI, etc.), and optional filtering of out-of-scope subdomains.
+Moderate recon for a wildcard domain (e.g. *.domain.com) with optional vuln checks.
+Balanced scan depth: discovers subdomains, does basic service/port checks and optional lightweight vulnerability checks.
 
 Usage:
   garudrecon mediumscope [flags]
@@ -428,10 +413,60 @@ Example:
   <summary><b>LargeScope Mode</b></summary>
 
 ```
+Full-scale recon for an organization.
+Deep discovery and enumeration (subdomains, ports, asset correlation, extensive vuln checks) for comprehensive coverage.
+
+Usage:
+  garudrecon largescope [flags]
+
+Flags:
+  -d, --domain                          Scan a domain (e.g. domain)
+  -ef, --exclude-functions              Exclude a function from running (e.g. AMASS)
+  -s, --recon-subdomain                 Run Subdomain Enumeration only
+  -a, --active                          Run Active Subdomain Enumeration also (e.g. puredns, altdns)
+  -su, --recon-subdomainurls            Run Subdomain Enumeration + Url Crawling only
+  -rx, --recon-xss                      Run full recon with XSS checks
+  -rs, --recon-sqli                     Run full recon with SQLi checks
+  -rl, --recon-lfi                      Run full recon with LFI checks
+  -rst, --recon-subtakeover             Run full recon with Subdomain Takeover checks
+  -rr, --recon-rce                      Run full recon with RCE checks
+  -ri, --recon-iis                      Run full recon with IIS checks
+  -oos, --outofscope                    Exclude outofscope subdomains from a list (e.g. domain.oos)
+  -c, --config                          Custom configuration file path
+  -r, --resume <scan_folder>            Resume stopped/uncompleted scan from /root/.garudrecon/scans/<scan_folder> (e.g., --resume domain or --resume domain_1). Skips functions already completed in resume.cfg.
+  -h, --help                            help for largescope
+
+Example:
+# Full recon with all vulnerability scan
+  garudrecon largescope -d domain
+
+# Recon Subdomain Enumeration only
+  garudrecon largescope -d domain -s
+
+# Run Active Subdomain Enumeration also (e.g. puredns, altdns)
+  garudrecon largescope -d domain -s -a
+
+# Recon Subdomain Enumeration + Url Crawling only
+  garudrecon largescope -d domain -su
+
+# Recon with XSS only
+  garudrecon largescope -d domain -rx
+
+# Recon with SQLi only
+  garudrecon largescope -d domain -rs
+
+# Exclude functions manually
+  garudrecon largescope -d domain -ef "SUBFINDER,AMASS"
+
+# Combined
+  garudrecon largescope -d domain -rx -ef "AMASS"
+
+# Skips functions already completed in resume.cfg.
+  garudrecon largescope -d domain -rx --resume domain_1
 ```
 
 #### Output
-<img src="img/output/mediumscope.png"/>
+<img src="img/output/largescope.png"/>
 </details>
 
 
@@ -449,19 +484,21 @@ Example:
   <summary><b>Workflow Mode</b></summary>
 
 ```
-Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan).
+Chain multiple tools into a reusable pipeline so you can run complex scans with a single command.
+Compose small steps (mapcidr → httpx → nuclei …) into one workflow file and execute it without manually installing or running each tool.
 
 Usage:
   garudrecon workflow [flags]
 
 Flags:
-  -i, --input                   Pass the input
-  -o, --output                  Location where you want to save output
-  -v, --verbose                 enable verbose mode
-  -h, --help                    help for cronjobs
+  -i, --input       Pass the input
+  -o, --output      Location where you want to save output
+  -v, --verbose     enable verbose mode
+  -h, --help        help for modules
 
 Example:
   garudrecon workflow amass --input <domain> --output <file> [--verbose]
+  garudrecon workflow CVE-2025-0133 -i all.cidr -o CVE-2025-0133.nuclei
   garudrecon workflow ls
   garudrecon workflow ls [module]
   garudrecon workflow cat [module]
@@ -489,7 +526,8 @@ done
   <summary><b>Fleet Mode</b></summary>
 
 ```
-Run fleet scan (e.g. 1 vuln on all programs like mass vuln scan).
+Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
+Use one command to shard data, push jobs to remote nodes, run the chosen module, and collect consolidated results. Perfect for massively-parallel scans.
 
 Usage:
   garudrecon fleet [flags]
@@ -512,7 +550,8 @@ Example:
   <summary><b>CronJobs Mode</b></summary>
 
 ```
-This command runs scheduled reconnaissance tasks on a specified domain, such as monitoring subdomains, ports, JavaScript files, and live hosts. It supports various monitoring functions and can be customized with configuration files and verbose output.
+Schedule and monitor recurring recon tasks (subdomains, open ports, JS leaks, templates, alerts).
+Run continuous monitoring: periodic scans, delta detection, and notifications when new assets or issues appear.
 
 Usage:
   garudrecon cronjobs [flags]

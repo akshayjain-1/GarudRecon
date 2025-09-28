@@ -19,7 +19,8 @@ RESUME_TARGET=""
 # Help function
 function show_help() {
   cat <<EOF
-Performs a minimal reconnaissance on the target domain, typically scoped as support.domain.com. This includes port scanning, url crawling, vulnerability checks (like XSS, SQLi, LFI, etc.).
+Quick recon for a single host or subdomain (e.g. support.domain.com).
+Lightweight, fast checks — ideal for a single target when you want quick visibility without a full-scale scan.
 
 Usage:
   garudrecon smallscope [flags]

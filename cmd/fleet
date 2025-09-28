@@ -4,7 +4,8 @@
 # Help function
 function show_help() {
   cat <<EOF
-Run fleet scan (e.g. 1 vuln on all programs like mass vuln scan).
+Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
+Use one command to shard data, push jobs to remote nodes, run the chosen module, and collect consolidated results. Perfect for massively-parallel scans.
 
 Usage:
   garudrecon fleet [flags]

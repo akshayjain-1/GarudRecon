@@ -11,7 +11,8 @@ CRONJOBS_SLEEP_INTERVAL=3600  # default: 1 hour
 # Help function
 function show_help() {
   cat <<EOF
-This command runs scheduled reconnaissance tasks on a specified domain, such as monitoring subdomains, ports, JavaScript files, and live hosts. It supports various monitoring functions and can be customized with configuration files and verbose output.
+Schedule and monitor recurring recon tasks (subdomains, open ports, JS leaks, templates, alerts).
+Run continuous monitoring: periodic scans, delta detection, and notifications when new assets or issues appear.
 
 Usage:
   garudrecon cronjobs [flags]

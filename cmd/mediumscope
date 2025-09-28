@@ -23,7 +23,8 @@ RESUME_TARGET=""
 # Help function
 function show_help() {
   cat <<EOF
-Performs a medium-level reconnaissance on the target domain, typically scoped as *.domain.com. This includes subdomain enumeration, vulnerability checks (like XSS, SQLi, LFI, etc.), and optional filtering of out-of-scope subdomains.
+Moderate recon for a wildcard domain (e.g. *.domain.com) with optional vuln checks.
+Balanced scan depth: discovers subdomains, does basic service/port checks and optional lightweight vulnerability checks.
 
 Usage:
   garudrecon mediumscope [flags]

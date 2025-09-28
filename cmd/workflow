@@ -9,7 +9,8 @@ VERBOSE=false
 # Help function
 function show_help() {
   cat <<EOF
-Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan).
+Chain multiple tools into a reusable pipeline so you can run complex scans with a single command.
+Compose small steps (mapcidr → httpx → nuclei …) into one workflow file and execute it without manually installing or running each tool.
 
 Usage:
   garudrecon workflow [flags]
@@ -22,6 +23,7 @@ Flags:
 
 Example:
   garudrecon workflow amass --input <domain> --output <file> [--verbose]
+  garudrecon workflow CVE-2025-0133 -i all.cidr -o CVE-2025-0133.nuclei
   garudrecon workflow ls
   garudrecon workflow ls [module]
   garudrecon workflow cat [module]

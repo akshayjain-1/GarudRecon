@@ -6,41 +6,20 @@ source "configuration/garudrecon_max.cfg"
 # Help function
 function show_help() {
   cat <<EOF
-GarudRecon - Recon Automation Framework
-
-GarudRecon is an automated reconnaissance framework designed for asset discovery,
-vulnerability detection, and continuous monitoring. It leverages a wide range of
-open-source tools to scan domains, collect subdomains, and check for various
-vulnerabilities such as:
-
-  • XSS (Cross-Site Scripting)
-  • SQLi (SQL Injection)
-  • LFI (Local File Inclusion)
-  • RCE (Remote Code Execution)
-  • IIS misconfigurations
-  • Subdomain Takeover
-  • Open Redirects
-  • Swagger UI exposures
-  • .git directory leaks
-  • JavaScript secrets and more.
-
-The tool supports scoped recon with flexible modes like smallscope, mediumscope,
-and largescope, depending on your coverage needs. You can customize scans,
-exclude specific functions, provide configuration files, and automate cron jobs
-for continuous monitoring.
+GarudRecon is a comprehensive bash-based reconnaissance automation framework that streamlines the asset discovery and vulnerability assessment process for security professionals and bug bounty hunters. This tool orchestrates over 80+ open-source security tools to provide thorough reconnaissance capabilities across multiple attack vectors.
 
 Usage:
   garudrecon [command]
 
 Available Commands:
-  install                 Set up the tool and dependencies
-  smallscope              Run minimal recon for subdomain (e.g. support.domain.com)
-  mediumscope             Perform moderate recon with optional vulnerability checks for wildcard domain (e.g. *.domain.com)
-  largescope              Full-scale recon for deep visibility for organisation
-  cidrscope               Run fullscan on cidr
-  workflow                Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan)
-  fleet                   Run workflow scan (e.g. 1 vuln on all programs like mass vuln scan on vps)
-  cronjobs                Automate recurring recon tasks continuously
+  install                 Install the tool and all required dependencies.
+  smallscope              Quick recon for a single host or subdomain (e.g. support.domain.com).
+  mediumscope             Moderate recon for a wildcard domain (e.g. *.domain.com) with optional vuln checks.
+  largescope              Full-scale recon for an organization.
+  cidrscope               Run a full scan against one or more CIDR ranges.
+  workflow                Chain multiple tools into a reusable pipeline so you can run complex scans with a single command.
+  fleet                   Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
+  cronjobs                Schedule and monitor recurring recon tasks (subdomains, open ports, JS leaks, templates, alerts).
 
 Flags:
   -h, --help     help for garudrecon
