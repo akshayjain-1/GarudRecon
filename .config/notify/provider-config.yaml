@@ -1,4 +1,10 @@
 discord:
+  - id: "manualcheck"
+    discord_channel: "manualcheck"
+    discord_username: "manualcheck"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
   - id: "subdomain"
     discord_channel: "subdomain"
     discord_username: "subdomain"
@@ -26,5 +32,23 @@ discord:
   - id: "javascriptleaks"
     discord_channel: "javascriptleaks"
     discord_username: "javascriptleaks"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "xss"
+    discord_channel: "xss"
+    discord_username: "xss"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "allvuln"
+    discord_channel: "allvuln"
+    discord_username: "allvuln"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "scanfinished"
+    discord_channel: "scanfinished"
+    discord_username: "scanfinished"
     discord_format: "{{data}}"
     discord_webhook_url: ""

@@ -604,6 +604,8 @@ HAKTRAILSFREE(){
         case "$option" in
             1)
                 echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
+
+                echo -e "HAKTRAILSFREE: Add securitytrails cookie manually" | notify -silent -duc -id ${MANUALCHECK_NOTIFY} &>/dev/null
                 
                 # Display prompt once and enter wait loop
                 counter=0
@@ -683,6 +685,8 @@ ORG2ASN(){
         case "$option" in
             1)
                 echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
+
+                echo -e "ORG2ASN: Remove unnecessary results manually" | notify -silent -duc -id ${MANUALCHECK_NOTIFY} &>/dev/null
                 
                 # Display prompt once and enter wait loop
                 counter=0
@@ -1721,7 +1725,7 @@ MANUAL_GOOGLE_DORKING(){
             1)
                 echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
 
-                echo -e "MANUAL_GOOGLE_DORKING: Waiting for manually google dorking" | notify -silent -duc -id xssnotify &>/dev/null
+                echo -e "MANUAL_GOOGLE_DORKING: Waiting for manually google dorking" | notify -silent -duc -id ${MANUALCHECK_NOTIFY} &>/dev/null
                 
                 # Display prompt once and enter wait loop
                 counter=0
@@ -1778,7 +1782,7 @@ BURPSUITE(){
             1)
                 echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
 
-                echo -e "BURPSUITE: Waiting for manually add burpsuite urls" | notify -silent -duc -id xssnotify &>/dev/null
+                echo -e "BURPSUITE: Waiting for manually add burpsuite urls" | notify -silent -duc -id ${MANUALCHECK_NOTIFY} &>/dev/null
                 
                 # Display prompt once and enter wait loop
                 counter=0
@@ -2097,7 +2101,7 @@ MANUAL_ALLURLS_FILTER(){
         1)
             echo -e "${BGREEN}[+] Waiting for up to 30 minutes. Press Enter if you're done early...${RESET}"
 
-            echo -e "MANUAL_ALLURLS_FILTER: Remove unnecessary urls manually" | notify -silent -duc -id xssnotify &>/dev/null
+            echo -e "MANUAL_ALLURLS_FILTER: Remove unnecessary urls manually" | notify -silent -duc -id ${MANUALCHECK_NOTIFY} &>/dev/null
 
             # Display prompt once and enter wait loop
             counter=0
@@ -2331,10 +2335,12 @@ XSS(){
 	if [ "$XSS_SCAN_MODE" = "NORMAL" ]; then
 		if [ "$USE_GFPATTERNS" = "TRUE" ]; then
 			cat ${URLSDIR}/filteredurls.txt | gf xss | unew -el -t -q ${URLSDIR}/gf_xss.txt
-			cat ${URLSDIR}/gf_xss.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
+			cat ${URLSDIR}/gf_xss.txt | xssrecon --silent --skipspecialchar --json | jq -r 'select(.reflected==true) | .baseurl' | unew -q ${VULNDIR}/xss_xssrecon.txt
+			cat ${VULNDIR}/xss_xssrecon.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
 		else
 			# if USE_GFPATTERNS is FALSE then scan all parameters
-			cat ${URLSDIR}/filteredurls.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
+			cat ${URLSDIR}/filteredurls.txt | xssrecon --silent --skipspecialchar --json | jq -r 'select(.reflected==true) | .baseurl' | unew -q ${VULNDIR}/xss_xssrecon.txt
+			cat ${VULNDIR}/xss_xssrecon.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
 		fi
 
 		# Common steps for both TRUE and FALSE conditions
@@ -2344,10 +2350,12 @@ XSS(){
 	if [ "$XSS_SCAN_MODE" = "ADVANCED" ]; then
 		if [ "$USE_GFPATTERNS" = "TRUE" ]; then
 			cat ${URLSDIR}/filteredurls.txt | gf xss | unew -el -t -q ${URLSDIR}/gf_xss.txt
-			cat ${URLSDIR}/gf_xss.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
+			cat ${URLSDIR}/gf_xss.txt | xssrecon --silent --skipspecialchar --json | jq -r 'select(.reflected==true) | .baseurl' | unew -q ${VULNDIR}/xss_xssrecon.txt
+			cat ${VULNDIR}/xss_xssrecon.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
 		else
 			# if USE_GFPATTERNS is FALSE then scan all parameters
-			cat ${URLSDIR}/filteredurls.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
+			cat ${URLSDIR}/filteredurls.txt | xssrecon --silent --skipspecialchar --json | jq -r 'select(.reflected==true) | .baseurl' | unew -q ${VULNDIR}/xss_xssrecon.txt
+			cat ${VULNDIR}/xss_xssrecon.txt | pvreplace -silent -payload ${XSS_WORDLIST} -fuzzing-part param-value -fuzzing-type replace -fuzzing-mode single | unew -el -t -q ${VULNDIR}/xss_pvreplace.txt
 		fi
 
 		# Common steps for both TRUE and FALSE conditions
@@ -2356,7 +2364,7 @@ XSS(){
 		# Checks XSS False Positive
 		cat ${VULNDIR}/xsschecker.txt | unew -q -split ${XSSCHECKER_SPLIT} ${VULNDIR}/xsschecker_split.txt
 		parallel --ungroup -j${PYXSS_PARALLEL_FILE_SCAN} "cat {} | pyxss --silent --no-color -o {= s:xsschecker_split:xss: =}" ::: ${VULNDIR}/xsschecker_split*.txt &>/dev/null
-		cat ${VULNDIR}/xss[0-9]*.txt | egrep -av 'NOT VULNERABLE:' | unew -el -ef -q ${ROOT_VULNDIR}/xss.txt
+		cat ${VULNDIR}/xss[0-9]*.txt | egrep -av 'NOT VULNERABLE:' | unew -el -ef ${ROOT_VULNDIR}/xss.txt | notify -silent -duc -bulk -id ${XSS_NOTIFY} &>/dev/null
 	fi
 
 	STOP_SPINNER
@@ -2602,6 +2610,7 @@ IIS(){
     # Run the commands if the file has content
 	cat ${VULNDIR}/iis.txt | interlace --silent -threads 10 -c "shortscan _target_ -F -s -p 1 > _output_/_cleantarget_.txt" -o ${IISIDR} 2>> >(sed "s/^/${FUNCNAME[0]}: /" >> "$ERRORLOGFILE") >/dev/null
 	find ${IISIDR}/*.txt -type f -print0 | xargs --null grep -a -Z -L 'Vulnerable: Yes' | xargs --null rm -rf
+	while IFS= read -r -d '' f; do printf 'URL: ===== %s =======\n' "$f"; cat -- "$f"; echo; done < <(find ${IISIDR}/*.txt -type f -print0 | xargs -0 -r grep -a -Z -L 'Vulnerable: No') >> ${ROOT_VULNDIR}/iis.txt
 
 	STOP_SPINNER
 	echo -e "${BGREEN}[+] IIS${RESET}: $(wc -l 2>/dev/null < ${ROOT_VULNDIR}/iis.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
@@ -3227,4 +3236,4 @@ TIMETOOK=$(printf "%02d:%02d:%02d" $((DURATION/3600)) $(( (DURATION%3600)/60 )) 
 
 echo -e "${BGREEN}[+] STARTED${RESET}: ${STARTED_AT}, ${BGREEN}FINISHED${RESET}: ${ENDED_AT}, ${BGREEN}TIMETOOK${RESET}: ${TIMETOOK}" | unew -a $RESUMELOGFILE
 
-echo -e "Scan finished: $TARGET" | notify -silent -duc -id ${NOTIFY_SCAN_FINISHED} &>/dev/null
+echo -e "Scan finished: $TARGET" | notify -silent -duc -id ${SCAN_FINISHED_NOTIFY} &>/dev/null

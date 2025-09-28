@@ -89,18 +89,6 @@ After that i tried in python, golang but i did'nt liked "String Concatenation", 
 >  
 > Make sure your shell is set to **bash**.
 
-## Errors
-- If you getting this error
-<img width="968" height="429" alt="image" src="https://github.com/user-attachments/assets/4d312058-0be8-413d-98de-7b29e4abb884" />
-
-```
-# Then install go manually
-curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash && source ~/.bashrc
-
-# Now run this command
-bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
-```
-
 ### Docker
 ```
 
@@ -111,11 +99,11 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
 ```
 
-### ✅ Example invocations:
-- Very help if we installing on github actions or 100 1GB vps
+<details>
+  <summary><b>✅ Configure Examples:</b></summary>
 
+```yaml
 👉 Installtion modes:
-```
 echo "Choose installation scope:"
 echo "1) SMALLSCOPE"
 echo "2) MEDIUMSCOPE"
@@ -125,25 +113,96 @@ echo "5) WORKFLOW"
 echo "6) FLEET"
 echo "7) CRONJOBS"
 echo "8) ALL (default)"
-```
 
 👉 Non-interactive without update:
-```bash
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5
 # Executes: garudrecon install -f CRONJOBS
-```
 
 👉 Non-interactive with update:
-```bash
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5 --update
 # Executes: garudrecon install -f CRONJOBS --update
-```
 
 👉 Interactive mode (no args):
-```bash
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
 # Interactive prompts as before
 ```
+</details>
+
+<details>
+  <summary><b>✅ Solve Errors</b></summary>
+
+<img width="968" height="429" alt="image" src="https://github.com/user-attachments/assets/4d312058-0be8-413d-98de-7b29e4abb884" />
+
+```yaml
+👉 Then install go manually
+curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash && source ~/.bashrc
+
+👉 Now run this command
+bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
+```
+</details>
+
+<details>
+  <summary><b>✅ Discord Webhook Setup</b></summary>
+
+```yaml
+👉 Add all discord webhook url in ~/.bashrc:
+discord:
+  - id: "manualcheck"
+    discord_channel: "manualcheck"
+    discord_username: "manualcheck"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "subdomain"
+    discord_channel: "subdomain"
+    discord_username: "subdomain"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "ports"
+    discord_channel: "ports"
+    discord_username: "ports"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "alivesubdomain"
+    discord_channel: "alivesubdomain"
+    discord_username: "alivesubdomain"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "javascript"
+    discord_channel: "javascript"
+    discord_username: "javascript"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "javascriptleaks"
+    discord_channel: "javascriptleaks"
+    discord_username: "javascriptleaks"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "xss"
+    discord_channel: "xss"
+    discord_username: "xss"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "allvuln"
+    discord_channel: "allvuln"
+    discord_username: "allvuln"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+
+  - id: "scanfinished"
+    discord_channel: "scanfinished"
+    discord_username: "scanfinished"
+    discord_format: "{{data}}"
+    discord_webhook_url: ""
+```
+</details>
 
 ### Download prebuilt binaries
 ```
@@ -158,26 +217,6 @@ bash configure
 git clone --depth 1 https://github.com/rix4uni/GarudRecon.git
 cd GarudRecon
 bash configure
-```
-
-### ✅ Example invocations:
-
-👉 Non-interactive without update:
-```bash
-bash configure 5
-# Executes: garudrecon install -f CRONJOBS
-```
-
-👉 Non-interactive with update:
-```bash
-bash configure 5 --update
-# Executes: garudrecon install -f CRONJOBS --update
-```
-
-👉 Interactive mode (no args):
-```bash
-bash configure
-# Interactive prompts as before
 ```
 
 ## Usage
@@ -483,8 +522,11 @@ Example:
 <img src="img/output/cronjobs_discord.png"/>
 </details>
 
-👉 short commands automatically adds in ~/.bashrc during installation:
-```
+<details>
+  <summary><b>✅ Short commands</b></summary>
+
+```yaml
+👉 Short commands automatically adds in ~/.bashrc during installation:
 gs="garudrecon smallscope"
 gm="garudrecon mediumscope"
 gl="garudrecon largescope"
@@ -493,6 +535,7 @@ gw="garudrecon workflow"
 gf="garudrecon fleet"
 gc="garudrecon cronjobs"
 ```
+</details>
 
 ## Demo
 

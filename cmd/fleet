@@ -98,9 +98,7 @@ parallel -a $HOME/credentials.txt --colsep ':' -j20 "
 grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
 
 # Run command in tmux session and send file to "main VPS"
-# grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux send-keys -t fleet \"cat fleet/subs.txt | httpx -duc -silent | unew fleet/subs.httpx && scp -i ~/.ssh/id_rsa_vps fleet/subs.httpx root@206.189.136.241:~/distribute/fleet/subs.httpx_{} &>/dev/null && rm -rf fleet && exit\" C-m"'
-
-grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} root@206.189.136.241:$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master_vps.txt):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
 
 
 DEST="$FLEETDIR/${OUTPUT}"
