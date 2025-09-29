@@ -90,10 +90,17 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
         6) scope="FLEET"
             echo "[*] FLEET mode selected. Deploying on 100+ VPS from credentials.txt..."
 
+            # Send sshkey to Mini-Child-VPS
+            KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+            export KEY_PATH
+            parallel -a $HOME/credentials.txt --colsep ':' -j20 "
+              sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
+            "
+
             # FLEET deployment logic here
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh | bash"'
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz &&tar -xvzf unew-linux-amd64-0.0.6.tgz &&rm -rf unew-linux-amd64-0.0.6.tgz &&mv unew ~/go/bin/unew"'
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 6\" C-m"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
 
             echo "[*] FLEET deployment initiated."
             exit 0
@@ -121,7 +128,24 @@ else
         3) scope="LARGESCOPE" ;;
         4) scope="CIDRSCOPE" ;;
         5) scope="WORKFLOW" ;;
-        6) scope="FLEET" ;;
+        6) scope="FLEET"
+            echo "[*] FLEET mode selected. Deploying on 100+ VPS from credentials.txt..."
+
+            # Send sshkey to Mini-Child-VPS
+            KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+            export KEY_PATH
+            parallel -a $HOME/credentials.txt --colsep ':' -j20 "
+              sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
+            "
+
+            # FLEET deployment logic here
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh | bash"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz && tar -xvzf unew-linux-amd64-0.0.6.tgz && rm -rf unew-linux-amd64-0.0.6.tgz && mkdir -p ~/go/bin && mv unew ~/go/bin/unew"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
+
+            echo "[*] FLEET deployment initiated."
+            exit 0
+            ;;
         7) scope="CRONJOBS" ;;
         8|"") scope="ALL" ;;   # empty input defaults to ALL
         *) echo "Invalid choice, defaulting to ALL"; scope="ALL" ;;
