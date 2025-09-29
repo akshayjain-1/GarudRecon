@@ -97,20 +97,24 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
             mkdir -p $OUTPUT
 
             # Send sshkey to Mini-Child-VPS
-            KEY_PATH="$HOME/.ssh/id_ed25519.pub"
-            # --- check & create key ---
-            if [[ ! -f "$KEY_PATH" ]]; then
-              echo "No public key at $KEY_PATH — generating a new ed25519 key..."
-              ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
-              echo "Key generated: $KEY_PATH"
-            fi
-
-            export KEY_PATH
-            parallel -a $HOME/credentials.txt --colsep ':' -j20 "rm -rf $HOME/.ssh/id_ed25519.pub && sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
+            rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
+            parallel -a $HOME/credentials.txt --colsep ':' -j20 "sshpass -p {2} ssh-copy-id -i $HOME/.ssh/id_ed25519.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
             # Send master_credentials.txt file to Mini-Child-VPS
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master_credentials.txt {}:/root/master_credentials.txt"
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"PASSWORD=$(cat master_credentials.txt | cut -d: -f2) && USER_IP=$(cat master_credentials.txt | cut -d: -f1) && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q && sshpass -p ${PASSWORD} ssh-copy-id -i ${HOME}/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${USER_IP} &>/dev/null\" C-m"'
+            
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | \
+            parallel -j50 "ssh -o StrictHostKeyChecking=no {} '
+              # read variables from the master_credentials.txt on the worker
+              USER_IP=\$(cut -d: -f1 /root/master_credentials.txt)
+              PASSWORD=\$(cut -d: -f2 /root/master_credentials.txt)
+
+              tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet
+              tmux send-keys -t fleet \"rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f \${HOME}/.ssh/id_ed25519 -N '' -q && \
+              sshpass -p \${PASSWORD} ssh-copy-id -i \${HOME}/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \${USER_IP} &>/dev/null\" C-m
+            '"
+
 
             # FLEET deployment logic here
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/11e3b54333b9760973a3dec5c5e71d9507971333/go.sh | bash &>/dev/null"'
@@ -178,20 +182,24 @@ else
             mkdir -p $OUTPUT
 
             # Send sshkey to Mini-Child-VPS
-            KEY_PATH="$HOME/.ssh/id_ed25519.pub"
-            # --- check & create key ---
-            if [[ ! -f "$KEY_PATH" ]]; then
-              echo "No public key at $KEY_PATH — generating a new ed25519 key..."
-              ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
-              echo "Key generated: $KEY_PATH"
-            fi
-
-            export KEY_PATH
-            parallel -a $HOME/credentials.txt --colsep ':' -j20 "rm -rf $HOME/.ssh/id_ed25519.pub && sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
+            rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
+            parallel -a $HOME/credentials.txt --colsep ':' -j20 "sshpass -p {2} ssh-copy-id -i $HOME/.ssh/id_ed25519.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
             # Send master_credentials.txt file to Mini-Child-VPS
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master_credentials.txt {}:/root/master_credentials.txt"
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"PASSWORD=$(cat master_credentials.txt | cut -d: -f2) && USER_IP=$(cat master_credentials.txt | cut -d: -f1) && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q && sshpass -p ${PASSWORD} ssh-copy-id -i ${HOME}/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${USER_IP} &>/dev/null\" C-m"'
+            
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | \
+            parallel -j50 "ssh -o StrictHostKeyChecking=no {} '
+              # read variables from the master_credentials.txt on the worker
+              USER_IP=\$(cut -d: -f1 /root/master_credentials.txt)
+              PASSWORD=\$(cut -d: -f2 /root/master_credentials.txt)
+
+              tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet
+              tmux send-keys -t fleet \"rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f \${HOME}/.ssh/id_ed25519 -N '' -q && \
+              sshpass -p \${PASSWORD} ssh-copy-id -i \${HOME}/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \${USER_IP} &>/dev/null\" C-m
+            '"
+
 
             # FLEET deployment logic here
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/11e3b54333b9760973a3dec5c5e71d9507971333/go.sh | bash &>/dev/null"'
