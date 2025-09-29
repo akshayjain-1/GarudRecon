@@ -88,10 +88,23 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
         4) scope="CIDRSCOPE" ;;
         5) scope="WORKFLOW" ;;
         6) scope="FLEET"
-            echo "[*] FLEET mode selected. Deploying on 100+ VPS from credentials.txt..."
+            TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | wc -l)
+            echo "[*] FLEET mode selected. Deploying on $TOTALVPS VPS from credentials.txt..."
+
+            FLEETDIR="$HOME/.garudrecon/fleet"
+            OUTPUT="$HOME/.garudrecon/fleet/output"
+            mkdir -p $FLEETDIR
+            mkdir -p $OUTPUT
 
             # Send sshkey to Mini-Child-VPS
             KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+            # --- check & create key ---
+            if [[ ! -f "$KEY_PATH" ]]; then
+              echo "No public key at $KEY_PATH — generating a new ed25519 key..."
+              ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
+              echo "Key generated: $KEY_PATH"
+            fi
+
             export KEY_PATH
             parallel -a $HOME/credentials.txt --colsep ':' -j20 "
               sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
@@ -99,10 +112,35 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
 
             # FLEET deployment logic here
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh | bash"'
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz &&tar -xvzf unew-linux-amd64-0.0.6.tgz &&rm -rf unew-linux-amd64-0.0.6.tgz &&mv unew ~/go/bin/unew"'
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz && tar -xvzf unew-linux-amd64-0.0.6.tgz && rm -rf unew-linux-amd64-0.0.6.tgz && mkdir -p ~/go/bin && mv unew ~/go/bin/unew"'
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
 
-            echo "[*] FLEET deployment initiated."
+            DEST="$FLEETDIR/${OUTPUT}"
+            echo "[*] Waiting for results from $TOTALVPS VPS..."
+
+            while true; do
+                DONE=$(find "$FLEETDIR" -maxdepth 1 -type f -name "${OUTPUT}_*" | wc -l)
+
+                # Calculate percentage
+                PERCENT=$(( 100 * DONE / TOTALVPS ))
+
+                # Build simple progress bar (50 chars wide)
+                BAR_WIDTH=50
+                FILLED=$(( PERCENT * BAR_WIDTH / 100 ))
+                EMPTY=$(( BAR_WIDTH - FILLED ))
+                BAR=$(printf "%${FILLED}s" | tr ' ' '#')
+                SPACE=$(printf "%${EMPTY}s")
+
+                echo -ne "\rProgress: [$BAR$SPACE] $DONE / $TOTALVPS VPS ($PERCENT%)"
+
+                if [[ $DONE -ge $TOTALVPS ]]; then
+                    echo "[*] FLEET deployment initiated."
+                    break
+                fi
+
+                sleep 5
+            done
+
             exit 0
             ;;
         7) scope="CRONJOBS" ;;
@@ -129,10 +167,23 @@ else
         4) scope="CIDRSCOPE" ;;
         5) scope="WORKFLOW" ;;
         6) scope="FLEET"
-            echo "[*] FLEET mode selected. Deploying on 100+ VPS from credentials.txt..."
+            TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | wc -l)
+            echo "[*] FLEET mode selected. Deploying on $TOTALVPS VPS from credentials.txt..."
+
+            FLEETDIR="$HOME/.garudrecon/fleet"
+            OUTPUT="$HOME/.garudrecon/fleet/output"
+            mkdir -p $FLEETDIR
+            mkdir -p $OUTPUT
 
             # Send sshkey to Mini-Child-VPS
             KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+            # --- check & create key ---
+            if [[ ! -f "$KEY_PATH" ]]; then
+              echo "No public key at $KEY_PATH — generating a new ed25519 key..."
+              ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
+              echo "Key generated: $KEY_PATH"
+            fi
+
             export KEY_PATH
             parallel -a $HOME/credentials.txt --colsep ':' -j20 "
               sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
@@ -143,7 +194,32 @@ else
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz && tar -xvzf unew-linux-amd64-0.0.6.tgz && rm -rf unew-linux-amd64-0.0.6.tgz && mkdir -p ~/go/bin && mv unew ~/go/bin/unew"'
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
 
-            echo "[*] FLEET deployment initiated."
+            DEST="$FLEETDIR/${OUTPUT}"
+            echo "[*] Waiting for results from $TOTALVPS VPS..."
+
+            while true; do
+                DONE=$(find "$FLEETDIR" -maxdepth 1 -type f -name "${OUTPUT}_*" | wc -l)
+
+                # Calculate percentage
+                PERCENT=$(( 100 * DONE / TOTALVPS ))
+
+                # Build simple progress bar (50 chars wide)
+                BAR_WIDTH=50
+                FILLED=$(( PERCENT * BAR_WIDTH / 100 ))
+                EMPTY=$(( BAR_WIDTH - FILLED ))
+                BAR=$(printf "%${FILLED}s" | tr ' ' '#')
+                SPACE=$(printf "%${EMPTY}s")
+
+                echo -ne "\rProgress: [$BAR$SPACE] $DONE / $TOTALVPS VPS ($PERCENT%)"
+
+                if [[ $DONE -ge $TOTALVPS ]]; then
+                    echo "[*] FLEET deployment initiated."
+                    break
+                fi
+
+                sleep 5
+            done
+
             exit 0
             ;;
         7) scope="CRONJOBS" ;;

@@ -18,7 +18,7 @@ Flags:
 
 Example:
   garudrecon fleet -m <module> -i <wildcards> -o <file>
-  garudrecon fleet -m subfinder -i wildcards.txt -o wildcards.subs
+  garudrecon fleet -m httpx -i subs.txt -o subs.httpx
 EOF
 }
 
@@ -64,19 +64,19 @@ mkdir -p $SPLITDIR
 # Split files logic
 FILE=${INPUT}
 TOTALVPS=$(cat $HOME/credentials.txt | wc -l)
-# SPLIT=$2
+SPLIT=$(echo "$INPUT" | sed 's/\.[^.]*$//')
 
 LINES=$(wc -l < "$FILE")
 PER_VPS=$(( (LINES + $TOTALVPS - 1) / $TOTALVPS ))
 echo "TOTAL: $LINES, Lines per VPS: $PER_VPS"
 
 # Split the file
-split --numeric-suffixes=1 -a 3 -l $PER_VPS "$FILE" $SPLITDIR/subs.
+split --numeric-suffixes=1 -a 3 -l $PER_VPS "$FILE" $SPLITDIR/${SPLIT}.
 
-# Renames files like: $SPLITDIR/subs.001 → $SPLITDIR/subs.1
-for f in $SPLITDIR/subs.[0-9][0-9][0-9]; do
+# Renames files like: $SPLITDIR/${SPLIT}.001 → $SPLITDIR/${SPLIT}.1
+for f in $SPLITDIR/${SPLIT}.[0-9][0-9][0-9]; do
     n=$(echo "$f" | sed -E 's/.*\.0*([0-9]+)/\1/')
-    mv "$f" "$SPLITDIR/subs.$n" &>/dev/null
+    mv "$f" "$SPLITDIR/${SPLIT}.$n" &>/dev/null
 done
 
 # Delete empty files
@@ -85,14 +85,21 @@ find $SPLITDIR -type f -empty -delete
 
 # Send sshkey to Mini-Child-VPS
 KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+# --- check & create key ---
+if [[ ! -f "$KEY_PATH" ]]; then
+  echo "No public key at $KEY_PATH — generating a new ed25519 key..."
+  ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
+  echo "Key generated: $KEY_PATH"
+fi
+
 export KEY_PATH
 parallel -a $HOME/credentials.txt --colsep ':' -j20 "
   sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
 
   ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p $FLEETDIR" &>/dev/null
 
-  echo "Sending file subs.{#} to {1}..."
-  scp -o StrictHostKeyChecking=no $SPLITDIR/subs.{#} {1}:$FLEETDIR/${INPUT}
+  echo "Sending file ${SPLIT}.{#} to {1}..."
+  scp -o StrictHostKeyChecking=no $SPLITDIR/${SPLIT}.{#} {1}:$FLEETDIR/${INPUT}
 "
 
 # Create a tmux session
