@@ -184,7 +184,7 @@ GO() {
     # Remove broken Go installation
     sudo rm -rf /usr/local/go
 
-    curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash && source ~/.bashrc &>/dev/null
+    curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/11e3b54333b9760973a3dec5c5e71d9507971333/go.sh" | bash && source ~/.bashrc &>/dev/null
     go env &>/dev/null
 
     if ! command -v go &>/dev/null; then
