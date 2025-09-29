@@ -193,6 +193,21 @@ else
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; curl -s https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh | bash"'
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "export PATH=$PATH:/usr/local/go/bin; wget https://github.com/rix4uni/unew/releases/download/v0.0.6/unew-linux-amd64-0.0.6.tgz && tar -xvzf unew-linux-amd64-0.0.6.tgz && rm -rf unew-linux-amd64-0.0.6.tgz && mkdir -p ~/go/bin && mv unew ~/go/bin/unew"'
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
+            
+            # read main VPS creds
+            read MAIN_HOST MAIN_PASS < <(awk -F: '{print $1, $2}' master_credentials.txt)
+            export MAIN_HOST MAIN_PASS
+
+            # launch jobs
+            grep -vE '^\s*$|^\s*#' "$HOME/credentials.txt" \
+            | cut -d: -f1 \
+            | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "
+              tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet;
+              tmux send-keys -t fleet \
+              \"ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N \"\" -q \
+               && sshpass -p \"$MAIN_PASS\" ssh-copy-id -i ~/.ssh/id_ed25519.pub \
+                  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                  $MAIN_HOST &>/dev/null\" C-m"'
 
             DEST="$FLEETDIR/${OUTPUT}"
             echo "[*] Waiting for results from $TOTALVPS VPS..."
