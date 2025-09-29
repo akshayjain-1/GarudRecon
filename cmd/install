@@ -447,15 +447,15 @@ DOS2UNIX() {
 AWSCLI() {
     START_SPINNER "${BGREEN}AWSCLI${RESET}"
 
-    if [[ "$UPDATE" == false ]] && command -v awscli &>/dev/null; then
+    if [[ "$UPDATE" == false ]] && command -v aws &>/dev/null; then
         echo -e "${YELLOW}[~] AWSCLI - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
         STOP_SPINNER
         return
     fi
 
-    pip3 install awscli --upgrade --user &>/dev/null
+    pip3 install awscli --upgrade &>/dev/null
 
-    if ! command -v awscli &>/dev/null; then
+    if ! command -v aws &>/dev/null; then
         echo -e "${BRED}[x] AWSCLI - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
         STOP_SPINNER
         return
@@ -4438,22 +4438,6 @@ WORKFLOW(){
     GOCL
     PACKAGES
     REQUIRED
-}
-
-# Install only those tools that used in fleet
-FLEET(){
-    VARIABLES
-    GO
-    UNEW
-    PIPX
-    GOCL
-    PACKAGES
-    PYTHON3
-    PIP3
-    SETUPTOOLS
-    DOS2UNIX
-    JQ
-    PARALLEL
 }
 
 # Install only those tools that used in cronjobs
