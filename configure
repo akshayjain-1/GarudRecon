@@ -109,7 +109,7 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
             parallel -a $HOME/credentials.txt --colsep ':' -j20 "rm -rf $HOME/.ssh/id_ed25519.pub && sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
             # Send master_credentials.txt file to Mini-Child-VPS
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no master_credentials.txt {}:/root/master_credentials.txt"
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master_credentials.txt {}:/root/master_credentials.txt"
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"PASSWORD=$(cat master_credentials.txt | cut -d: -f2) && USER_IP=$(cat master_credentials.txt | cut -d: -f1) && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q && sshpass -p ${PASSWORD} ssh-copy-id -i ${HOME}/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${USER_IP} &>/dev/null\" C-m"'
 
             # FLEET deployment logic here
@@ -190,7 +190,7 @@ else
             parallel -a $HOME/credentials.txt --colsep ':' -j20 "rm -rf $HOME/.ssh/id_ed25519.pub && sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
             # Send master_credentials.txt file to Mini-Child-VPS
-            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no master_credentials.txt {}:/root/master_credentials.txt"
+            grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master_credentials.txt {}:/root/master_credentials.txt"
             grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"PASSWORD=$(cat master_credentials.txt | cut -d: -f2) && USER_IP=$(cat master_credentials.txt | cut -d: -f1) && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q && sshpass -p ${PASSWORD} ssh-copy-id -i ${HOME}/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${USER_IP} &>/dev/null\" C-m"'
 
             # FLEET deployment logic here
