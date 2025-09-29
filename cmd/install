@@ -4433,9 +4433,9 @@ CIDRSCOPE(){
 WORKFLOW(){
     VARIABLES
     GO
+    UNEW
     PIPX
     GOCL
-    UNEW
     PACKAGES
     REQUIRED
 }
@@ -4444,9 +4444,9 @@ WORKFLOW(){
 FLEET(){
     VARIABLES
     GO
+    UNEW
     PIPX
     GOCL
-    UNEW
     PACKAGES
     PYTHON3
     PIP3
