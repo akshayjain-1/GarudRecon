@@ -525,14 +525,16 @@ done
 <details>
   <summary><b>Fleet Mode</b></summary>
 
-## This is temporary setup for now in next update it will fixed
+## This is temporary setup for now in next update i'll add progress bar
 ```
-## Create master.credentials and worker.credentials now same the credentials
+## Create master.credentials and worker.credentials now same the credentials, in this format:
+root@IP:PASSWORD
+root@IP:PASSWORD
 
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5
+bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 6
 
-grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
-
+## Wait for 15-20 minutes then check 1 worker if it's done then all workers done now run this command
 
 garudrecon fleet -m httpx -i subs.txt -o httpx.subs
 ```
