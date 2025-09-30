@@ -63,7 +63,7 @@ mkdir -p $SPLITDIR
 
 # Split files logic
 FILE=${INPUT}
-TOTALVPS=$(cat $HOME/credentials.txt | wc -l)
+TOTALVPS=$(cat $HOME/worker.credentials | wc -l)
 SPLIT=$(echo "$INPUT" | sed 's/\.[^.]*$//')
 
 LINES=$(wc -l < "$FILE")
@@ -93,7 +93,7 @@ if [[ ! -f "$KEY_PATH" ]]; then
 fi
 
 export KEY_PATH
-parallel -a $HOME/credentials.txt --colsep ':' -j20 "
+parallel -a $HOME/worker.credentials --colsep ':' -j20 "
   sshpass -p {2} ssh-copy-id -i $KEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null
 
   ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p $FLEETDIR" &>/dev/null
@@ -103,14 +103,14 @@ parallel -a $HOME/credentials.txt --colsep ':' -j20 "
 "
 
 # Create a tmux session
-grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
+grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
 
 # Run command in tmux session and send file to "main VPS"
-grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master_vps.txt):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master.credentials):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
 
 
 DEST="$FLEETDIR/${OUTPUT}"
-TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | wc -l)
+TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | wc -l)
 
 echo "[*] Waiting for results from $TOTALVPS VPS..."
 

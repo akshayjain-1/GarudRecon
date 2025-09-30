@@ -112,7 +112,7 @@ Afterwards, I experimented with rewriting GarudRecon in **Python** and **Go**, b
 
 ### Easy Install `Recommended`
 ```
-bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
+bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) --update
 ```
 
 <details>
@@ -524,6 +524,18 @@ done
 
 <details>
   <summary><b>Fleet Mode</b></summary>
+
+## This is temporary setup for now in next update it will fixed
+```
+## Create master.credentials and worker.credentials now same the credentials
+
+bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5
+
+grep -vE '^\s*$|^\s*#' $HOME/credentials.txt | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux has-session -t fleet 2>/dev/null || tmux new-session -d -s fleet && tmux send-keys -t fleet \"bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5\" C-m"'
+
+
+garudrecon fleet -m httpx -i subs.txt -o httpx.subs
+```
 
 ```
 Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
