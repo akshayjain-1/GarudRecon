@@ -115,9 +115,9 @@ grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 's
 
 # Run command in tmux session and send file to "main VPS"
 if $VERBOSE; then
-  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} --verbose && scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} \\\$(shuf -n 1 $HOME/master.credentials | cut -d: -f1):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} --verbose && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} \\\$(shuf -n 1 $HOME/master.credentials | cut -d: -f1):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
 else
-  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} \\\$(shuf -n 1 $HOME/master.credentials | cut -d: -f1):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} \\\$(shuf -n 1 $HOME/master.credentials | cut -d: -f1):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
 fi
 
 DEST="$FLEETDIR/${OUTPUT}"
