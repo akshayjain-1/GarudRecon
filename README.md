@@ -149,20 +149,6 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 </details>
 
 <details>
-  <summary><b>✅ Solve Errors</b></summary>
-
-<img width="968" height="429" alt="image" src="https://github.com/user-attachments/assets/4d312058-0be8-413d-98de-7b29e4abb884" />
-
-```yaml
-👉 Then install go manually
-curl -s "https://gist.githubusercontent.com/rix4uni/c412ca956ea3bfa114bf4b615a9762bc/raw/91e9c8c93afbad3f16bdc41eb581f3e428dea9df/go.sh" | bash && source ~/.bashrc
-
-👉 Now run this command
-bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure)
-```
-</details>
-
-<details>
   <summary><b>✅ Discord Webhook Setup</b></summary>
 
 ```yaml
