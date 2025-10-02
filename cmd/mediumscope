@@ -1129,6 +1129,18 @@ DNSX(){
 
 
 # Port Scanning
+PORTMAP(){
+	START_SPINNER "${BGREEN}PORTMAP${RESET}"
+
+	cat ${ROOT_SUBDOMAINDIR}/allsubs.txt | portmap internetdb | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}(:[0-9]+)?' | unew -ef -el -i -t -q ${ROOT_SUBDOMAINDIR}/portmap.txt
+
+	# Reuse old scanned data
+	cat ${BASEDIR}/${TARGET}*/subdomain/portmap.txt 2>/dev/null | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/portmap.txt
+
+	STOP_SPINNER
+	echo -e "${BGREEN}[+] PORTMAP${RESET}: $(wc -l 2>/dev/null < ${ROOT_SUBDOMAINDIR}/portmap.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+}
+
 NAABU(){
 	START_SPINNER "${BGREEN}NAABU${RESET}"
 
@@ -1174,7 +1186,8 @@ NMAP(){
 HTTPX(){
 	START_SPINNER "${BGREEN}HTTPX${RESET}"
 
-	cat ${ROOT_SUBDOMAINDIR}/naabu.txt | httpx -duc -silent -nc -sc -title -td -cl -ct -t ${HTTPX_THREADS} | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/httpx.txt
+	cat ${ROOT_SUBDOMAINDIR}/naabu.txt 2>/dev/null | httpx -duc -silent -nc -sc -title -td -cl -ct -t ${HTTPX_THREADS} | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/httpx.txt
+	cat ${ROOT_SUBDOMAINDIR}/portmap.txt 2>/dev/null | httpx -duc -silent -nc -sc -title -td -cl -ct -t ${HTTPX_THREADS} | unew -el -i -t -q ${ROOT_SUBDOMAINDIR}/httpx.txt
 
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/alivesubs.txt
 	cat ${ROOT_SUBDOMAINDIR}/httpx.txt | awk '{print $1}' | sed -e 's/https\?:\/\/\(www\.\)\?//' -e 's/:.*$//' | dlevel --silent --max-level | unew -el -i -t -q ${SUBDOMAINDIR}/withoutprotocolsubs.txt
@@ -2774,7 +2787,8 @@ RECON(){
 
 
 	# Port Scanning
-	run "NAABU"
+	run "PORTMAP"
+	# run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
@@ -2942,7 +2956,8 @@ if [[ "$RECON_SUBDOMAIN" == true ]]; then
 
 
 	# Port Scanning
-	run "NAABU"
+	run "PORTMAP"
+	# run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
@@ -3075,7 +3090,8 @@ else
 
 
 	# Port Scanning
-	run "NAABU"
+	run "PORTMAP"
+	# run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
