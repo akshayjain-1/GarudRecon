@@ -1322,7 +1322,7 @@ SQLMAP() {
     cd /opt/sqlmap
     echo -e '#!/usr/bin/env bash\nexec python3 "'"$(pwd)"'/sqlmap.py" "$@"' | sudo tee /usr/local/bin/sqlmap &>/dev/null
     sudo chmod +x /usr/local/bin/sqlmap
-    cd -
+    cd - &>/dev/null
 
     if ! command -v sqlmap &>/dev/null; then
         echo -e "${BRED}[x] SQLMAP - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
