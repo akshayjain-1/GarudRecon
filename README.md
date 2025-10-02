@@ -547,15 +547,12 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
 
 ## Wait for 15-20 minutes then check 1 worker if there is no tmux session that means fleet setup is done all workers, now run this command
 
-# Check is it worfking-1
-garudrecon fleet -m ipinfo -i json -o output.ipinfo
-
-# Check is it worfking-2
+# Check is everything working fine
 ## nano subs.txt
 krazeplanet.com
 labs.krazeplanet.com
 
-garudrecon fleet -m httpx -i subs.txt -o httpx.subs
+garudrecon fleet -m workerscheck -i subs.txt -o subs.output --verbose
 ```
 
 ```
