@@ -96,11 +96,11 @@ if [[ "$1" =~ ^[1-8]$ ]]; then
             mkdir -p $FLEETDIR
             mkdir -p $OUTPUT
 
-            # Send sshkey to Mini-Child-VPS
+            # Send sshkey to Workers-VPS
             rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
             parallel -a $HOME/worker.credentials --colsep ':' -j20 "sshpass -p {2} ssh-copy-id -i $HOME/.ssh/id_ed25519.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
-            # Send master.credentials file to Mini-Child-VPS
+            # Send master.credentials file to Workers-VPS
             grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master.credentials {}:/root/master.credentials"
             
             grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | \
@@ -178,11 +178,11 @@ else
             mkdir -p $FLEETDIR
             mkdir -p $OUTPUT
 
-            # Send sshkey to Mini-Child-VPS
+            # Send sshkey to Workers-VPS
             rm -rf $HOME/.ssh/id_ed25519 && ssh-keygen -t ed25519 -f "${HOME}/.ssh/id_ed25519" -N "" -q
             parallel -a $HOME/worker.credentials --colsep ':' -j20 "sshpass -p {2} ssh-copy-id -i $HOME/.ssh/id_ed25519.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {1} &>/dev/null"
 
-            # Send master.credentials file to Mini-Child-VPS
+            # Send master.credentials file to Workers-VPS
             grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "scp -o StrictHostKeyChecking=no $HOME/master.credentials {}:/root/master.credentials"
             
             grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | \

@@ -39,6 +39,10 @@ The framework provides three distinct operational modes tailored to different en
 - **SmallScope Mode** - Designed for focused subdomain reconnaissance (e.g., support.domain.com) with deep vulnerability analysis on a limited attack surface.
 - **MediumScope Mode** - Comprehensive wildcard domain scanning (e.g., *.domain.com) with balanced coverage and performance optimization.
 - **LargeScope Mode** - Organization-wide reconnaissance for maximum asset discovery and extensive vulnerability coverage.
+- **CidrScope Mode** - Not completed yet
+- **Workflow Mode** - Chain multiple tools into a reusable pipeline so you can run complex scans with a single command.
+- **Fleet Mode** - Distribute work across many VPS instances — split input automatically and run modules in parallel on 100+ hosts.
+- **CronJobs Mode** - Schedule and monitor recurring recon tasks (subdomains, open ports, JS leaks, templates, alerts).
 
 ### Advanced Features
 **Automated Monitoring**
@@ -527,14 +531,29 @@ done
 
 ## This is temporary setup for now in next update i'll add progress bar
 ```
-## Create master.credentials and worker.credentials now same the credentials, in this format:
+## Add passwords like this to avoid single/double quotes problem, you can use https://codepen.io/rix4uni/pen/PwZzdpV
+4fd6dbe0Haafa1d7bf4df9f96597e48p
+
+## Save credentials in master.credentials and worker.credentials, in this format:
+## touch master.credentials worker.credentials
+## nano master.credentials
+## nano worker.credentials
 root@IP:PASSWORD
 root@IP:PASSWORD
 
+# Run both commands one by one on master vps
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 5
 bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configure) 6
 
-## Wait for 15-20 minutes then check 1 worker if it's done then all workers done now run this command
+## Wait for 15-20 minutes then check 1 worker if there is no tmux session that means fleet setup is done all workers, now run this command
+
+# Check is it worfking-1
+garudrecon fleet -m ipinfo -i json -o output.ipinfo
+
+# Check is it worfking-2
+## nano subs.txt
+krazeplanet.com
+labs.krazeplanet.com
 
 garudrecon fleet -m httpx -i subs.txt -o httpx.subs
 ```

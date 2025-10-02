@@ -228,6 +228,16 @@ if [[ "$RESUME_MODE" == true ]]; then
 	INTERLACE_TLDSCANDIR="$SUBDOMAINDIR/tldscan"
 	INTERLACE_BUGBOUNTYDATADIR="$SUBDOMAINDIR/bugbountydata"
 	INTERLACE_SUBFINDERDIR="$SUBDOMAINDIR/subfinder"
+	INTERLACE_AMASSDIR="$SUBDOMAINDIR/amass"
+	INTERLACE_SUBDOGDIR="$SUBDOMAINDIR/subdog"
+	INTERLACE_XSUBFIND3RDIR="$SUBDOMAINDIR/xsubfind3r"
+	INTERLACE_FINDOMAINDIR="$SUBDOMAINDIR/findomain"
+	INTERLACE_CHAOSDIR="$SUBDOMAINDIR/chaos"
+	INTERLACE_GITHUB_SUBDOMAINSDIR="$SUBDOMAINDIR/github_subdomains"
+	INTERLACE_SHOSUBGODIR="$SUBDOMAINDIR/shosubgo"
+	INTERLACE_ASSETFINDERDIR="$SUBDOMAINDIR/assetfinder"
+	INTERLACE_HAKTRAILSDIR="$SUBDOMAINDIR/haktrails"
+	INTERLACE_ORG2ASNDIR="$SUBDOMAINDIR/org2asn"
 	GITHUB_ENDPOINTSDIR="$URLSDIR/github_endpoints"
 	CRAWLEYDIR="$URLSDIR/crawley"
 	CARIDDIDIR="$URLSDIR/cariddi"
@@ -277,6 +287,16 @@ else
 	INTERLACE_TLDSCANDIR="$SUBDOMAINDIR/tldscan"
 	INTERLACE_BUGBOUNTYDATADIR="$SUBDOMAINDIR/bugbountydata"
 	INTERLACE_SUBFINDERDIR="$SUBDOMAINDIR/subfinder"
+	INTERLACE_AMASSDIR="$SUBDOMAINDIR/amass"
+	INTERLACE_SUBDOGDIR="$SUBDOMAINDIR/subdog"
+	INTERLACE_XSUBFIND3RDIR="$SUBDOMAINDIR/xsubfind3r"
+	INTERLACE_FINDOMAINDIR="$SUBDOMAINDIR/findomain"
+	INTERLACE_CHAOSDIR="$SUBDOMAINDIR/chaos"
+	INTERLACE_GITHUB_SUBDOMAINSDIR="$SUBDOMAINDIR/github_subdomains"
+	INTERLACE_SHOSUBGODIR="$SUBDOMAINDIR/shosubgo"
+	INTERLACE_ASSETFINDERDIR="$SUBDOMAINDIR/assetfinder"
+	INTERLACE_HAKTRAILSDIR="$SUBDOMAINDIR/haktrails"
+	INTERLACE_ORG2ASNDIR="$SUBDOMAINDIR/org2asn"
 	GITHUB_ENDPOINTSDIR="$URLSDIR/github_endpoints"
 	CRAWLEYDIR="$URLSDIR/crawley"
 	CARIDDIDIR="$URLSDIR/cariddi"
@@ -313,6 +333,16 @@ else
 	mkdir -p "$INTERLACE_TLDSCANDIR"
 	mkdir -p "$INTERLACE_BUGBOUNTYDATADIR"
 	mkdir -p "$INTERLACE_SUBFINDERDIR"
+	mkdir -p "$INTERLACE_AMASSDIR"
+	mkdir -p "$INTERLACE_SUBDOGDIR"
+	mkdir -p "$INTERLACE_XSUBFIND3RDIR"
+	mkdir -p "$INTERLACE_FINDOMAINDIR"
+	mkdir -p "$INTERLACE_CHAOSDIR"
+	mkdir -p "$INTERLACE_GITHUB_SUBDOMAINSDIR"
+	mkdir -p "$INTERLACE_SHOSUBGODIR"
+	mkdir -p "$INTERLACE_ASSETFINDERDIR"
+	mkdir -p "$INTERLACE_HAKTRAILSDIR"
+	mkdir -p "$INTERLACE_ORG2ASNDIR"
 	mkdir -p "$GITHUB_ENDPOINTSDIR"
 	mkdir -p "$CRAWLEYDIR"
 	mkdir -p "$CARIDDIDIR"
@@ -646,7 +676,8 @@ ONEFORALL(){
 SHOSUBGO(){
 	START_SPINNER "${BGREEN}SHOSUBGO${RESET}"
 
-	shosubgo -d ${TARGET} -s $(shuf -n 1 ~/.config/shosubgo/shosubgo-api.txt) | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/shosubgo.subs
+	cat ${SUBDOMAINDIR}/tldscan.txt | interlace --silent -threads ${INTERLACE_SHOSUBGO} -c "shosubgo -d _target_ -s $(shuf -n 1 ~/.config/shosubgo/shosubgo-api.txt) | eval ${SUBDOMAIN_FILTER} | unew -ef -el -i -t -q _output_/_cleantarget_.subs" -o ${INTERLACE_SHOSUBGODIR} 2>/dev/null
+	cat ${INTERLACE_SHOSUBGODIR}/*.subs | unew -el -t -q ${SUBDOMAINDIR}/shosubgo.subs
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/shosubgo.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/shosubgo.subs
@@ -658,7 +689,8 @@ SHOSUBGO(){
 ASSETFINDER(){
 	START_SPINNER "${BGREEN}ASSETFINDER${RESET}"
 
-	assetfinder --subs-only ${TARGET} | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/assetfinder.subs
+	cat ${SUBDOMAINDIR}/tldscan.txt | interlace --silent -threads ${INTERLACE_ASSETFINDER} -c "assetfinder --subs-only _target_ | eval ${SUBDOMAIN_FILTER} | unew -ef -el -i -t -q _output_/_cleantarget_.subs" -o ${INTERLACE_ASSETFINDERDIR} 2>/dev/null
+	cat ${INTERLACE_ASSETFINDERDIR}/*.subs | unew -el -t -q ${SUBDOMAINDIR}/assetfinder.subs
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/assetfinder.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/assetfinder.subs
@@ -677,7 +709,8 @@ HAKTRAILS(){
         return
     fi
 
-	echo ${TARGET} | haktrails subdomains | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/haktrails.subs
+    cat ${SUBDOMAINDIR}/tldscan.txt | interlace --silent -threads ${INTERLACE_HAKTRAILS} -c "echo _target_ | haktrails subdomains | eval ${SUBDOMAIN_FILTER} | unew -ef -el -i -t -q _output_/_cleantarget_.subs" -o ${INTERLACE_HAKTRAILSDIR} 2>/dev/null
+	cat ${INTERLACE_HAKTRAILSDIR}/*.subs | unew -el -t -q ${SUBDOMAINDIR}/haktrails.subs
 
 	# Reuse old scanned data
 	cat ${BASEDIR}/${TARGET}*/.tmp/subdomain/haktrails.subs 2>/dev/null | eval ${SUBDOMAIN_FILTER} | unew -el -i -t -q ${SUBDOMAINDIR}/haktrails.subs
@@ -758,7 +791,8 @@ ORG2ASN(){
 	START_SPINNER "${BGREEN}ORG2ASN${RESET}"
 
 	if [ "$ORG2ASN_SCAN_MODE" = "NORMAL" ]; then
-		echo "$TARGET" | tldinfo --silent --extract domain | org2asn -silent | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
+		cat ${SUBDOMAINDIR}/tldscan.txt | interlace --silent -threads ${INTERLACE_ORG2ASN} -c "echo _target_ | tldinfo --silent --extract domain | org2asn -silent | unew -ef -el -i -t -q _output_/_cleantarget_.txt" -o ${INTERLACE_ORG2ASNDIR} 2>/dev/null
+		cat ${INTERLACE_ORG2ASNDIR}/*.txt | unew -el -t -q ${SUBDOMAINDIR}/org2asn.txt
 	fi
 
 	if [ "$ORG2ASN_SCAN_MODE" = "ADVANCED" ]; then

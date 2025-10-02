@@ -14,11 +14,12 @@ Flags:
   -i, --input       Pass the input
   -o, --output      Location where you want to save output
   -m, --module      module name you want to run
+  -v, --verbose     enable verbose mode
   -h, --help        help for modules
 
 Example:
-  garudrecon fleet -m <module> -i <wildcards> -o <file>
-  garudrecon fleet -m httpx -i subs.txt -o subs.httpx
+  garudrecon fleet -m <module> -i <wildcards> -o <file> [--verbose]
+  garudrecon fleet -m httpx -i subs.txt -o subs.httpx --verbose
 EOF
 }
 
@@ -38,6 +39,10 @@ while [[ $# -gt 0 ]]; do
     -m|--module)
       MODULE="$2"
       shift 2
+      ;;
+    --verbose)
+      VERBOSE=true
+      shift
       ;;
     -h|--help)
       show_help
@@ -99,15 +104,21 @@ parallel -a $HOME/worker.credentials --colsep ':' -j20 "
   ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 {1} "mkdir -p $FLEETDIR" &>/dev/null
 
   echo "Sending file ${SPLIT}.{#} to {1}..."
-  scp -o StrictHostKeyChecking=no $SPLITDIR/${SPLIT}.{#} {1}:$FLEETDIR/${INPUT}
+  scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SPLITDIR/${SPLIT}.{#} {1}:$FLEETDIR/${INPUT}
+
+  echo "Sending module file $HOME/.garudrecon/modules/${MODULE}.json to {1}..."
+  scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $HOME/.garudrecon/modules/${MODULE}.json {1}:$HOME/.garudrecon/modules/${MODULE}.json
 "
 
 # Create a tmux session
-grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no {} "tmux new-session -d -s fleet"'
+grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} "tmux new-session -d -s fleet"'
 
 # Run command in tmux session and send file to "main VPS"
-grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master.credentials):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
-
+if $VERBOSE; then
+  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} --verbose && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master.credentials):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+else
+  grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | parallel -j50 "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {} \"tmux send-keys -t fleet \\\"garudrecon workflow ${MODULE} -i $FLEETDIR/${INPUT} -o $FLEETDIR/${OUTPUT} && scp -i ~/.ssh/id_rsa_vps $FLEETDIR/${OUTPUT} $(shuf -n 1 $HOME/master.credentials):$FLEET_MODULEDIR/${OUTPUT}_{} &>/dev/null && rm -rf fleet\\\" C-m\""
+fi
 
 DEST="$FLEETDIR/${OUTPUT}"
 TOTALVPS=$(grep -vE '^\s*$|^\s*#' $HOME/worker.credentials | cut -d: -f1 | wc -l)
