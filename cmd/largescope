@@ -519,10 +519,10 @@ ALLWILDCARDS(){
 
 	if grep -q "https://www.crunchbase.com" "${URLSDIR}/crunchbase.txt"; then
 		# If the file contains Crunchbase URLs
-		cat ${URLSDIR}/crunchbase.txt | grep -E "https://www.crunchbase.com/organization/|https://www.crunchbase.com/acquisition/" | sed 's/acquisition/organization/' | sed 's|.*/\(.*\)-acquires-\(.*\)--.*|https://www.crunchbase.com/organization/\2|' | sed 's|\(https://www.crunchbase.com/organization/[^/]*\).*|\1|' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+		cat ${URLSDIR}/crunchbase.txt | grep -E "https://www.crunchbase.com/organization/|https://www.crunchbase.com/acquisition/" | sed 's/acquisition/organization/' | sed 's|.*/\(.*\)-acquires-\(.*\)--.*|https://www.crunchbase.com/organization/\2|' | sed 's|\(https://www.crunchbase.com/organization/[^/]*\).*|\1|' | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
 	else
 	    # If the file does NOT contain Crunchbase URLs
-		cat ${URLSDIR}/crunchbase.txt | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+		cat ${URLSDIR}/crunchbase.txt | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
 	fi
 
     STOP_SPINNER
