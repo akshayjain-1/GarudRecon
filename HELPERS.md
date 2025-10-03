@@ -6,7 +6,7 @@ cat tmp.txt | grep -E "https://www.crunchbase.com/organization/|https://www.crun
 
 2. open unew output using `Bulk URL Opener`
 
-3. save all valid Acquisitions wildcard in ${URLSDIR}/crunchbase.txt like this
+3. save all valid Acquisitions wildcard in ${ROOT_INPUTDIR}/crunchbase.txt like this
 alter.xyz
 bynorth.com
 wiz.io
