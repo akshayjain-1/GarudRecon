@@ -252,8 +252,8 @@ PACKAGES() {
     START_SPINNER "${BGREEN}PACKAGES${RESET}"
     sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list &>/dev/null
     sudo sed -i 's|http://mirrors.digitalocean.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources &>/dev/null
-    dpkg --configure -a &>/dev/null
     apt --fix-broken install -y &>/dev/null
+    dpkg --configure -a &>/dev/null
     apt update -y &>/dev/null
     # apt upgrade -y &>/dev/null
     apt install -y autoconf automake libtool build-essential libssl-dev libpcre3-dev libpcap-dev rsync net-tools dmidecode &>/dev/null
@@ -4437,7 +4437,26 @@ WORKFLOW(){
     PIPX
     GOCL
     PACKAGES
-    REQUIRED
+    PYTHON3
+    PIP3
+    SETUPTOOLS
+    GCC
+    GIT
+    CURL
+    WGET
+    ZIP
+    JQ
+    LIBPCAP_DEV
+    NPM
+    PKG_CONFIG
+    LIBUDEV_DEV
+    BUILD_ESSENTIAL
+    CHROMIUM
+    CHROME
+    PIPX
+    CMAKE
+    RUST
+    PARALLEL
 }
 
 # Install only those tools that used in cronjobs
