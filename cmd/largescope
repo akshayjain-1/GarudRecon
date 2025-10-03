@@ -319,6 +319,8 @@ else
 	ERRORLOGFILE="$UNIQUEDOMAINDIR/error.log"
 	RESUMELOGFILE="$UNIQUEDOMAINDIR/resume.cfg"
 
+	ROOT_INPUTDIR="$UNIQUEDOMAINDIR/input"
+
 
 	# Creating directories
 	# Subdirectories within .tmp
@@ -361,12 +363,14 @@ else
 	mkdir -p "$ROOT_EMAILSDIR"
 	mkdir -p "$ROOT_VULNDIR"
 	mkdir -p "$ROOT_WORDLISTDIR"
+
+	mkdir -p "$ROOT_INPUTDIR"
 fi
 
 # Creating files
-touch "$URLSDIR/crunchbase.txt"
-touch "$URLSDIR/manual_google_dorking.urls"
-touch "$URLSDIR/burpsuite.urls"
+touch "$ROOT_INPUTDIR/crunchbase.txt"
+touch "$ROOT_INPUTDIR/manual_google_dorking.urls"
+touch "$ROOT_INPUTDIR/burpsuite.urls"
 
 # Utility function to check if a function is excluded or already completed
 is_excluded() {
@@ -461,8 +465,8 @@ NUCLEIHUB_TEMPLATES(){
 
 # Wildcard Enumeration
 CRUNCHBASE(){
-    if [ ! -s "$URLSDIR/crunchbase.txt" ]; then
-        echo -e "${GRAY}[!] Collect Crunchbase acquisitions using Crunchbase dorking, then add these output in ${URLSDIR}/crunchbase.txt currently file is empty. Please choose an option:${RESET}"
+    if [ ! -s "$ROOT_INPUTDIR/crunchbase.txt" ]; then
+        echo -e "${GRAY}[!] Collect Crunchbase acquisitions using Crunchbase dorking, then add these output in ${ROOT_INPUTDIR}/crunchbase.txt currently file is empty. Please choose an option:${RESET}"
         echo -e "${GRAY}1. Wait for up to 30 minutes, I'm not done yet still doing Crunchbase dorking but allow me to continue if i'm done earlier by pressing Enter button"
         echo -e "${GRAY}2. Done, I have done Crunchbase dorking don't wait now"
         echo -e "${GRAY}3. Skip, I don't have time for manual Crunchbase dorking"
@@ -510,20 +514,13 @@ CRUNCHBASE(){
         esac
     fi
 
-	cat ${URLSDIR}/crunchbase.txt | unew -el -i -t -q ${SUBDOMAINDIR}/acquisitions.txt
-	echo -e "${BGREEN}[+] CRUNCHBASE${RESET}: $(wc -l 2>/dev/null < ${URLSDIR}/crunchbase.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] CRUNCHBASE${RESET}: $(wc -l 2>/dev/null < ${ROOT_INPUTDIR}/crunchbase.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ALLWILDCARDS(){
 	START_SPINNER "${BGREEN}ALLWILDCARDS${RESET}"
 
-	if grep -q "https://www.crunchbase.com" "${URLSDIR}/crunchbase.txt"; then
-		# If the file contains Crunchbase URLs
-		cat ${URLSDIR}/crunchbase.txt | grep -E "https://www.crunchbase.com/organization/|https://www.crunchbase.com/acquisition/" | sed 's/acquisition/organization/' | sed 's|.*/\(.*\)-acquires-\(.*\)--.*|https://www.crunchbase.com/organization/\2|' | sed 's|\(https://www.crunchbase.com/organization/[^/]*\).*|\1|' | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
-	else
-	    # If the file does NOT contain Crunchbase URLs
-		cat ${URLSDIR}/crunchbase.txt | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
-	fi
+	cat ${ROOT_INPUTDIR}/crunchbase.txt | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
 
     STOP_SPINNER
 	echo -e "${BGREEN}[+] ALLWILDCARDS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allwildcards.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE

@@ -2305,6 +2305,27 @@ PORTMAP() {
     echo -e "${BGREEN}[+] PORTMAP - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
 }
 
+TLDSCAN() {
+    START_SPINNER "${BGREEN}TLDSCAN${RESET}"
+
+    if [[ "$UPDATE" == false ]] && command -v tldscan &>/dev/null; then
+        echo -e "${YELLOW}[~] TLDSCAN - INSTALLATION SKIPPED${RESET}: ${TIME} seconds" | unew -a "$INSTALLEDLOGFILE"
+        STOP_SPINNER
+        return
+    fi
+
+    gocl -i github.com/rix4uni/tldscan &>/dev/null
+
+    if ! command -v tldscan &>/dev/null; then
+        echo -e "${BRED}[x] TLDSCAN - INSTALLATION FAILED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+        STOP_SPINNER
+        return
+    fi
+
+    STOP_SPINNER
+    echo -e "${BGREEN}[+] TLDSCAN - INSTALLED${RESET}: ${TIME} seconds" | unew -a $INSTALLEDLOGFILE
+}
+
 PARAMFINDER() {
     START_SPINNER "${BGREEN}PARAMFINDER${RESET}"
 
@@ -4562,6 +4583,7 @@ ALL(){
     XSSRECON
     GOSQLI
     PORTMAP
+    TLDSCAN
     PARAMFINDER
     GXSS
     MSARJUN
