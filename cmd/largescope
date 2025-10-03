@@ -857,7 +857,7 @@ ORG2ASN(){
 	cat ${SUBDOMAINDIR}/org2asn.txt | grep -oP '(?<=\[Route\] ).*' | sed 's/^\[//' | sed 's/\]$//' | unew -el -t -q ${SUBDOMAINDIR}/orgs.txt
 
 	STOP_SPINNER
-	echo -e "${BGREEN}[+] ORG2ASN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/cero.subs || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
+	echo -e "${BGREEN}[+] ORG2ASN${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/org2asn.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
 }
 
 ARINRANGE(){
@@ -873,11 +873,11 @@ SPK(){
 	START_SPINNER "${BGREEN}SPK${RESET}"
 
 	if [ "$SPK_SCAN_MODE" = "NORMAL" ]; then
-		for ORG in $(cat ${SUBDOMAINDIR}/orgs.txt);do spk -silent -s "$ORG" | unew -el -t -q ${SUBDOMAINDIR}/ips.txt;done
+		timelimitx -t ${SPK_TIMELIMITX} "for ORG in $(cat ${SUBDOMAINDIR}/orgs.txt);do spk -silent -s \"$ORG\" | unew -el -t -q ${SUBDOMAINDIR}/ips.txt;done"
 	fi
 
 	if [ "$SPK_SCAN_MODE" = "ADVANCED" ]; then
-		for ORG in $(cat ${SUBDOMAINDIR}/orgs.txt);do spk -silent -s "$ORG" | unew -el -t -q ${SUBDOMAINDIR}/ips.txt;done
+		timelimitx -t ${SPK_TIMELIMITX} "for ORG in $(cat ${SUBDOMAINDIR}/orgs.txt);do spk -silent -s \"$ORG\" | unew -el -t -q ${SUBDOMAINDIR}/ips.txt;done"
 	fi
 
 	# Reuse old scanned data
