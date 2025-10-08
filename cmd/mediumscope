@@ -2787,8 +2787,8 @@ RECON(){
 
 
 	# Port Scanning
-	run "PORTMAP"
-	# run "NAABU"
+	# run "PORTMAP"
+	run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
@@ -2956,8 +2956,8 @@ if [[ "$RECON_SUBDOMAIN" == true ]]; then
 
 
 	# Port Scanning
-	run "PORTMAP"
-	# run "NAABU"
+	# run "PORTMAP"
+	run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
@@ -3090,8 +3090,8 @@ else
 
 
 	# Port Scanning
-	run "PORTMAP"
-	# run "NAABU"
+	# run "PORTMAP"
+	run "NAABU"
 	# run "MASSCAN"
 	# run "RUSTSCAN"
 	# run "NMAP"
