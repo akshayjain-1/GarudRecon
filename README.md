@@ -1,6 +1,5 @@
-<h1 align="center">
-  <img src="img/GarudRecon_banner2.png" alt="GarudRecon"></a>
-</h1>
+![GarudRecon](https://github.com/user-attachments/assets/bbacc7c3-396b-4ca6-b6aa-ee30511ba9e9)
+
 
 <p align="center">
 <a href="#"><img src="https://madewithlove.org.in/badge.svg"></a>
