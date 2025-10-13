@@ -520,7 +520,7 @@ CRUNCHBASE(){
 ALLWILDCARDS(){
 	START_SPINNER "${BGREEN}ALLWILDCARDS${RESET}"
 
-	cat ${ROOT_INPUTDIR}/crunchbase.txt | httpx -duc -silent -nc -mc 200 | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
+	cat ${ROOT_INPUTDIR}/crunchbase.txt | tr '[:upper:]' '[:lower:]' | sed 's/^\*\.//' | sed 's/^\*//' | sed 's/^\.//' | sed 's/^\www\.//' | sed 's/https\?:\/\///' | unew -el -i -t -q ${SUBDOMAINDIR}/allwildcards.txt
 
     STOP_SPINNER
 	echo -e "${BGREEN}[+] ALLWILDCARDS${RESET}: $(wc -l 2>/dev/null < ${SUBDOMAINDIR}/allwildcards.txt || echo 0), ${TIME} seconds" | unew -a $RESUMELOGFILE
