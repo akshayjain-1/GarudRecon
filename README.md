@@ -151,7 +151,7 @@ bash <(curl -s https://raw.githubusercontent.com/rix4uni/GarudRecon/main/configu
   <summary><b>✅ Discord Webhook Setup</b></summary>
 
 ```yaml
-👉 Add all discord webhook url in ~/.bashrc:
+👉 Add all discord webhook url in /root/.config/notify/provider-config.yaml:
 discord:
   - id: "manualcheck"
     discord_channel: "manualcheck"
